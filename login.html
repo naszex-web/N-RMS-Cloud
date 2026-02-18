@@ -97,14 +97,15 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Check kalau user dah login, terus campak ke Dashboard
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // Simpan UID dalam localstorage untuk kegunaan pantas
-                localStorage.setItem('rms_uid', user.uid);
-                window.location.href = 'index.html'; 
-            }
-        });
+      auth.onAuthStateChanged(user => {
+    if (user) {
+        // Kalau user dah login dan dia MEMANG tengah kat login.html, baru campak ke index
+        // Ini elakkan loop dari settings.html
+        if (window.location.pathname.includes('login.html')) {
+            window.location.href = 'index.html';
+        }
+    }
+});
 
         // --- FUNGSI LOGIN ---
         async function handleLogin(e) {
