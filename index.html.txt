@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f8fafc">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <title>NASZEX CLOUD - RMS FINAL v7.1</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    
+    <style>
+        :root { --primary: #0f172a; --accent: #ef4444; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc;
+            color: #1e293b; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+            overscroll-behavior-y: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .font-num { font-family: 'Inter', sans-serif; }
+
+        /* --- 90Hz SMOOTH ENGINE & GPU --- */
+        .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
+
+        /* Modal Animation - Spring Physics */
+        .modal-wrapper {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none;
+            will-change: transform, opacity;
+        }
+        .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+
+        /* Page Transitions */
+        .view-section { display: none; opacity: 0; transform: scale(0.99); transition: opacity 0.2s ease, transform 0.2s ease; will-change: opacity, transform; }
+        .view-section.active { display: block; opacity: 1; transform: scale(1); }
+
+        /* List Animation */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .list-anim { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+
+        /* UI Elements */
+        .glass-nav { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
+        
+        .tap-effect { transition: transform 0.1s; cursor: pointer; }
+        .tap-effect:active { transform: scale(0.95); }
+        
+        .tab-active { background: #0f172a !important; color: #fff !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
+        .nav-item-active { color: #ef4444 !important; }
+
+        /* Inputs */
+        .float-input-group { position: relative; width: 100%; transition: 0.3s; }
+        .float-input-group label { position: absolute; top: 6px; left: 14px; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; pointer-events: none; }
+        .float-input-group input, .float-input-group select { padding-top: 22px; padding-bottom: 10px; }
+
+        /* Toast */
+        #toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(-20px); pointer-events: auto; display: flex; align-items: center; gap: 8px; }
+        @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* Timeline Specifics */
+        .timeline-item { position: relative; padding-left: 24px; padding-bottom: 24px; border-left: 2px solid #e2e8f0; }
+        .timeline-item:last-child { border-left: none; padding-bottom: 0; }
+        .timeline-item.active { border-left-color: #10b981; }
+        .timeline-dot { position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 2px solid #fff; box-shadow: 0 0 0 2px #e2e8f0; }
+        .timeline-item.active .timeline-dot { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+
+       /* --- SAFE AREA ADJUSTMENTS (IMPROVED) --- */
+.safe-top { 
+    /* Ambil nilai safe area + 10px extra supaya tak rapat sangat dengan jam */
+    padding-top: calc(10px + env(safe-area-inset-top)); 
+}
+
+.safe-bottom { 
+    /* Ambil nilai safe area + 15px extra supaya tak kena bar home */
+    padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
+}
+
+/* Fix untuk body supaya content tak sangkut bawah nav */
+body {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+/* Toast pun kita kena naikkan sikit supaya tak kena Notch */
+#toast-container { 
+    position: fixed; 
+    top: calc(20px + env(safe-area-inset-top)); 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 100; 
+}
+
+    </style>
+</head>
+<body class="min-h-screen pb-32 bg-[#f8fafc]">
+
+    <div id="toast-container"></div>
+
+    <nav class="sticky top-0 z-40 glass-nav px-5 gpu safe-top pb-3">
+    <div class="max-w-md mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
+                <span class="text-white font-black text-[12px] italic">NX</span>
+            </div>
+            <div>
+                <h1 class="text-[12px] font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">NASZEX <span class="text-red-600">CLOUD</span></h1>
+                <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1.5 leading-none">RMS Final v7.1</p>
+            </div>
+        </div>
+        <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
+            <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
+        </button>
+    </div>
+</nav>
+
+
+    <div class="max-w-md mx-auto p-4 space-y-6">
+        
+        <main id="dashboardView" class="view-section active space-y-5">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-4 shadow-lg shadow-emerald-500/20 text-center relative overflow-hidden tap-effect">
+                    <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-paid">0</span></p>
+                    <p class="text-[7px] font-bold text-emerald-100 uppercase mt-1 tracking-widest">Paid</p>
+                </div>
+                <div class="bg-gradient-to-br from-rose-500 to-rose-700 rounded-2xl p-4 shadow-lg shadow-rose-500/20 text-center relative overflow-hidden tap-effect">
+                    <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-pending">0</span></p>
+                    <p class="text-[7px] font-bold text-rose-100 uppercase mt-1 tracking-widest">Unpaid</p>
+                </div>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-950 rounded-2xl p-4 shadow-lg shadow-slate-900/20 text-center relative overflow-hidden tap-effect">
+                    <p class="text-[14px] font-black text-white font-num"><span id="stat-month-jobs">0</span></p>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase mt-1 tracking-widest">Jobs</p>
+                </div>
+            </div>
+
+            <div class="relative group">
+                <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="SEARCH RECORD..." 
+                       class="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold shadow-sm outline-none focus:ring-2 focus:ring-slate-900/5 transition-all font-num tracking-wide">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within:text-slate-900"></i>
+            </div>
+
+            <div class="flex p-1.5 bg-slate-200/50 rounded-2xl gap-1.5 backdrop-blur-md">
+                <button onclick="filterInvoices('all')" id="f-all" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tab-active tap-effect">All</button>
+                <button onclick="filterInvoices('paid')" id="f-paid" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-400 hover:text-slate-600 tap-effect">Paid</button>
+                <button onclick="filterInvoices('outstanding')" id="f-pending" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-400 hover:text-slate-600 tap-effect">Unpaid</button>
+            </div>
+
+            <div id="invoiceContainer" class="space-y-3 pb-8 min-h-[50vh]">
+                </div>
+            
+            <div class="text-center pt-2">
+                 <p class="text-[8px] text-slate-300 font-bold uppercase tracking-widest">Showing Latest 50 Records</p>
+            </div>
+        </main>
+
+        <main id="reportsView" class="view-section">
+            <div id="dataMenu" class="space-y-4 pt-2">
+                <button onclick="openSubReport('performance')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between tap-effect">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><i data-lucide="bar-chart-2"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase text-slate-900">Performance</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Job Volume & Trends</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                </button>
+                <button onclick="openSubReport('profit')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between tap-effect">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><i data-lucide="trending-up"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase text-slate-900">Profit Analysis</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Revenue vs Cost</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                </button>
+            </div>
+
+            <div id="performanceContainer" class="hidden">
+                <button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-slate-400">Jobs</th><th class="pr-6 text-right text-[9px] font-black uppercase text-slate-400">Total</th></tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="text-slate-800 text-[11px] font-bold font-num"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="profitContainer" class="hidden">
+                <button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                     <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-rose-400">Cost</th><th class="pr-6 text-right text-[9px] font-black uppercase text-emerald-500">Nett</th></tr>
+                        </thead>
+                        <tbody id="profitTableBody" class="text-[11px] font-bold font-num"></tbody>
+                        <tfoot class="bg-slate-900 text-white font-num">
+                            <tr><td class="pl-6 py-4 text-[9px] uppercase font-bold text-white/50">Total Profit</td><td colspan="2" id="total-net-profit" class="text-right pr-6 py-4 text-lg font-black italic">RM 0</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <main id="toolsView" class="view-section">
+            <div id="toolsMenu" class="space-y-4 pt-2">
+                <button onclick="openSubTool('receipt')" class="w-full bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-900/20 text-white flex items-center justify-between tap-effect">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><i data-lucide="printer"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase">Smart Receipt</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">PDF & WhatsApp</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-white/20"></i>
+                </button>
+                <button onclick="openSubTool('track')" class="w-full bg-white border border-slate-200 p-6 rounded-[2rem] shadow-sm text-slate-900 flex items-center justify-between tap-effect">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center"><i data-lucide="radar"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase">Live Tracker</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Trace by Phone</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                </button>
+            </div>
+
+            <div id="toolReceiptContainer" class="hidden">
+                <button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 text-center space-y-6">
+                    <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg"><i data-lucide="printer"></i></div>
+                    <div class="space-y-4">
+                         <div class="float-input-group text-left">
+                            <input type="tel" id="toolReceiptPhone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none font-num rounded-2xl">
+                            <label>No. Telefon Pelanggan</label>
+                         </div>
+                         <div class="grid grid-cols-1 gap-3">
+                            <button onclick="handleTools('whatsapp')" class="w-full bg-[#25D366] text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg shadow-green-500/20"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button>
+                            <button onclick="handleTools('pdf')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg"><i data-lucide="download" class="w-4 h-4"></i> Download PDF</button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="toolTrackContainer" class="hidden">
+                <button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-100 space-y-6">
+                     <div class="relative">
+                        <input type="tel" id="toolTrackPhone" placeholder="Masukkan No. Phone..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 pr-20 text-sm font-bold outline-none font-num">
+                        <button onclick="trackStatus()" class="absolute right-2 top-2 bottom-2 bg-orange-500 text-white px-5 rounded-xl font-bold text-[10px] uppercase tap-effect">Check</button>
+                     </div>
+                     <div id="trackResult" class="hidden">
+                         <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6">
+                             <div class="flex justify-between items-start">
+                                 <h4 id="trName" class="font-black text-xs uppercase text-slate-900"></h4>
+                                 <span id="trNo" class="text-[9px] font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-num"></span>
+                             </div>
+                             <p id="trDevice" class="text-[10px] text-slate-500 font-bold mt-1"></p>
+                         </div>
+                         <div class="space-y-0 px-2 pl-4" id="timelineContainer"></div>
+                     </div>
+                     <div id="trackEmpty" class="text-center py-12 opacity-40">
+                         <i data-lucide="radar" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
+                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sedia untuk dikesan</p>
+                     </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-6 gpu safe-bottom">
+    <div class="max-w-md mx-auto grid grid-cols-4 items-center h-16">
+        <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1 tap-effect transition-colors nav-item-active">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            <span class="text-[9px] font-black uppercase">Home</span>
+        </button>
+        
+        <button onclick="openAddModal()" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-900">
+            <div class="w-6 h-6 bg-slate-900 text-white rounded-lg flex items-center justify-center shadow-md">
+                 <i data-lucide="plus" class="w-4 h-4"></i>
+            </div>
+            <span class="text-[9px] font-black uppercase">New</span>
+        </button>
+        
+        <button onclick="showPage('reports')" id="nav-report" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-400">
+            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+            <span class="text-[9px] font-black uppercase">Data</span>
+        </button>
+        
+        <button onclick="showPage('tools')" id="nav-tools" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-400">
+            <i data-lucide="wrench" class="w-5 h-5"></i>
+            <span class="text-[9px] font-black uppercase">Tools</span>
+        </button>
+    </div>
+</div>
+
+    <div id="invoiceModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end sm:justify-center gpu">
+        <div class="bg-[#f8fafc] w-full max-w-md mx-auto h-[92vh] sm:h-[85vh] sm:rounded-3xl rounded-t-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative">
+            <div class="px-6 py-5 bg-white/80 backdrop-blur-md border-b border-slate-100 flex justify-between items-center shrink-0 sticky top-0 z-10">
+                <div>
+                    <h2 id="modalTitle" class="text-sm font-black uppercase text-slate-900">Initiate Job</h2>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Maklumat Customer</p>
+                </div>
+                <button onclick="toggleModal(false)" class="w-9 h-9 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 border border-slate-100 tap-effect"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
+                <input type="hidden" id="editId">
+                <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 space-y-4">
+                    <div class="float-input-group">
+                        <input type="text" id="custName" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none focus:bg-white transition-colors">
+                        <label>Nama Pelanggan</label>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="float-input-group">
+                            <input type="tel" id="custPhone" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none font-num">
+                            <label>No. Phone</label>
+                        </div>
+                        <div class="float-input-group">
+                            <select id="warranty" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none">
+                                <option value="No Warranty">No Warranty</option>
+                                <option value="3 Hari">3 Hari</option>
+                                <option value="1 Minggu">1 Minggu</option>
+                                <option value="1 Bulan">1 Bulan</option>
+                            </select>
+                            <label></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-end px-1">
+                        <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Item/Service</h4>
+                        <button onclick="addRow()" class="text-[9px] font-bold text-white bg-slate-900 px-4 py-2 rounded-xl uppercase tracking-wide tap-effect shadow-md">
+                            + Item
+                        </button>
+                    </div>
+                    <div id="itemRowsContainer" class="space-y-3 pb-20"></div>
+                </div>
+            </div>
+
+            <div class="p-5 bg-white border-t border-slate-100 shrink-0 safe-bottom">
+                <div class="flex justify-between items-center mb-4">
+                    <select id="initialStatus" class="bg-slate-100 text-slate-700 py-2 px-3 rounded-xl text-[10px] font-black uppercase outline-none">
+                        <option value="outstanding">Unpaid</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                    <div class="text-right">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-0.5">Grand Total</p>
+                        <p class="text-2xl font-black text-slate-900 italic font-num">RM <span id="grandTotal">0.00</span></p>
+                    </div>
+                </div>
+                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-slate-900/20 tap-effect flex items-center justify-center gap-2">
+                    Simpan <i data-lucide="check" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="actionModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end gpu">
+        <div class="bg-white rounded-t-[2.5rem] w-full p-6 pb-10 shadow-2xl space-y-5 safe-bottom">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto"></div>
+            <div class="text-center">
+                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tindakan Untuk</p>
+                 <h2 id="actionTargetName" class="font-black text-lg uppercase text-slate-900 italic mt-1 truncate px-4"></h2>
+            </div>
+            
+            <div class="bg-slate-50 p-1 rounded-2xl border border-slate-200">
+                <select id="updateRepairStatus" onchange="updateLiveStatus(activeId, this.value)" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-black outline-none shadow-sm text-slate-700">
+                    <option value="Received">1. Received</option>
+                    <option value="Waiting">2. Waiting</option>
+                    <option value="Diagnosis">3. Diagnosis</option>
+                    <option value="Repairing">4. Repairing</option>
+                    <option value="Ready">5. Ready</option>
+                    <option value="Collected">6. Collected</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button id="btnToggleStatus" class="col-span-2 p-4 rounded-2xl font-black text-[10px] uppercase shadow-lg tap-effect flex justify-between items-center px-6 transition-all duration-300">
+                    </button>
+
+                <button onclick="handleAction('getlink')" class="p-4 bg-blue-50 text-blue-600 rounded-2xl font-black text-[9px] uppercase border border-blue-100 flex justify-center items-center gap-2 tap-effect">
+                    <i data-lucide="link" class="w-4 h-4"></i> Link
+                </button>
+                <button onclick="handleAction('edit')" class="p-4 bg-amber-50 text-amber-600 rounded-2xl font-black text-[9px] uppercase border border-amber-100 flex justify-center items-center gap-2 tap-effect">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
+                </button>
+            </div>
+             <button onclick="handleAction('delete')" class="w-full p-4 text-rose-500 font-black text-[10px] uppercase border border-rose-100 rounded-2xl tap-effect">
+                Hapus Rekod
+            </button>
+            <button onclick="closeActionMenu()" class="w-full py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Batal</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // PWA REGISTER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered!', reg.scope))
+                    .catch(err => console.log('SW Fail:', err));
+            });
+        }
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg", 
+            authDomain: "invoicely-52db9.firebaseapp.com", 
+            projectId: "invoicely-52db9", 
+            storageBucket: "invoicely-52db9.firebasestorage.app", 
+            messagingSenderId: "512282448037", 
+            appId: "1:512282448037:web:ad9600a2aa477c3533fd4c" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let allInvoices = [], currentFilter = 'all', activeId = null;
+        let searchTimeout = null;
+
+        const statusDescriptions = {
+            'Received': 'Peranti diterima, menunggu giliran.',
+            'Waiting': 'Dalam senarai menunggu (Queue).',
+            'Diagnosis': 'Juruteknik sedang mencari punca kerosakan.',
+            'Repairing': 'Sedang dibaiki (Hardware/Software).',
+            'Ready': 'Siap dibaiki & sedia untuk diambil.',
+            'Collected': 'Telah diambil oleh pelanggan.'
+        };
+
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+            const color = type === 'success' ? 'text-emerald-400' : 'text-rose-400';
+            toast.className = 'toast';
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 ${color}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            if(navigator.vibrate) navigator.vibrate(50);
+            setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function showPage(p) {
+            const views = ['dashboardView', 'reportsView', 'toolsView'];
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                el.classList.remove('active');
+                setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 200);
+            });
+            const target = document.getElementById(p + 'View');
+            target.style.display = 'block';
+            void target.offsetWidth;
+            target.classList.add('active');
+            
+            document.querySelectorAll('button[id^="nav-"]').forEach(b => {
+                b.classList.remove('nav-item-active');
+                b.classList.add('text-slate-400');
+            });
+            
+            const navId = p === 'dashboard' ? 'nav-dash' : p === 'reports' ? 'nav-report' : 'nav-tools';
+            const activeBtn = document.getElementById(navId);
+            activeBtn.classList.add('nav-item-active');
+            activeBtn.classList.remove('text-slate-400');
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            lucide.createIcons();
+        }
+
+        async function refreshData() {
+            const btnIcon = document.getElementById('refresh-icon');
+            btnIcon.classList.add('animate-spin');
+            try {
+                const s = await db.collection("invoices").orderBy("createdAt", "desc").limit(50).get();
+                allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
+                updateDashboard();
+                showToast("Data Synced (Top 50)");
+            } catch (error) { 
+                console.error(error);
+                showToast("Sync Failed", "error"); 
+            } 
+            finally { btnIcon.classList.remove('animate-spin'); }
+        }
+
+        function filterInvoices(type) {
+            currentFilter = type;
+            const ids = {all: 'f-all', paid: 'f-paid', outstanding: 'f-pending'};
+            Object.keys(ids).forEach(k => {
+                const el = document.getElementById(ids[k]);
+                if(k === type) el.classList.add('tab-active'); else el.classList.remove('tab-active');
+            });
+            updateDashboard();
+        }
+
+        function createItemRow(d = {}) {
+            return `
+            <div class="item-entry bg-white p-3 rounded-2xl border border-slate-200 relative mb-3 shadow-sm list-anim">
+                <button onclick="this.closest('.item-entry').remove(); calculateTotal();" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 shadow-md border-2 border-white flex items-center justify-center tap-effect z-10"><i data-lucide="x" class="w-3 h-3"></i></button>
+                <div class="space-y-2 mb-2">
+                    <input type="text" class="item-name w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:bg-white transition-colors" placeholder="Nama Item" value="${d.name || ''}">
+                    <textarea class="item-desc w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[10px] font-medium outline-none focus:bg-white transition-colors resize-none h-16" placeholder="Keterangan">${d.description || ''}</textarea>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="float-input-group"><input type="number" oninput="calculateTotal()" class="qty w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] font-num" value="${d.qty || 1}"><label class="w-full text-center">Qty</label></div>
+                    <div class="float-input-group"><input type="number" step="0.01" oninput="calculateTotal()" class="kos w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] font-num" value="${d.kos || ''}"><label class="w-full text-center">Harga</label></div>
+                    <div class="float-input-group"><input type="number" step="0.01" class="modal-price w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] text-rose-500 font-num" value="${d.modal || ''}"><label class="w-full text-center text-rose-300">Modal</label></div>
+                    <div class="float-input-group"><input type="number" step="0.01" oninput="calculateTotal()" class="discount w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] text-blue-500 font-num" value="${d.discount || ''}"><label class="w-full text-center text-blue-300">Diskaun</label></div>
+                </div>
+            </div>`;
+        }
+
+        function addRow() {
+            const container = document.getElementById('itemRowsContainer');
+            container.insertAdjacentHTML('beforeend', createItemRow());
+            lucide.createIcons();
+            container.parentElement.scrollTo({ top: container.parentElement.scrollHeight, behavior: 'smooth' });
+        }
+
+        function calculateTotal() {
+            let t = 0;
+            document.querySelectorAll('.item-entry').forEach(r => {
+                const q = parseFloat(r.querySelector('.qty').value)||0, k = parseFloat(r.querySelector('.kos').value)||0, d = parseFloat(r.querySelector('.discount').value)||0;
+                t += (q * k) - d;
+            });
+            document.getElementById('grandTotal').innerText = t.toFixed(2);
+        }
+
+        function generateInvoicePDF(inv) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.width;
+
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageWidth, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("NASZEX CLOUD", 15, 20);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("GSM Professional Repair Center", 15, 26);
+            
+            doc.setFontSize(9);
+            doc.text("Ara Kuda / Tasek Gelugor, Penang", pageWidth - 15, 18, { align: "right" });
+            doc.text("SSM: PG052XXXX-T", pageWidth - 15, 23, { align: "right" });
+            doc.text("Contact: 01X-XXXXXXX", pageWidth - 15, 28, { align: "right" });
+
+            doc.setTextColor(30, 41, 59); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("OFFICIAL RECEIPT", 15, 55);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text(`No. Resit: ${inv.invoiceNo}`, 15, 62);
+            doc.text(`Tarikh: ${formatDate(inv.createdAt, true)}`, 15, 67);
+            doc.text(`Status: ${inv.status.toUpperCase()}`, 15, 72);
+
+            doc.setFont("helvetica", "bold"); doc.text("KEPADA:", 120, 62);
+            doc.setFont("helvetica", "normal"); doc.text(inv.customerName, 120, 67); doc.text(inv.customerPhone, 120, 72);
+
+            const rows = (inv.items||[]).map(x => [x.name, x.description||'-', x.qty, `RM ${parseFloat(x.kos).toFixed(2)}`, `RM ${((x.qty*x.kos)-x.discount).toFixed(2)}`]);
+            doc.autoTable({
+                startY: 85,
+                head: [['Perkara', 'Keterangan', 'Unit', 'Harga', 'Jumlah']],
+                body: rows,
+                theme: 'grid',
+                headStyles: { fillColor: [15, 23, 42] }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(14); doc.setFont("helvetica", "bold");
+            doc.text(`JUMLAH KESELURUHAN: RM ${parseFloat(inv.total).toFixed(2)}`, 110, finalY);
+            
+            doc.setFontSize(8); doc.setTextColor(150);
+            const terms = [
+                "TERMA & SYARAT:",
+                "1. Waranti hanya meliputi bahagian yang ditukar sahaja.",
+                "2. NASZEX Cloud tidak bertanggungjawab atas kehilangan data semasa proses pembaikan.",
+                "3. Barang yang tidak dituntut selepas 3 bulan akan dilupuskan."
+            ];
+            let termY = 270;
+            terms.forEach(t => { doc.text(t, 15, termY); termY += 4; });
+
+            doc.save(`NASZEX-${inv.invoiceNo}.pdf`);
+            showToast("PDF Generated");
+        }
+
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                updateDashboard(document.getElementById('searchInput').value);
+            }, 300);
+        }
+
+        function updateDashboard(search = "") {
+            const container = document.getElementById('invoiceContainer');
+            const now = new Date();
+            let mPaid=0, mPending=0, mJobs=0;
+
+            allInvoices.forEach(i => {
+                const d = i.createdAt?.toDate ? i.createdAt.toDate() : new Date();
+                if(d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+                    mJobs++;
+                    if(i.status === 'paid') mPaid += parseFloat(i.total); else mPending += parseFloat(i.total);
+                }
+            });
+
+            document.getElementById('stat-month-paid').innerText = Math.round(mPaid);
+            document.getElementById('stat-month-pending').innerText = Math.round(mPending);
+            document.getElementById('stat-month-jobs').innerText = mJobs;
+
+            let filtered = allInvoices.filter(i => {
+                if(currentFilter !== 'all' && i.status !== currentFilter) return false;
+                if(search) {
+                    const q = search.toLowerCase();
+                    return (i.customerName||"").toLowerCase().includes(q) || (i.customerPhone||"").includes(q) || (i.invoiceNo||"").toLowerCase().includes(q);
+                }
+                return true;
+            });
+
+            container.innerHTML = filtered.length ? '' : `<div class="py-12 text-center opacity-40 text-[10px] font-bold uppercase">Tiada Rekod</div>`;
+
+            filtered.forEach((i, index) => {
+                const isPaid = i.status === 'paid';
+                const statusColor = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
+                const repairMap = {'Received':'bg-slate-200','Waiting':'bg-amber-200','Diagnosis':'bg-purple-200','Repairing':'bg-blue-200','Ready':'bg-emerald-400 animate-pulse','Collected':'bg-slate-800 text-white'};
+                
+                const delay = index < 10 ? index * 0.05 : 0; 
+                
+                container.insertAdjacentHTML('beforeend', `
+                <div onclick="openActionMenu('${i.id}')" style="animation-delay: ${delay}s" class="list-anim bg-white p-4 rounded-2xl shadow-sm border border-slate-100 tap-effect flex justify-between items-center group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl ${repairMap[i.repairStatus]||'bg-slate-100'} flex items-center justify-center text-[10px] font-black uppercase">
+                            ${(i.repairStatus||'NEW').substring(0,3)}
+                        </div>
+                        <div>
+                            <h4 class="text-[11px] font-black uppercase text-slate-800 leading-none">${i.customerName}</h4>
+                            <p class="text-[9px] font-bold text-slate-400 mt-1 font-num">${i.invoiceNo} • ${formatDate(i.createdAt)}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[13px] font-black italic text-slate-800 font-num">RM ${Math.round(i.total)}</p>
+                        <span class="text-[8px] font-bold uppercase px-2 py-0.5 rounded ${statusColor}">${i.status}</span>
+                    </div>
+                </div>`);
+            });
+            lucide.createIcons();
+        }
+
+        function trackStatus() {
+            const p = document.getElementById('toolTrackPhone').value.trim();
+            if(!p) return showToast("Masukkan No. Phone", "error");
+            const match = allInvoices.filter(i => i.customerPhone.includes(p)).sort((a,b)=>b.createdAt-a.createdAt)[0];
+            if(!match) return showToast("Tiada rekod dijumpai", "error");
+            
+            document.getElementById('trackEmpty').classList.add('hidden');
+            document.getElementById('trackResult').classList.remove('hidden');
+            document.getElementById('trName').innerText = match.customerName;
+            document.getElementById('trNo').innerText = match.invoiceNo;
+            document.getElementById('trDevice').innerText = (match.items||[]).map(x=>x.name).join(", ") || "Servis Umum";
+            
+            const stages = ['Received', 'Waiting', 'Diagnosis', 'Repairing', 'Ready', 'Collected'];
+            let h = '', passed = true;
+            
+            stages.forEach(s => {
+                if(s === match.repairStatus) passed = false;
+                const active = passed || s === match.repairStatus;
+                
+                const desc = statusDescriptions[s] || 'Status update';
+                
+                h += `
+                <div class="timeline-item ${active?'active':''}">
+                    <div class="timeline-dot"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black ${active?'text-slate-900':'text-slate-300'} uppercase">${s}</span>
+                        <span class="text-[8px] font-medium ${active?'text-slate-500':'text-slate-200'} leading-tight">${desc}</span>
+                    </div>
+                    ${s===match.repairStatus ? '<span class="text-[8px] text-emerald-600 font-bold italic block mt-1">Status Semasa</span>' : ''}
+                </div>`;
+            });
+            document.getElementById('timelineContainer').innerHTML = h;
+            showToast("Rekod Dijumpai");
+        }
+
+        async function saveAndGenerate() {
+            const btn = document.getElementById('btnSave');
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...`; lucide.createIcons();
+            const n = document.getElementById('custName').value, p = document.getElementById('custPhone').value;
+            if(!n || !p) { showToast("Sila isi Nama & Phone!", "error"); btn.innerText = "Simpan Rekod"; return; }
+            
+            const items = [];
+            document.querySelectorAll('.item-entry').forEach(r => {
+                const name = r.querySelector('.item-name').value;
+                if(name) items.push({
+                    name: name, description: r.querySelector('.item-desc').value,
+                    qty: parseFloat(r.querySelector('.qty').value)||1, kos: parseFloat(r.querySelector('.kos').value)||0,
+                    modal: parseFloat(r.querySelector('.modal-price').value)||0, discount: parseFloat(r.querySelector('.discount').value)||0
+                });
+            });
+            const data = {
+                customerName: n, customerPhone: p, warranty: document.getElementById('warranty').value,
+                status: document.getElementById('initialStatus').value, total: document.getElementById('grandTotal').innerText, items: items
+            };
+            const editId = document.getElementById('editId').value;
+            try {
+                if(editId) { 
+                    await db.collection("invoices").doc(editId).update(data); 
+                    showToast("Rekod Dikemaskini");
+                    const idx = allInvoices.findIndex(x => x.id === editId);
+                    if(idx !== -1) allInvoices[idx] = { ...allInvoices[idx], ...data };
+                }
+                else {
+                    const lastNo = allInvoices.reduce((max, i) => Math.max(max, parseInt(i.invoiceNo?.split('-')[1]||0)), 0);
+                    data.invoiceNo = "NX-" + (lastNo + 1).toString().padStart(4, '0');
+                    data.repairStatus = 'Received'; data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    const docRef = await db.collection("invoices").add(data);
+                    allInvoices.unshift({ id: docRef.id, ...data });
+                    showToast("Job Sheet Dicipta");
+                }
+                updateDashboard();
+                toggleModal(false);
+            } catch(e) { console.error(e); showToast("Ralat Sistem", "error"); }
+            btn.innerHTML = `Simpan <i data-lucide="check" class="w-4 h-4"></i>`;
+        }
+
+        function toggleModal(show) {
+            const m = document.getElementById('invoiceModal');
+            if(show) { m.classList.remove('hidden'); requestAnimationFrame(()=>m.classList.add('active')); }
+            else { m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 250); }
+        }
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = "Initiate Job";
+            document.getElementById('editId').value = "";
+            document.getElementById('custName').value = ""; document.getElementById('custPhone').value = "";
+            document.getElementById('itemRowsContainer').innerHTML = ""; addRow();
+            document.getElementById('grandTotal').innerText = "0.00"; toggleModal(true);
+        }
+
+        function openActionMenu(id) {
+            activeId = id; 
+            const i = allInvoices.find(x=>x.id===id);
+            if (!i) return;
+
+            document.getElementById('actionTargetName').innerText = i.customerName;
+            document.getElementById('updateRepairStatus').value = i.repairStatus || 'Received';
+            
+            const btn = document.getElementById('btnToggleStatus');
+            btn.onclick = null;
+
+            if (i.status === 'paid') {
+                btn.className = "col-span-2 p-4 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl font-black text-[10px] uppercase shadow-sm tap-effect flex justify-between items-center px-6 transition-all";
+                btn.innerHTML = `<span>OUTSTANDING</span><i data-lucide="x-circle" class="w-4 h-4 text-rose-500"></i>`;
+                btn.onclick = async () => {
+                    await db.collection("invoices").doc(id).update({status: 'outstanding'});
+                    i.status = 'outstanding'; updateDashboard();
+                    showToast("Status: OUTSTANDING"); closeActionMenu();
+                };
+            } else {
+                btn.className = "col-span-2 p-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-emerald-500/30 tap-effect flex justify-between items-center px-6 transition-all";
+                btn.innerHTML = `<span>PAID</span><i data-lucide="check-circle" class="w-4 h-4 text-white"></i>`;
+                btn.onclick = async () => {
+                    await db.collection("invoices").doc(id).update({status: 'paid'});
+                    i.status = 'paid'; updateDashboard();
+                    showToast("Status: PAID"); closeActionMenu();
+                };
+            }
+
+            document.getElementById('actionModal').classList.remove('hidden');
+            requestAnimationFrame(()=>document.getElementById('actionModal').classList.add('active'));
+            lucide.createIcons();
+        }
+        
+        function closeActionMenu() { const m = document.getElementById('actionModal'); m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 250); }
+        
+        async function updateLiveStatus(id, val) { 
+            await db.collection("invoices").doc(id).update({repairStatus: val}); 
+            const i = allInvoices.find(x=>x.id===id); if(i) i.repairStatus = val;
+            updateDashboard();
+            showToast(`Status: ${val}`); 
+        }
+
+        function handleTools(act) {
+            const p = document.getElementById('toolReceiptPhone').value;
+            const match = allInvoices.filter(i => i.customerPhone.includes(p)).sort((a,b)=>b.createdAt-a.createdAt)[0];
+            if(!match) return showToast("Rekod tidak dijumpai", "error");
+            if(act === 'whatsapp') window.open(`https://wa.me/60${p.replace(/^0+/,'')}`); else generateInvoicePDF(match);
+        }
+        function formatDate(ts, full=false) { if(!ts) return '--/--'; const d = ts.toDate ? ts.toDate() : new Date(ts); return full ? `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` : `${d.getDate()}/${d.getMonth()+1}`; }
+
+        function openSubReport(t) {
+            document.getElementById('dataMenu').classList.add('hidden');
+            if(t==='performance'){ document.getElementById('performanceContainer').classList.remove('hidden'); generateReport(); }
+            else { document.getElementById('profitContainer').classList.remove('hidden'); generateProfitReport(); }
+        }
+        function closeSubReport() { document.getElementById('performanceContainer').classList.add('hidden'); document.getElementById('profitContainer').classList.add('hidden'); document.getElementById('dataMenu').classList.remove('hidden'); }
+        function openSubTool(t) { document.getElementById('toolsMenu').classList.add('hidden'); if(t==='receipt') document.getElementById('toolReceiptContainer').classList.remove('hidden'); else document.getElementById('toolTrackContainer').classList.remove('hidden'); }
+        function closeSubTool() { document.getElementById('toolReceiptContainer').classList.add('hidden'); document.getElementById('toolTrackContainer').classList.add('hidden'); document.getElementById('toolsMenu').classList.remove('hidden'); }
+
+        function generateReport() {
+            const tb = document.getElementById('reportTableBody'), mo = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+            let h = "";
+            mo.forEach((m, i) => {
+                const monthly = allInvoices.filter(inv => { const d = inv.createdAt?.toDate ? inv.createdAt.toDate() : new Date(); return d.getMonth() === i && d.getFullYear() === 2026; });
+                const pS = monthly.reduce((s, inv) => inv.status === 'paid' ? s + parseFloat(inv.total) : s, 0);
+                if (monthly.length > 0) h += `<tr class="border-b border-slate-50 last:border-0"><td class="pl-6 py-4 text-slate-500 uppercase font-bold text-[9px]">${m}</td><td class="text-center text-slate-400">${monthly.length}</td><td class="text-right pr-6 text-emerald-600 italic font-black">RM ${Math.round(pS)}</td></tr>`;
+            });
+            tb.innerHTML = h || '<tr><td colspan="3" class="text-center py-8">Tiada Data</td></tr>';
+        }
+
+        function generateProfitReport() {
+            const tb = document.getElementById('profitTableBody'), mo = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+            let h = "", totalNett = 0;
+            mo.forEach((m, i) => {
+                const monthly = allInvoices.filter(inv => { const d = inv.createdAt?.toDate ? inv.createdAt.toDate() : new Date(); return d.getMonth() === i && d.getFullYear() === 2026 && inv.status === 'paid'; });
+                let mModal = 0, mRev = 0;
+                monthly.forEach(inv => { mRev += parseFloat(inv.total); (inv.items || []).forEach(it => { mModal += (parseFloat(it.modal)||0) * (parseFloat(it.qty)||1); }); });
+                const mProfit = mRev - mModal; totalNett += mProfit;
+                if(mRev > 0) h += `<tr class="border-b border-slate-50 last:border-0"><td class="pl-6 py-4 text-slate-500 uppercase font-bold text-[9px]">${m}</td><td class="text-center text-rose-500">RM ${Math.round(mModal)}</td><td class="text-right pr-6 text-emerald-600 italic font-black">RM ${Math.round(mProfit)}</td></tr>`;
+            });
+            tb.innerHTML = h; document.getElementById('total-net-profit').innerText = `RM ${Math.round(totalNett)}`;
+        }
+
+        function handleAction(type) {
+            if(type === 'edit') {
+                const i = allInvoices.find(x=>x.id===activeId);
+                if(!i) return;
+                document.getElementById('editId').value = activeId;
+                document.getElementById('modalTitle').innerText = "Modify Job";
+                document.getElementById('custName').value = i.customerName;
+                document.getElementById('custPhone').value = i.customerPhone;
+                document.getElementById('warranty').value = i.warranty || 'No Warranty';
+                document.getElementById('initialStatus').value = i.status;
+                const cont = document.getElementById('itemRowsContainer');
+                cont.innerHTML = "";
+                (i.items||[]).forEach(it => { cont.insertAdjacentHTML('beforeend', createItemRow(it)); });
+                calculateTotal();
+                toggleModal(true);
+            }
+            if(type === 'delete' && confirm("Hapus rekod ini?")) { 
+                db.collection("invoices").doc(activeId).delete(); 
+                allInvoices = allInvoices.filter(x=>x.id !== activeId);
+                updateDashboard();
+                showToast("Rekod Dihapus"); 
+            }
+            if(type === 'getlink') { navigator.clipboard.writeText(window.location.origin + "/view?id=" + activeId); showToast("Link Disalin"); }
+            closeActionMenu();
+        }
+
+        db.collection("invoices").orderBy("createdAt", "desc").limit(50).onSnapshot(s => {
+            allInvoices = s.docs.map(d=>({id:d.id, ...d.data()}));
+            updateDashboard();
+        });
+        
+    </script>
+</body>
+</html>
