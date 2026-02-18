@@ -5,34 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Masuk - RMS Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; overflow: hidden; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .input-field { background: #0f172a; border: 1px solid #334155; color: white; transition: all 0.3s; }
         .input-field:focus { border-color: #ef4444; outline: none; }
         .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body class="min-h-screen flex items-center justify-center p-6 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
     <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
-    <div class="w-full max-w-sm">
+    <div class="w-full max-w-sm fade-in">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-3xl shadow-2xl mb-4 border border-slate-700">
                 <img src="logo.png" class="w-10 h-10 object-contain" alt="Logo">
             </div>
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">RMS <span class="text-red-500">Cloud</span></h1>
-            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Multi-User Repair Management</p>
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase leading-none">RMS <span class="text-red-500">Cloud</span></h1>
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-2">Professional Repair Management</p>
         </div>
 
         <div class="glass-card rounded-[2.5rem] p-8 shadow-2xl">
             <div id="step-phone">
                 <div class="mb-6">
                     <h2 class="text-lg font-black italic">Selamat Datang</h2>
-                    <p class="text-xs text-slate-400 font-bold">Log masuk guna nombor telefon</p>
+                    <p class="text-xs text-slate-400 font-bold">Akses sistem dengan No. Telefon</p>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-5">
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-widest">No. Telefon</label>
                         <div class="flex gap-2 mt-1">
@@ -40,24 +43,20 @@
                             <input type="tel" id="phoneInput" class="input-field flex-1 rounded-xl px-4 py-3.5 text-sm font-bold" placeholder="138491319">
                         </div>
                     </div>
-                    <div class="flex items-center mt-2 ml-1">
-                        <input type="checkbox" id="rememberMe" checked class="w-4 h-4 rounded accent-red-600">
-                        <label for="rememberMe" class="ml-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest cursor-pointer">Kekal Log Masuk</label>
-                    </div>
                     <div id="recaptcha-container" class="my-2"></div>
-                    <button onclick="sendOTP()" id="btnSend" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg transition-all active:scale-95">Hantar Kod Verifikasi</button>
+                    <button onclick="sendOTP()" id="btnSend" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg transition-all active:scale-95">Hantar Kod SMS</button>
                 </div>
             </div>
 
             <div id="step-otp" class="hidden">
                 <div class="mb-6 text-center">
                     <h2 class="text-lg font-black italic">Sahkan Kod</h2>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kod dihantar ke nombor anda</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kod 6-digit dihantar</p>
                 </div>
-                <div class="space-y-4 text-center">
-                    <input type="number" id="otpInput" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-4 text-2xl font-black text-center tracking-[0.5em] outline-none" placeholder="000000">
+                <div class="space-y-5 text-center">
+                    <input type="number" id="otpInput" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-4 text-2xl font-black text-center tracking-[0.5em] outline-none focus:border-emerald-500" placeholder="000000">
                     <button onclick="verifyOTP()" id="btnVerify" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg transition-all active:scale-95">Sahkan & Masuk</button>
-                    <button onclick="window.location.reload()" class="text-[10px] font-bold text-slate-500 uppercase">Tukar Nombor</button>
+                    <button onclick="window.location.reload()" class="text-[10px] font-bold text-slate-500 uppercase hover:text-white transition-colors">Tukar Nombor</button>
                 </div>
             </div>
         </div>
@@ -67,13 +66,23 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script>
-        const firebaseConfig = { /* GANTI CONFIG ANDA DI SINI */ };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg",
+            authDomain: "invoicely-52db9.firebaseapp.com",
+            projectId: "invoicely-52db9",
+            storageBucket: "invoicely-52db9.firebasestorage.app",
+            messagingSenderId: "512282448037",
+            appId: "1:512282448037:web:ad9600a2aa477c3533fd4c"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Gatekeeper: Auto-redirect kalau sudah login
         auth.onAuthStateChanged(user => {
-            if (user && window.location.pathname.includes('login.html')) window.location.href = 'index.html';
+            if (user && window.location.pathname.includes('login.html')) {
+                window.location.replace('index.html');
+            }
         });
 
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
@@ -81,24 +90,38 @@
 
         async function sendOTP() {
             const phone = document.getElementById('phoneInput').value;
-            if (phone.length < 8) return showToast("No. Telefon tidak sah", "error");
-            document.getElementById('btnSend').innerText = "Menghantar...";
+            if (phone.length < 8) return showToast("Nombor tidak sah", "error");
+            
+            const btn = document.getElementById('btnSend');
+            btn.disabled = true; btn.innerText = "Sila Tunggu...";
+
             try {
                 confirmationResult = await auth.signInWithPhoneNumber("+60" + phone, window.recaptchaVerifier);
                 document.getElementById('step-phone').classList.add('hidden');
                 document.getElementById('step-otp').classList.remove('hidden');
                 showToast("SMS dihantar!", "success");
-            } catch (e) { showToast("Gagal hantar SMS.", "error"); document.getElementById('btnSend').innerText = "Hantar Kod"; }
+            } catch (e) { 
+                console.error(e);
+                showToast("Gagal hantar SMS.", "error"); 
+                btn.disabled = false; btn.innerText = "Hantar Kod SMS";
+            }
         }
 
         async function verifyOTP() {
             const code = document.getElementById('otpInput').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
+            const btn = document.getElementById('btnVerify');
+            if (code.length < 6) return showToast("Kod mesti 6-digit", "error");
+
+            btn.disabled = true; btn.innerText = "Mengesahkan...";
+
             try {
-                const persistence = rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
-                await auth.setPersistence(persistence);
+                // PAKSA PERSISTENCE LOCAL (STAY LOGGED IN)
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                
                 const result = await confirmationResult.confirm(code);
                 const user = result.user;
+
+                // Create Profile if new
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (!doc.exists) {
                     await db.collection('users').doc(user.uid).set({
@@ -108,11 +131,22 @@
                         plan: 'free'
                     });
                 }
-                window.location.href = 'index.html';
-            } catch (e) { showToast("Kod salah.", "error"); }
+                window.location.replace('index.html');
+            } catch (e) { 
+                showToast("Kod salah atau tamat tempoh.", "error"); 
+                btn.disabled = false; btn.innerText = "Sahkan & Masuk";
+            }
         }
 
-        function showToast(msg, type) { /* Kod Toast sedia ada */ }
+        function showToast(msg, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
+            toast.className = `${bg} text-white px-6 py-3 rounded-full text-[10px] font-black uppercase shadow-lg text-center tracking-widest`;
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
     </script>
 </body>
 </html>
