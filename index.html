@@ -419,6 +419,33 @@ body {
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
+
+// --- Letak ni paling atas dalam script index.html ---
+const auth = firebase.auth();
+const db = firebase.firestore(); // Pastikan initializeApp dah ada sebelum ni
+
+// GATEKEEPER: Check login status
+auth.onAuthStateChanged(async user => {
+    if (!user) {
+        // Kalau tak login, tendang ke login page
+        window.location.href = 'login.html';
+    } else {
+        // Kalau dah login, tarik nama kedai dia!
+        const doc = await db.collection('users').doc(user.uid).get();
+        if(doc.exists) {
+            const shopData = doc.data();
+            // Contoh: Ubah nama NASZEX jadi nama kedai dia
+            // document.getElementById('shopTitle').innerText = shopData.shopName;
+            console.log("Logged in as: " + shopData.shopName);
+        }
+    }
+});
+
+// LOGOUT FUNCTION (Tambah butang logout nanti)
+function logout() {
+    auth.signOut().then(() => window.location.href = 'login.html');
+}
+
         // PWA REGISTER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
