@@ -424,28 +424,22 @@
         let currentUser = null; // Store user global
         let shopName = "NASZEX CLOUD"; // Default
 
-        // --- GATEKEEPER & INITIALIZATION ---
         auth.onAuthStateChanged(async user => {
-            if (!user) {
-                // User tak login, tendang ke login page
-                window.location.href = 'login.html';
-            } else {
-                // User login, tarik data profile dia
-                currentUser = user;
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    if(doc.exists) {
-                        shopName = doc.data().shopName;
-                        // Ubah header jadi nama kedai user
-                        document.getElementById('shopTitle').innerHTML = `${shopName} <span class="text-red-600">CLOUD</span>`;
-                    }
-                    // Lepas dapat user, baru start load data resit
-                    initRealtimeListener();
-                } catch (e) {
-                    console.error("Profile Error", e);
-                }
-            }
-        });
+    if (!user) {
+        // Hanya tendang kalau Firebase dah confirm user memang tak ada
+        window.location.href = 'login.html';
+    } else {
+        currentUser = user;
+        // Tarik data kedai...
+        const doc = await db.collection('users').doc(user.uid).get();
+        if(doc.exists) {
+            shopName = doc.data().shopName;
+            document.getElementById('shopTitle').innerHTML = `${shopName} <span class="text-red-600">CLOUD</span>`;
+        }
+        initRealtimeListener();
+    }
+});
+
 
         function logout() {
             if(confirm("Log keluar dari sistem?")) {
