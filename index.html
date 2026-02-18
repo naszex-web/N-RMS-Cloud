@@ -420,51 +420,69 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let allInvoices = [], currentFilter = 'all', activeId = null, searchTimeout = null;
-        let currentUser = null; // Store user global
-        let shopName = "NASZEX CLOUD"; // Default
+        // --- Bahagian Script di index.html ---
+let currentUser = null;
+let shopProfile = { shopName: "NASZEX" };
 
-        auth.onAuthStateChanged(async user => {
+// 1. GATEKEEPER DENGAN PERSISTENCE CHECK
+auth.onAuthStateChanged(async user => {
     if (!user) {
-        // Hanya tendang kalau Firebase dah confirm user memang tak ada
-        window.location.href = 'login.html';
+        // Confirm memang tak login, baru tendang
+        window.location.replace('login.html');
     } else {
         currentUser = user;
-        // Tarik data kedai...
-        const doc = await db.collection('users').doc(user.uid).get();
-        if(doc.exists) {
-            shopName = doc.data().shopName;
-            document.getElementById('shopTitle').innerHTML = `${shopName} <span class="text-red-600">CLOUD</span>`;
-        }
-        initRealtimeListener();
+        
+        // 2. Tarik Profil Kedai (Branding Dinamik)
+        try {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if(userDoc.exists) {
+                shopProfile = userDoc.data();
+                document.getElementById('shopTitle').innerHTML = `${shopProfile.shopName} <span class="text-red-600">CLOUD</span>`;
+            }
+        } catch(e) { console.error("Profile Error:", e); }
+
+        // 3. Jalankan Listener Data (Data Isolation)
+        initRealtimeInvoices();
     }
 });
 
+function initRealtimeInvoices() {
+    // PENTING: .where("uid", "==", ...) pastikan data tak bercampur
+    db.collection("invoices")
+      .where("uid", "==", currentUser.uid)
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .onSnapshot(s => {
+          allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
+          updateDashboard();
+      }, error => {
+          console.error("Firestore Error:", error);
+          if(error.code === 'failed-precondition') {
+              showToast("Sila aktifkan Index di Console!", "error");
+          }
+      });
+}
 
-        function logout() {
-            if(confirm("Log keluar dari sistem?")) {
-                auth.signOut().then(() => window.location.href = 'login.html');
-            }
-        }
+// Kemaskini fungsi Simpan
+async function saveAndGenerate() {
+    // ... logic form ...
+    const data = {
+        uid: currentUser.uid, // Wajib simpan UID pencipta resit
+        customerName: n,
+        customerPhone: p,
+        // ... data lain ...
+    };
+    // ... logic Firestore add/update ...
+}
 
-        // --- DATA LISTENER (MULTI-USER ISOLATION) ---
-        function initRealtimeListener() {
-            // PENTING: .where("uid", "==", currentUser.uid) pastikan dia cuma tarik data dia sendiri
-            db.collection("invoices")
-              .where("uid", "==", currentUser.uid)
-              .orderBy("createdAt", "desc")
-              .limit(50)
-              .onSnapshot(s => {
-                  allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
-                  updateDashboard();
-              }, error => {
-                  console.error("Firestore Error:", error);
-                  // Kalau error sebab index, bagitahu user
-                  if(error.code === 'failed-precondition') {
-                      alert("Admin Note: Sila bina Index di Firestore Console untuk query ini.");
-                  }
-              });
-        }
+// Fungsi Logout Rasmi
+function logout() {
+    if(confirm("Log keluar dari sistem?")) {
+        auth.signOut().then(() => {
+            window.location.replace('login.html');
+        });
+    }
+}
 
         async function refreshData() {
             const btnIcon = document.getElementById('refresh-icon');
