@@ -44,7 +44,7 @@
             opacity: 0.15;
             z-index: 0;
             pointer-events: none;
-            display: none;
+            display: none; /* JS will toggle this */
             mask-image: url("data:image/svg+xml;utf8,<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><filter id='noise'><feTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23noise)' opacity='0.5'/></svg>");
         }
 
@@ -77,8 +77,8 @@
 
     <div id="loader" class="loading-overlay">
         <div class="flex flex-col items-center animate-pulse">
-            <div class="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center mb-4 shadow-xl">
-                <span class="text-white font-black italic text-2xl">NX</span>
+            <div class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-4 shadow-xl">
+                <span class="text-white font-black italic text-lg">NX</span>
             </div>
             <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Loading Data...</p>
         </div>
@@ -86,18 +86,17 @@
 
     <div id="receiptContent" class="max-w-md mx-auto hidden opacity-0 transition-opacity duration-700 ease-in-out">
         
-        <div class="text-center mb-8 flex flex-col items-center">
-            <div class="w-20 h-20 bg-slate-900 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-slate-900/20 mb-5 relative z-10">
-                <span class="text-white font-black text-3xl italic tracking-tighter transform -skew-x-6">NX</span>
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-900 rounded-2xl shadow-xl shadow-slate-900/20 mb-4">
+                <span class="text-white font-black text-2xl italic tracking-tighter">NX</span>
             </div>
-            
-            <img src="logo.png" alt="NASZEX GSM" class="h-8 w-auto object-contain opacity-90">
-            
-            <div class="flex items-center justify-center gap-2 mt-3">
+            <h1 class="text-xl font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">NASZEX <span class="text-red-600">GSM</span></h1>
+            <div class="flex items-center justify-center gap-2 mt-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Professional Repair & Unlock Service</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Professional Repair Service</p>
             </div>
         </div>
+
         <div class="receipt-card p-6 mb-4">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Repair Status</h3>
@@ -195,9 +194,8 @@
         </div>
 
         <div class="text-center opacity-60 space-y-1 pb-10">
-             <p class="text-[9px] font-medium text-slate-500 uppercase">NASZEX GSM • KT0597422-T</p>
-             <p class="text-[9px] font-medium text-slate-400">Tasek Gelugor, Penang</p>
-             <p class="text-[9px] font-medium text-slate-400">Alor Setar, Kedah</p>
+             <p class="text-[9px] font-medium text-slate-500 uppercase">NASZEX GSM • PG052XXXX-T</p>
+             <p class="text-[9px] font-medium text-slate-400">Ara Kuda, Tasek Gelugor, Penang</p>
         </div>
 
     </div>
@@ -284,7 +282,7 @@
                     document.getElementById('paidStamp').style.display = 'block';
                 }
 
-                // --- ITEMS LIST RENDER (WITH DESCRIPTION) ---
+                // --- ITEMS LIST RENDER (FIXED) ---
                 const itemsCont = document.getElementById('itemsList');
                 itemsCont.innerHTML = "";
                 const items = data.items || [];
@@ -297,17 +295,15 @@
                     const lineTotal = (parseFloat(item.kos) * parseFloat(item.qty)).toFixed(2);
                     const disc = parseFloat(item.discount || 0);
                     
-                    // Logic untuk Description
-                    const description = item.description 
-                        ? `<p class="text-[10px] font-medium text-slate-400 mt-1 leading-snug tracking-wide italic">${item.description}</p>` 
-                        : '';
+                    // Keterangan Item (Description) dimasukkan di sini
+                    const description = item.description ? `<p class="text-[10px] font-medium text-slate-400 mt-1 leading-snug tracking-wide italic">${item.description}</p>` : '';
                     
                     itemsCont.insertAdjacentHTML('beforeend', `
                         <div class="pb-3 border-b border-dashed border-slate-100 last:border-0 last:pb-0">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1 pr-4">
                                     <p class="text-[11px] font-extrabold text-slate-800 uppercase leading-snug tracking-tight">${item.name}</p>
-                                    ${description}
+                                    ${description} 
                                 </div>
                                 <div class="text-right">
                                     <p class="text-[11px] font-bold text-slate-900 mono">RM ${lineTotal}</p>
