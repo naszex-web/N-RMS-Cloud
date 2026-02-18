@@ -3,202 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Masuk Sistem - RMS Cloud</title>
-    
+    <title>Masuk - RMS Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .input-field { background: #0f172a; border: 1px solid #334155; color: white; transition: all 0.3s; }
-        .input-field:focus { border-color: #ef4444; outline: none; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
+        .input-field:focus { border-color: #ef4444; outline: none; }
         .hidden { display: none; }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
-
+<body class="min-h-screen flex items-center justify-center p-6">
     <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
-    <div class="w-full max-w-sm fade-in">
+    <div class="w-full max-w-sm">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-3xl shadow-2xl mb-4 border border-slate-700">
-                <img src="logo.png" class="w-12 h-12 object-contain" alt="Logo">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-3xl shadow-2xl mb-4 border border-slate-700">
+                <img src="logo.png" class="w-10 h-10 object-contain" alt="Logo">
             </div>
-            <h1 class="text-2xl font-black tracking-tight text-white">RMS <span class="text-red-500">CLOUD</span></h1>
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Sistem Pengurusan Servis</p>
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase">RMS <span class="text-red-500">Cloud</span></h1>
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Multi-User Repair Management</p>
         </div>
 
-        <div class="glass-card rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
-            
-            <div class="flex bg-slate-900/50 p-1 rounded-xl mb-6 border border-slate-700/50">
-                <button onclick="switchMode('login')" id="tab-login" class="flex-1 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all bg-slate-700 text-white shadow-md">Log Masuk</button>
-                <button onclick="switchMode('register')" id="tab-register" class="flex-1 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all text-slate-400 hover:text-white">Daftar Baru</button>
+        <div class="glass-card rounded-[2.5rem] p-8 shadow-2xl">
+            <div id="step-phone">
+                <div class="mb-6">
+                    <h2 class="text-lg font-black italic">Selamat Datang</h2>
+                    <p class="text-xs text-slate-400 font-bold">Log masuk guna nombor telefon</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-widest">No. Telefon</label>
+                        <div class="flex gap-2 mt-1">
+                            <div class="bg-slate-900 border border-slate-700 rounded-xl px-3 flex items-center text-sm font-bold text-slate-400">+60</div>
+                            <input type="tel" id="phoneInput" class="input-field flex-1 rounded-xl px-4 py-3.5 text-sm font-bold" placeholder="138491319">
+                        </div>
+                    </div>
+                    <div class="flex items-center mt-2 ml-1">
+                        <input type="checkbox" id="rememberMe" checked class="w-4 h-4 rounded accent-red-600">
+                        <label for="rememberMe" class="ml-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest cursor-pointer">Kekal Log Masuk</label>
+                    </div>
+                    <div id="recaptcha-container" class="my-2"></div>
+                    <button onclick="sendOTP()" id="btnSend" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg transition-all active:scale-95">Hantar Kod Verifikasi</button>
+                </div>
             </div>
 
-            <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Email</label>
-                    <input type="email" id="l_email" required class="input-field w-full rounded-xl px-4 py-3.5 text-sm font-bold mt-1" placeholder="nama@email.com">
+            <div id="step-otp" class="hidden">
+                <div class="mb-6 text-center">
+                    <h2 class="text-lg font-black italic">Sahkan Kod</h2>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kod dihantar ke nombor anda</p>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Password</label>
-                    <input type="password" id="l_password" required class="input-field w-full rounded-xl px-4 py-3.5 text-sm font-bold mt-1" placeholder="••••••••">
+                <div class="space-y-4 text-center">
+                    <input type="number" id="otpInput" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-4 text-2xl font-black text-center tracking-[0.5em] outline-none" placeholder="000000">
+                    <button onclick="verifyOTP()" id="btnVerify" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg transition-all active:scale-95">Sahkan & Masuk</button>
+                    <button onclick="window.location.reload()" class="text-[10px] font-bold text-slate-500 uppercase">Tukar Nombor</button>
                 </div>
-                <button type="submit" id="btnLogin" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all active:scale-95 mt-2">
-                    Masuk Sekarang
-                </button>
-            </form>
-
-            <form id="registerForm" class="space-y-4 hidden" onsubmit="handleRegister(event)">
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nama Kedai / Bisnes</label>
-                    <input type="text" id="r_shopName" required class="input-field w-full rounded-xl px-4 py-3.5 text-sm font-bold mt-1" placeholder="Contoh: Ali Gadget">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Email (Untuk Login)</label>
-                    <input type="email" id="r_email" required class="input-field w-full rounded-xl px-4 py-3.5 text-sm font-bold mt-1" placeholder="nama@email.com">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Password</label>
-                    <input type="password" id="r_password" required minlength="6" class="input-field w-full rounded-xl px-4 py-3.5 text-sm font-bold mt-1" placeholder="Minimum 6 digit">
-                </div>
-                <button type="submit" id="btnReg" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase text-xs py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95 mt-2">
-                    Daftar Akaun
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                 <p class="text-[10px] text-slate-500">Lupa password? <a href="#" onclick="alert('Sila hubungi admin NASZEX.')" class="text-slate-300 font-bold hover:underline">Reset sini</a></p>
             </div>
         </div>
-        
-        <p class="text-center text-[9px] font-bold text-slate-600 mt-8 uppercase tracking-widest">Powered by NASZEX CLOUD</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
     <script>
-        // --- KONFIGURASI FIREBASE ---
-        const firebaseConfig = {
-  apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
-  authDomain: "rms-cloudnas.firebaseapp.com",
-  projectId: "rms-cloudnas",
-  storageBucket: "rms-cloudnas.firebasestorage.app",
-  messagingSenderId: "142738217487",
-  appId: "1:142738217487:web:2c2a08c40b77447484a17a"
-};
+        const firebaseConfig = { /* GANTI CONFIG ANDA DI SINI */ };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-      auth.onAuthStateChanged(user => {
-    if (user) {
-        // Kalau user dah login dan dia MEMANG tengah kat login.html, baru campak ke index
-        // Ini elakkan loop dari settings.html
-        if (window.location.pathname.includes('login.html')) {
-            window.location.href = 'index.html';
-        }
-    }
-});
+        auth.onAuthStateChanged(user => {
+            if (user && window.location.pathname.includes('login.html')) window.location.href = 'index.html';
+        });
 
-        // --- FUNGSI LOGIN ---
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnLogin');
-            btn.innerHTML = 'Memproses...'; btn.disabled = true;
-            
-            const email = document.getElementById('l_email').value;
-            const pass = document.getElementById('l_password').value;
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
+        let confirmationResult = null;
 
+        async function sendOTP() {
+            const phone = document.getElementById('phoneInput').value;
+            if (phone.length < 8) return showToast("No. Telefon tidak sah", "error");
+            document.getElementById('btnSend').innerText = "Menghantar...";
             try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                showToast('Login Berjaya!', 'success');
-                // Redirect diuruskan oleh onAuthStateChanged di atas
-            } catch (error) {
-                console.error(error);
-                let msg = "Login Gagal.";
-                if(error.code === 'auth/user-not-found') msg = "Email tidak dijumpai.";
-                if(error.code === 'auth/wrong-password') msg = "Password salah.";
-                showToast(msg, 'error');
-                btn.innerHTML = 'Masuk Sekarang'; btn.disabled = false;
-            }
+                confirmationResult = await auth.signInWithPhoneNumber("+60" + phone, window.recaptchaVerifier);
+                document.getElementById('step-phone').classList.add('hidden');
+                document.getElementById('step-otp').classList.remove('hidden');
+                showToast("SMS dihantar!", "success");
+            } catch (e) { showToast("Gagal hantar SMS.", "error"); document.getElementById('btnSend').innerText = "Hantar Kod"; }
         }
 
-        // --- FUNGSI REGISTER (Multi-User Core) ---
-        async function handleRegister(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnReg');
-            btn.innerHTML = 'Mendaftar...'; btn.disabled = true;
-
-            const shopName = document.getElementById('r_shopName').value;
-            const email = document.getElementById('r_email').value;
-            const pass = document.getElementById('r_password').value;
-
+        async function verifyOTP() {
+            const code = document.getElementById('otpInput').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
             try {
-                // 1. Buat User Authentication
-                const userCred = await auth.createUserWithEmailAndPassword(email, pass);
-                const user = userCred.user;
-
-                // 2. Buat Profile Kedai dalam Database (PENTING UNTUK SAAS)
-                await db.collection('users').doc(user.uid).set({
-                    shopName: shopName,
-                    email: email,
-                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    plan: 'free', // Boleh upgrade nanti
-                    settings: {
-                        phone: '',
-                        address: '',
-                        ssm: ''
-                    }
-                });
-
-                showToast('Akaun Dicipta! Redirecting...', 'success');
-                // Redirect automatik lepas create user
-            } catch (error) {
-                console.error(error);
-                let msg = "Gagal mendaftar.";
-                if(error.code === 'auth/email-already-in-use') msg = "Email ini sudah digunakan.";
-                if(error.code === 'auth/weak-password') msg = "Password terlalu lemah (min 6).";
-                showToast(msg, 'error');
-                btn.innerHTML = 'Daftar Akaun'; btn.disabled = false;
-            }
+                const persistence = rememberMe ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+                await auth.setPersistence(persistence);
+                const result = await confirmationResult.confirm(code);
+                const user = result.user;
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (!doc.exists) {
+                    await db.collection('users').doc(user.uid).set({
+                        shopName: "KEDAI " + user.phoneNumber,
+                        phoneNumber: user.phoneNumber,
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        plan: 'free'
+                    });
+                }
+                window.location.href = 'index.html';
+            } catch (e) { showToast("Kod salah.", "error"); }
         }
 
-        // --- UI UTILS ---
-        function switchMode(mode) {
-            const loginForm = document.getElementById('loginForm');
-            const regForm = document.getElementById('registerForm');
-            const tabL = document.getElementById('tab-login');
-            const tabR = document.getElementById('tab-register');
-
-            if(mode === 'login') {
-                loginForm.classList.remove('hidden');
-                regForm.classList.add('hidden');
-                tabL.className = "flex-1 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all bg-slate-700 text-white shadow-md";
-                tabR.className = "flex-1 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all text-slate-400 hover:text-white";
-            } else {
-                loginForm.classList.add('hidden');
-                regForm.classList.remove('hidden');
-                tabR.className = "flex-1 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all bg-slate-700 text-white shadow-md";
-                tabL.className = "flex-1 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all text-slate-400 hover:text-white";
-            }
-        }
-
-        function showToast(msg, type) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const bg = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
-            toast.className = `${bg} text-white px-6 py-3 rounded-full text-xs font-bold shadow-lg text-center shadow-black/20 pointer-events-auto fade-in`;
-            toast.innerText = msg;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+        function showToast(msg, type) { /* Kod Toast sedia ada */ }
     </script>
 </body>
 </html>
