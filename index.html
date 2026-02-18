@@ -10,7 +10,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
     
-    <title>NASZEX CLOUD - RMS FINAL v7.1</title>
+    <title>RMS CLOUD - Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -33,14 +33,13 @@
             user-select: none;
             overscroll-behavior-y: none;
             -webkit-font-smoothing: antialiased;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .font-num { font-family: 'Inter', sans-serif; }
 
-        /* --- 90Hz SMOOTH ENGINE & GPU --- */
         .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
 
-        /* Modal Animation - Spring Physics */
         .modal-wrapper {
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
             transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none;
@@ -48,15 +47,12 @@
         }
         .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
-        /* Page Transitions */
         .view-section { display: none; opacity: 0; transform: scale(0.99); transition: opacity 0.2s ease, transform 0.2s ease; will-change: opacity, transform; }
         .view-section.active { display: block; opacity: 1; transform: scale(1); }
 
-        /* List Animation */
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .list-anim { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
 
-        /* UI Elements */
         .glass-nav { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
         .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
         
@@ -66,71 +62,51 @@
         .tab-active { background: #0f172a !important; color: #fff !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
         .nav-item-active { color: #ef4444 !important; }
 
-        /* Inputs */
         .float-input-group { position: relative; width: 100%; transition: 0.3s; }
         .float-input-group label { position: absolute; top: 6px; left: 14px; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; pointer-events: none; }
         .float-input-group input, .float-input-group select { padding-top: 22px; padding-bottom: 10px; }
 
-        /* Toast */
-        #toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        #toast-container { position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(-20px); pointer-events: auto; display: flex; align-items: center; gap: 8px; }
         @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* Timeline Specifics */
         .timeline-item { position: relative; padding-left: 24px; padding-bottom: 24px; border-left: 2px solid #e2e8f0; }
         .timeline-item:last-child { border-left: none; padding-bottom: 0; }
         .timeline-item.active { border-left-color: #10b981; }
         .timeline-dot { position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 2px solid #fff; box-shadow: 0 0 0 2px #e2e8f0; }
         .timeline-item.active .timeline-dot { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
 
-       /* --- SAFE AREA ADJUSTMENTS (IMPROVED) --- */
-.safe-top { 
-    /* Ambil nilai safe area + 10px extra supaya tak rapat sangat dengan jam */
-    padding-top: calc(10px + env(safe-area-inset-top)); 
-}
-
-.safe-bottom { 
-    /* Ambil nilai safe area + 15px extra supaya tak kena bar home */
-    padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
-}
-
-/* Fix untuk body supaya content tak sangkut bawah nav */
-body {
-    padding-bottom: calc(100px + env(safe-area-inset-bottom));
-}
-
-/* Toast pun kita kena naikkan sikit supaya tak kena Notch */
-#toast-container { 
-    position: fixed; 
-    top: calc(20px + env(safe-area-inset-top)); 
-    left: 50%; 
-    transform: translateX(-50%); 
-    z-index: 100; 
-}
-
+        .safe-top { padding-top: calc(10px + env(safe-area-inset-top)); }
+        .safe-bottom { padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
+        body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="min-h-screen pb-32 bg-[#f8fafc]">
+<body class="min-h-screen bg-[#f8fafc]">
 
     <div id="toast-container"></div>
 
     <nav class="sticky top-0 z-40 glass-nav px-5 gpu safe-top pb-3">
-    <div class="max-w-md mx-auto flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
-                <span class="text-white font-black text-[12px] italic">NX</span>
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md border border-slate-100 p-1">
+                    <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
+                </div>
+                <div>
+                    <h1 id="shopTitle" class="text-[12px] font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">LOADING...</h1>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1.5 leading-none">RMS Cloud v8.0</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-[12px] font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">NASZEX <span class="text-red-600">CLOUD</span></h1>
-                <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1.5 leading-none">RMS Final v7.1</p>
+            <div class="flex gap-2">
+                <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
+                    <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
+                </button>
+                <button onclick="logout()" class="w-10 h-10 flex items-center justify-center bg-rose-50 rounded-xl text-rose-500 border border-rose-100 tap-effect shadow-sm">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
-        <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
-            <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
-        </button>
-    </div>
-</nav>
-
+    </nav>
 
     <div class="max-w-md mx-auto p-4 space-y-6">
         
@@ -290,30 +266,30 @@ body {
     </div>
 
     <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-6 gpu safe-bottom">
-    <div class="max-w-md mx-auto grid grid-cols-4 items-center h-16">
-        <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1 tap-effect transition-colors nav-item-active">
-            <i data-lucide="layout-grid" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Home</span>
-        </button>
-        
-        <button onclick="openAddModal()" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-900">
-            <div class="w-6 h-6 bg-slate-900 text-white rounded-lg flex items-center justify-center shadow-md">
-                 <i data-lucide="plus" class="w-4 h-4"></i>
-            </div>
-            <span class="text-[9px] font-black uppercase">New</span>
-        </button>
-        
-        <button onclick="showPage('reports')" id="nav-report" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-400">
-            <i data-lucide="pie-chart" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Data</span>
-        </button>
-        
-        <button onclick="showPage('tools')" id="nav-tools" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-400">
-            <i data-lucide="wrench" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Tools</span>
-        </button>
+        <div class="max-w-md mx-auto grid grid-cols-4 items-end h-14 pb-2">
+            <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors nav-item-active">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Home</span>
+            </button>
+            
+            <button onclick="openAddModal()" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-900">
+                <div class="w-5 h-5 bg-slate-900 text-white rounded-md flex items-center justify-center shadow-md">
+                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[9px] font-black uppercase tracking-tight">New</span>
+            </button>
+            
+            <button onclick="showPage('reports')" id="nav-report" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Data</span>
+            </button>
+            
+            <button onclick="showPage('tools')" id="nav-tools" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="wrench" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Tools</span>
+            </button>
+        </div>
     </div>
-</div>
 
     <div id="invoiceModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end sm:justify-center gpu">
         <div class="bg-[#f8fafc] w-full max-w-md mx-auto h-[92vh] sm:h-[85vh] sm:rounded-3xl rounded-t-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative">
@@ -416,42 +392,14 @@ body {
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-
-// --- Letak ni paling atas dalam script index.html ---
-const auth = firebase.auth();
-const db = firebase.firestore(); // Pastikan initializeApp dah ada sebelum ni
-
-// GATEKEEPER: Check login status
-auth.onAuthStateChanged(async user => {
-    if (!user) {
-        // Kalau tak login, tendang ke login page
-        window.location.href = 'login.html';
-    } else {
-        // Kalau dah login, tarik nama kedai dia!
-        const doc = await db.collection('users').doc(user.uid).get();
-        if(doc.exists) {
-            const shopData = doc.data();
-            // Contoh: Ubah nama NASZEX jadi nama kedai dia
-            // document.getElementById('shopTitle').innerText = shopData.shopName;
-            console.log("Logged in as: " + shopData.shopName);
-        }
-    }
-});
-
-// LOGOUT FUNCTION (Tambah butang logout nanti)
-function logout() {
-    auth.signOut().then(() => window.location.href = 'login.html');
-}
-
-        // PWA REGISTER
+        // PWA Register
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered!', reg.scope))
-                    .catch(err => console.log('SW Fail:', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Fail:', err));
             });
         }
 
@@ -464,11 +412,78 @@ function logout() {
             appId: "1:512282448037:web:ad9600a2aa477c3533fd4c" 
         };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let allInvoices = [], currentFilter = 'all', activeId = null;
-        let searchTimeout = null;
+        let allInvoices = [], currentFilter = 'all', activeId = null, searchTimeout = null;
+        let currentUser = null; // Store user global
+        let shopName = "NASZEX CLOUD"; // Default
 
+        // --- GATEKEEPER & INITIALIZATION ---
+        auth.onAuthStateChanged(async user => {
+            if (!user) {
+                // User tak login, tendang ke login page
+                window.location.href = 'login.html';
+            } else {
+                // User login, tarik data profile dia
+                currentUser = user;
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    if(doc.exists) {
+                        shopName = doc.data().shopName;
+                        // Ubah header jadi nama kedai user
+                        document.getElementById('shopTitle').innerHTML = `${shopName} <span class="text-red-600">CLOUD</span>`;
+                    }
+                    // Lepas dapat user, baru start load data resit
+                    initRealtimeListener();
+                } catch (e) {
+                    console.error("Profile Error", e);
+                }
+            }
+        });
+
+        function logout() {
+            if(confirm("Log keluar dari sistem?")) {
+                auth.signOut().then(() => window.location.href = 'login.html');
+            }
+        }
+
+        // --- DATA LISTENER (MULTI-USER ISOLATION) ---
+        function initRealtimeListener() {
+            // PENTING: .where("uid", "==", currentUser.uid) pastikan dia cuma tarik data dia sendiri
+            db.collection("invoices")
+              .where("uid", "==", currentUser.uid)
+              .orderBy("createdAt", "desc")
+              .limit(50)
+              .onSnapshot(s => {
+                  allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
+                  updateDashboard();
+              }, error => {
+                  console.error("Firestore Error:", error);
+                  // Kalau error sebab index, bagitahu user
+                  if(error.code === 'failed-precondition') {
+                      alert("Admin Note: Sila bina Index di Firestore Console untuk query ini.");
+                  }
+              });
+        }
+
+        async function refreshData() {
+            const btnIcon = document.getElementById('refresh-icon');
+            btnIcon.classList.add('animate-spin');
+            try {
+                // Sama juga, tarik ikut UID
+                const s = await db.collection("invoices")
+                                  .where("uid", "==", currentUser.uid)
+                                  .orderBy("createdAt", "desc")
+                                  .limit(50).get();
+                allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
+                updateDashboard();
+                showToast("Data Synced");
+            } catch (error) { console.error(error); showToast("Sync Failed", "error"); } 
+            finally { btnIcon.classList.remove('animate-spin'); }
+        }
+
+        // --- EXISTING LOGIC (NO CHANGE) ---
         const statusDescriptions = {
             'Received': 'Peranti diterima, menunggu giliran.',
             'Waiting': 'Dalam senarai menunggu (Queue).',
@@ -517,21 +532,6 @@ function logout() {
             lucide.createIcons();
         }
 
-        async function refreshData() {
-            const btnIcon = document.getElementById('refresh-icon');
-            btnIcon.classList.add('animate-spin');
-            try {
-                const s = await db.collection("invoices").orderBy("createdAt", "desc").limit(50).get();
-                allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
-                updateDashboard();
-                showToast("Data Synced (Top 50)");
-            } catch (error) { 
-                console.error(error);
-                showToast("Sync Failed", "error"); 
-            } 
-            finally { btnIcon.classList.remove('animate-spin'); }
-        }
-
         function filterInvoices(type) {
             currentFilter = type;
             const ids = {all: 'f-all', paid: 'f-paid', outstanding: 'f-pending'};
@@ -575,57 +575,6 @@ function logout() {
             document.getElementById('grandTotal').innerText = t.toFixed(2);
         }
 
-        function generateInvoicePDF(inv) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const pageWidth = doc.internal.pageSize.width;
-
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageWidth, 40, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("NASZEX CLOUD", 15, 20);
-            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("GSM Professional Repair Center", 15, 26);
-            
-            doc.setFontSize(9);
-            doc.text("Ara Kuda / Tasek Gelugor, Penang", pageWidth - 15, 18, { align: "right" });
-            doc.text("SSM: PG052XXXX-T", pageWidth - 15, 23, { align: "right" });
-            doc.text("Contact: 01X-XXXXXXX", pageWidth - 15, 28, { align: "right" });
-
-            doc.setTextColor(30, 41, 59); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("OFFICIAL RECEIPT", 15, 55);
-            doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text(`No. Resit: ${inv.invoiceNo}`, 15, 62);
-            doc.text(`Tarikh: ${formatDate(inv.createdAt, true)}`, 15, 67);
-            doc.text(`Status: ${inv.status.toUpperCase()}`, 15, 72);
-
-            doc.setFont("helvetica", "bold"); doc.text("KEPADA:", 120, 62);
-            doc.setFont("helvetica", "normal"); doc.text(inv.customerName, 120, 67); doc.text(inv.customerPhone, 120, 72);
-
-            const rows = (inv.items||[]).map(x => [x.name, x.description||'-', x.qty, `RM ${parseFloat(x.kos).toFixed(2)}`, `RM ${((x.qty*x.kos)-x.discount).toFixed(2)}`]);
-            doc.autoTable({
-                startY: 85,
-                head: [['Perkara', 'Keterangan', 'Unit', 'Harga', 'Jumlah']],
-                body: rows,
-                theme: 'grid',
-                headStyles: { fillColor: [15, 23, 42] }
-            });
-
-            const finalY = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(14); doc.setFont("helvetica", "bold");
-            doc.text(`JUMLAH KESELURUHAN: RM ${parseFloat(inv.total).toFixed(2)}`, 110, finalY);
-            
-            doc.setFontSize(8); doc.setTextColor(150);
-            const terms = [
-                "TERMA & SYARAT:",
-                "1. Waranti hanya meliputi bahagian yang ditukar sahaja.",
-                "2. NASZEX Cloud tidak bertanggungjawab atas kehilangan data semasa proses pembaikan.",
-                "3. Barang yang tidak dituntut selepas 3 bulan akan dilupuskan."
-            ];
-            let termY = 270;
-            terms.forEach(t => { doc.text(t, 15, termY); termY += 4; });
-
-            doc.save(`NASZEX-${inv.invoiceNo}.pdf`);
-            showToast("PDF Generated");
-        }
-
         function handleSearch() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
@@ -665,7 +614,6 @@ function logout() {
                 const isPaid = i.status === 'paid';
                 const statusColor = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
                 const repairMap = {'Received':'bg-slate-200','Waiting':'bg-amber-200','Diagnosis':'bg-purple-200','Repairing':'bg-blue-200','Ready':'bg-emerald-400 animate-pulse','Collected':'bg-slate-800 text-white'};
-                
                 const delay = index < 10 ? index * 0.05 : 0; 
                 
                 container.insertAdjacentHTML('beforeend', `
@@ -691,6 +639,8 @@ function logout() {
         function trackStatus() {
             const p = document.getElementById('toolTrackPhone').value.trim();
             if(!p) return showToast("Masukkan No. Phone", "error");
+            // Nota: Tracker ni kalau multi-user, mungkin kena fikir logic lain (global search or user specific)
+            // Buat masa ni kita limit search dalam user punya invoices sahaja
             const match = allInvoices.filter(i => i.customerPhone.includes(p)).sort((a,b)=>b.createdAt-a.createdAt)[0];
             if(!match) return showToast("Tiada rekod dijumpai", "error");
             
@@ -706,9 +656,7 @@ function logout() {
             stages.forEach(s => {
                 if(s === match.repairStatus) passed = false;
                 const active = passed || s === match.repairStatus;
-                
                 const desc = statusDescriptions[s] || 'Status update';
-                
                 h += `
                 <div class="timeline-item ${active?'active':''}">
                     <div class="timeline-dot"></div>
@@ -738,7 +686,10 @@ function logout() {
                     modal: parseFloat(r.querySelector('.modal-price').value)||0, discount: parseFloat(r.querySelector('.discount').value)||0
                 });
             });
+            
+            // PENTING: Tambah uid currentUser masa simpan data!
             const data = {
+                uid: currentUser.uid, // INI KUNCI DATA ISOLATION
                 customerName: n, customerPhone: p, warranty: document.getElementById('warranty').value,
                 status: document.getElementById('initialStatus').value, total: document.getElementById('grandTotal').innerText, items: items
             };
@@ -747,18 +698,18 @@ function logout() {
                 if(editId) { 
                     await db.collection("invoices").doc(editId).update(data); 
                     showToast("Rekod Dikemaskini");
-                    const idx = allInvoices.findIndex(x => x.id === editId);
-                    if(idx !== -1) allInvoices[idx] = { ...allInvoices[idx], ...data };
+                    // Refresh array
+                    refreshData();
                 }
                 else {
                     const lastNo = allInvoices.reduce((max, i) => Math.max(max, parseInt(i.invoiceNo?.split('-')[1]||0)), 0);
                     data.invoiceNo = "NX-" + (lastNo + 1).toString().padStart(4, '0');
                     data.repairStatus = 'Received'; data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    const docRef = await db.collection("invoices").add(data);
-                    allInvoices.unshift({ id: docRef.id, ...data });
+                    await db.collection("invoices").add(data);
+                    // Refresh array
+                    refreshData();
                     showToast("Job Sheet Dicipta");
                 }
-                updateDashboard();
                 toggleModal(false);
             } catch(e) { console.error(e); showToast("Ralat Sistem", "error"); }
             btn.innerHTML = `Simpan <i data-lucide="check" class="w-4 h-4"></i>`;
@@ -815,8 +766,7 @@ function logout() {
         
         async function updateLiveStatus(id, val) { 
             await db.collection("invoices").doc(id).update({repairStatus: val}); 
-            const i = allInvoices.find(x=>x.id===id); if(i) i.repairStatus = val;
-            updateDashboard();
+            refreshData(); // Refresh untuk update UI
             showToast(`Status: ${val}`); 
         }
 
@@ -828,6 +778,61 @@ function logout() {
         }
         function formatDate(ts, full=false) { if(!ts) return '--/--'; const d = ts.toDate ? ts.toDate() : new Date(ts); return full ? `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` : `${d.getDate()}/${d.getMonth()+1}`; }
 
+        // PDF Generation dengan Branding Dinamik
+        function generateInvoicePDF(inv) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.width;
+
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageWidth, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22); doc.setFont("helvetica", "bold"); 
+            // Guna nama kedai user (shopName)
+            doc.text(shopName.toUpperCase() + " CLOUD", 15, 20); 
+            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("GSM Professional Repair Center", 15, 26);
+            
+            // ... (baki kod PDF sama)
+            doc.setFontSize(9);
+            doc.text("Ara Kuda / Tasek Gelugor, Penang", pageWidth - 15, 18, { align: "right" });
+            doc.text("SSM: PG052XXXX-T", pageWidth - 15, 23, { align: "right" });
+            doc.text("Contact: 01X-XXXXXXX", pageWidth - 15, 28, { align: "right" });
+
+            doc.setTextColor(30, 41, 59); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("OFFICIAL RECEIPT", 15, 55);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text(`No. Resit: ${inv.invoiceNo}`, 15, 62);
+            doc.text(`Tarikh: ${formatDate(inv.createdAt, true)}`, 15, 67);
+            doc.text(`Status: ${inv.status.toUpperCase()}`, 15, 72);
+
+            doc.setFont("helvetica", "bold"); doc.text("KEPADA:", 120, 62);
+            doc.setFont("helvetica", "normal"); doc.text(inv.customerName, 120, 67); doc.text(inv.customerPhone, 120, 72);
+
+            const rows = (inv.items||[]).map(x => [x.name, x.description||'-', x.qty, `RM ${parseFloat(x.kos).toFixed(2)}`, `RM ${((x.qty*x.kos)-x.discount).toFixed(2)}`]);
+            doc.autoTable({
+                startY: 85,
+                head: [['Perkara', 'Keterangan', 'Unit', 'Harga', 'Jumlah']],
+                body: rows,
+                theme: 'grid',
+                headStyles: { fillColor: [15, 23, 42] }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(14); doc.setFont("helvetica", "bold");
+            doc.text(`JUMLAH KESELURUHAN: RM ${parseFloat(inv.total).toFixed(2)}`, 110, finalY);
+            
+            doc.setFontSize(8); doc.setTextColor(150);
+            const terms = [
+                "TERMA & SYARAT:",
+                "1. Waranti hanya meliputi bahagian yang ditukar sahaja.",
+                "2. "+shopName+" tidak bertanggungjawab atas kehilangan data semasa proses pembaikan.",
+                "3. Barang yang tidak dituntut selepas 3 bulan akan dilupuskan."
+            ];
+            let termY = 270;
+            terms.forEach(t => { doc.text(t, 15, termY); termY += 4; });
+
+            doc.save(`REC-${inv.invoiceNo}.pdf`);
+            showToast("PDF Generated");
+        }
+        
         function openSubReport(t) {
             document.getElementById('dataMenu').classList.add('hidden');
             if(t==='performance'){ document.getElementById('performanceContainer').classList.remove('hidden'); generateReport(); }
@@ -836,7 +841,6 @@ function logout() {
         function closeSubReport() { document.getElementById('performanceContainer').classList.add('hidden'); document.getElementById('profitContainer').classList.add('hidden'); document.getElementById('dataMenu').classList.remove('hidden'); }
         function openSubTool(t) { document.getElementById('toolsMenu').classList.add('hidden'); if(t==='receipt') document.getElementById('toolReceiptContainer').classList.remove('hidden'); else document.getElementById('toolTrackContainer').classList.remove('hidden'); }
         function closeSubTool() { document.getElementById('toolReceiptContainer').classList.add('hidden'); document.getElementById('toolTrackContainer').classList.add('hidden'); document.getElementById('toolsMenu').classList.remove('hidden'); }
-
         function generateReport() {
             const tb = document.getElementById('reportTableBody'), mo = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
             let h = "";
@@ -847,7 +851,6 @@ function logout() {
             });
             tb.innerHTML = h || '<tr><td colspan="3" class="text-center py-8">Tiada Data</td></tr>';
         }
-
         function generateProfitReport() {
             const tb = document.getElementById('profitTableBody'), mo = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
             let h = "", totalNett = 0;
@@ -860,7 +863,6 @@ function logout() {
             });
             tb.innerHTML = h; document.getElementById('total-net-profit').innerText = `RM ${Math.round(totalNett)}`;
         }
-
         function handleAction(type) {
             if(type === 'edit') {
                 const i = allInvoices.find(x=>x.id===activeId);
@@ -886,12 +888,6 @@ function logout() {
             if(type === 'getlink') { navigator.clipboard.writeText(window.location.origin + "/view?id=" + activeId); showToast("Link Disalin"); }
             closeActionMenu();
         }
-
-        db.collection("invoices").orderBy("createdAt", "desc").limit(50).onSnapshot(s => {
-            allInvoices = s.docs.map(d=>({id:d.id, ...d.data()}));
-            updateDashboard();
-        });
-        
     </script>
 </body>
 </html>
