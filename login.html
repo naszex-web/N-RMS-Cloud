@@ -10,6 +10,8 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .input-field { background: #0f172a; border: 1px solid #334155; color: white; transition: all 0.3s; }
+        .input-field:focus { border-color: #ef4444; outline: none; }
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -23,26 +25,37 @@
                 <img src="logo.png" class="w-12 h-12 object-contain" alt="Logo">
             </div>
             <h1 class="text-2xl font-black tracking-tighter text-white uppercase leading-none">RMS <span class="text-red-500">Cloud</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Professional Repair Suite v8.1</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Sistem Pengurusan V8.2</p>
         </div>
 
-        <div class="glass-card rounded-[3rem] p-10 shadow-2xl space-y-6 text-center">
+        <div class="glass-card rounded-[3rem] p-8 shadow-2xl space-y-6">
+            
+            <div class="space-y-4">
+                <h2 class="text-sm font-black italic text-center uppercase tracking-widest text-slate-300">Admin Login</h2>
+                <div>
+                    <input type="text" id="username" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase" placeholder="USERNAME">
+                </div>
+                <div>
+                    <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase" placeholder="PASSWORD">
+                </div>
+                <button onclick="loginAdmin()" id="btnAdmin" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-lg transition-all active:scale-95 tracking-widest">
+                    Log Masuk
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4 py-2 opacity-50">
+                <div class="flex-1 h-px bg-slate-600"></div>
+                <span class="text-[9px] font-black uppercase tracking-widest">Atau</span>
+                <div class="flex-1 h-px bg-slate-600"></div>
+            </div>
+
             <div>
-                <h2 class="text-xl font-black italic">Selamat Datang</h2>
-                <p class="text-xs text-slate-400 font-bold mt-1">Guna akaun Google untuk akses sistem</p>
-            </div>
-
-            <div class="space-y-3">
-                <button onclick="signInGoogle()" id="btnGoogle" class="w-full bg-white text-slate-900 font-black uppercase text-[10px] py-4 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all active:scale-95">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-4 h-4" alt="Google">
-                    Sign in with Google
-                </button>
-
-                <button onclick="signInGuest()" id="btnGuest" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-md flex items-center justify-center gap-3 transition-all active:scale-95 border border-slate-700">
+                <button onclick="loginGuest()" id="btnGuest" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-700 tracking-widest">
                     <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-                    Try as Guest (Demo)
+                    Cuba Sebagai Guest
                 </button>
             </div>
+
         </div>
     </div>
 
@@ -50,7 +63,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script>
-        // GANTI API KEY KAU DI SINI
+        // MASUKKAN API KEY FIREBASE KAU DI SINI
         const firebaseConfig = {
             apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg",
             authDomain: "invoicely-52db9.firebaseapp.com",
@@ -65,44 +78,77 @@
 
         lucide.createIcons();
 
+        // Redirect automatik kalau dah pernah login
         auth.onAuthStateChanged(user => {
-            if (user) window.location.replace('index.html');
+            if (user && window.location.pathname.includes('login.html')) {
+                window.location.replace('index.html');
+            }
         });
 
-        async function signInGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                const result = await auth.signInWithPopup(provider);
-                await checkUserProfile(result.user);
-            } catch (e) { 
-                console.error(e);
-                showToast("Gagal log masuk Google.", "error"); 
+        async function loginAdmin() {
+            const u = document.getElementById('username').value.trim().toUpperCase();
+            const p = document.getElementById('password').value.trim().toUpperCase();
+            const btn = document.getElementById('btnAdmin');
+
+            if (u === 'ADMIN' && p === 'ADMIN') {
+                btn.innerHTML = "Memproses..."; btn.disabled = true;
+                
+                // Kitaran Rahsia: Kita linkkan ADMIN ke satu email khas supaya data tak hilang
+                const adminEmail = "admin@naszex.com";
+                const adminPass = "naszexadmin123";
+
+                try {
+                    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    await auth.signInWithEmailAndPassword(adminEmail, adminPass);
+                    window.location.replace('index.html');
+                } catch (e) {
+                    // Kalau first time, sistem akan auto-create akaun admin ni
+                    if (e.code === 'auth/user-not-found') {
+                        try {
+                            const res = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
+                            await db.collection('users').doc(res.user.uid).set({
+                                shopName: "NASZEX GSM",
+                                role: "admin",
+                                joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            window.location.replace('index.html');
+                        } catch (err) {
+                            showToast("Ralat. Pastikan Email/Password diaktifkan di Firebase.", "error");
+                            btn.innerHTML = "Log Masuk"; btn.disabled = false;
+                        }
+                    } else {
+                        showToast("Domain belum dibenarkan di Firebase.", "error");
+                        btn.innerHTML = "Log Masuk"; btn.disabled = false;
+                    }
+                }
+            } else {
+                showToast("Username atau Password Salah", "error");
             }
         }
 
-        async function signInGuest() {
+        async function loginGuest() {
+            const btn = document.getElementById('btnGuest');
+            btn.innerHTML = "Membuka Demo..."; btn.disabled = true;
+
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                const result = await auth.signInAnonymously();
-                await checkUserProfile(result.user);
+                const res = await auth.signInAnonymously();
+                
+                const doc = await db.collection('users').doc(res.user.uid).get();
+                if (!doc.exists) {
+                    await db.collection('users').doc(res.user.uid).set({
+                        shopName: "KEDAI DEMO GUEST",
+                        role: "guest",
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                window.location.replace('index.html');
             } catch (e) { 
-                console.error(e);
-                showToast("Gagal log masuk Guest.", "error"); 
+                showToast("Ralat. Pastikan Anonymous diaktifkan di Firebase.", "error");
+                btn.innerHTML = `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i> Cuba Sebagai Guest`;
+                btn.disabled = false;
+                lucide.createIcons();
             }
-        }
-
-        async function checkUserProfile(user) {
-            const doc = await db.collection('users').doc(user.uid).get();
-            if (!doc.exists) {
-                await db.collection('users').doc(user.uid).set({
-                    shopName: user.displayName ? user.displayName.split(' ')[0] + " GSM" : "GUEST SHOP",
-                    email: user.email || "anonymous",
-                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    plan: 'free'
-                });
-            }
-            window.location.replace('index.html');
         }
 
         function showToast(msg, type) {
