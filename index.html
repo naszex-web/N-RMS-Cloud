@@ -401,7 +401,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // PWA Register
+          // PWA Register
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Fail:', err));
@@ -409,65 +409,66 @@
         }
 
         const firebaseConfig = {
-  apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
-  authDomain: "rms-cloudnas.firebaseapp.com",
-  projectId: "rms-cloudnas",
-  storageBucket: "rms-cloudnas.firebasestorage.app",
-  messagingSenderId: "142738217487",
-  appId: "1:142738217487:web:2c2a08c40b77447484a17a"
-};
+            apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
+            authDomain: "rms-cloudnas.firebaseapp.com",
+            projectId: "rms-cloudnas",
+            storageBucket: "rms-cloudnas.firebasestorage.app",
+            messagingSenderId: "142738217487",
+            appId: "1:142738217487:web:2c2a08c40b77447484a17a"
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- Bahagian Script di index.html ---
-let currentUser = null;
+        // Variabel Utama
+        let currentUser = null;
+        let allInvoices = [], currentFilter = 'all', activeId = null, searchTimeout = null;
+        let shopName = "RMS CLOUD"; // Default untuk PDF
 
-auth.onAuthStateChanged(async user => {
-    if (!user) {
-        window.location.replace('login.html');
-    } else {
-        currentUser = user;
-        
-        // Ambil profil kedai (Branding)
-        try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if(userDoc.exists) {
-                const data = userDoc.data();
-                document.getElementById('shopTitle').innerHTML = `${data.shopName} <span class="text-red-600">CLOUD</span>`;
+        // 1. GATEKEEPER
+        auth.onAuthStateChanged(async user => {
+            if (!user) {
+                window.location.replace('login.html');
+            } else {
+                currentUser = user;
+                
+                // Ambil profil kedai (Branding)
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if(userDoc.exists) {
+                        const data = userDoc.data();
+                        shopName = data.shopName; // Set untuk resit PDF
+                        
+                        // Letak tag DEMO kalau guest
+                        const demoTag = data.role === 'guest' ? '<span class="text-amber-500 text-[8px] ml-1">[DEMO]</span>' : '';
+                        document.getElementById('shopTitle').innerHTML = `${data.shopName} <span class="text-red-600">CLOUD</span> ${demoTag}`;
+                    }
+                } catch(e) { console.error(e); }
+
+                initRealtimeInvoices();
             }
-        } catch(e) { console.error(e); }
+        });
 
-        initRealtimeInvoices();
-    }
-});
-
-function initRealtimeInvoices() {
-    // PENTING: Index diperlukan di Console untuk query ini (uid + createdAt)
-    db.collection("invoices")
-      .where("uid", "==", currentUser.uid)
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .onSnapshot(s => {
-          allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
-          updateDashboard();
-      }, err => {
-          // Jika naik error index, sistem akan tunjuk 'Admin Note'
-          if(err.code === 'failed-precondition') {
-              // Kod modal Admin Note anda di sini
-          }
-      });
-}
-
-function logout() {
-    if(confirm("Log keluar?")) auth.signOut().then(() => window.location.replace('login.html'));
-}
+        // 2. TARIK DATA ISOLATION
+        function initRealtimeInvoices() {
+            db.collection("invoices")
+              .where("uid", "==", currentUser.uid)
+              .orderBy("createdAt", "desc")
+              .limit(50)
+              .onSnapshot(s => {
+                  allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
+                  updateDashboard();
+              }, err => {
+                  if(err.code === 'failed-precondition') {
+                      showToast("Sila aktifkan Index di Firestore!", "error");
+                  }
+              });
+        }
 
         async function refreshData() {
             const btnIcon = document.getElementById('refresh-icon');
             btnIcon.classList.add('animate-spin');
             try {
-                // Sama juga, tarik ikut UID
                 const s = await db.collection("invoices")
                                   .where("uid", "==", currentUser.uid)
                                   .orderBy("createdAt", "desc")
@@ -479,7 +480,10 @@ function logout() {
             finally { btnIcon.classList.remove('animate-spin'); }
         }
 
-        // --- EXISTING LOGIC (NO CHANGE) ---
+        function logout() {
+            if(confirm("Log keluar?")) auth.signOut().then(() => window.location.replace('login.html'));
+        }
+
         const statusDescriptions = {
             'Received': 'Peranti diterima, menunggu giliran.',
             'Waiting': 'Dalam senarai menunggu (Queue).',
@@ -635,8 +639,6 @@ function logout() {
         function trackStatus() {
             const p = document.getElementById('toolTrackPhone').value.trim();
             if(!p) return showToast("Masukkan No. Phone", "error");
-            // Nota: Tracker ni kalau multi-user, mungkin kena fikir logic lain (global search or user specific)
-            // Buat masa ni kita limit search dalam user punya invoices sahaja
             const match = allInvoices.filter(i => i.customerPhone.includes(p)).sort((a,b)=>b.createdAt-a.createdAt)[0];
             if(!match) return showToast("Tiada rekod dijumpai", "error");
             
@@ -683,9 +685,9 @@ function logout() {
                 });
             });
             
-            // PENTING: Tambah uid currentUser masa simpan data!
+            // PENTING: Wajib simpan uid tuan punya data
             const data = {
-                uid: currentUser.uid, // INI KUNCI DATA ISOLATION
+                uid: currentUser.uid, 
                 customerName: n, customerPhone: p, warranty: document.getElementById('warranty').value,
                 status: document.getElementById('initialStatus').value, total: document.getElementById('grandTotal').innerText, items: items
             };
@@ -694,7 +696,6 @@ function logout() {
                 if(editId) { 
                     await db.collection("invoices").doc(editId).update(data); 
                     showToast("Rekod Dikemaskini");
-                    // Refresh array
                     refreshData();
                 }
                 else {
@@ -702,7 +703,6 @@ function logout() {
                     data.invoiceNo = "NX-" + (lastNo + 1).toString().padStart(4, '0');
                     data.repairStatus = 'Received'; data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("invoices").add(data);
-                    // Refresh array
                     refreshData();
                     showToast("Job Sheet Dicipta");
                 }
@@ -783,11 +783,9 @@ function logout() {
             doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageWidth, 40, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(22); doc.setFont("helvetica", "bold"); 
-            // Guna nama kedai user (shopName)
             doc.text(shopName.toUpperCase() + " CLOUD", 15, 20); 
             doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("GSM Professional Repair Center", 15, 26);
             
-            // ... (baki kod PDF sama)
             doc.setFontSize(9);
             doc.text("Ara Kuda / Tasek Gelugor, Penang", pageWidth - 15, 18, { align: "right" });
             doc.text("SSM: PG052XXXX-T", pageWidth - 15, 23, { align: "right" });
