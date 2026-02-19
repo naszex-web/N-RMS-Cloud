@@ -3,122 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#f1f5f9">
+    <meta name="theme-color" content="#f8fafc">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
     
-    <title>RMS CLOUD - Premium</title>
+    <title>RMS CLOUD - Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <link rel="icon" type="image/png" href="logo.png">
+    
     <style>
-        :root { --glass: rgba(255, 255, 255, 0.8); --border: rgba(255, 255, 255, 0.3); }
+        :root { --primary: #0f172a; --accent: #ef4444; }
+        
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #f1f5f9; 
-            background-image: radial-gradient(at 0% 0%, rgba(241, 245, 249, 1) 0, transparent 50%), radial-gradient(at 50% 0%, rgba(219, 234, 254, 1) 0, transparent 50%);
-            color: #1e293b; -webkit-tap-highlight-color: transparent; user-select: none;
-            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            background: #f8fafc;
+            color: #1e293b; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+            overscroll-behavior-y: none;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: env(safe-area-inset-bottom);
         }
+        
         .font-num { font-family: 'Inter', sans-serif; }
-        .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; }
 
-        /* Premium Glasses */
-        .glass-nav { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-        .floating-nav { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
-        .stat-glow-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3); }
-        .stat-glow-red { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); box-shadow: 0 10px 20px -5px rgba(244, 63, 94, 0.3); }
-        .stat-glow-dark { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3); }
+        .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
 
-        .modal-wrapper { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none; }
+        .modal-wrapper {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none;
+            will-change: transform, opacity;
+        }
         .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
-        .view-section { display: none; opacity: 0; transform: scale(0.99); transition: opacity 0.2s ease, transform 0.2s ease; }
+
+        .view-section { display: none; opacity: 0; transform: scale(0.99); transition: opacity 0.2s ease, transform 0.2s ease; will-change: opacity, transform; }
         .view-section.active { display: block; opacity: 1; transform: scale(1); }
+
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .list-anim { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+
+        .glass-nav { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
+        
         .tap-effect { transition: transform 0.1s; cursor: pointer; }
         .tap-effect:active { transform: scale(0.95); }
+        
         .tab-active { background: #0f172a !important; color: #fff !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
+        .nav-item-active { color: #ef4444 !important; }
 
         .float-input-group { position: relative; width: 100%; transition: 0.3s; }
         .float-input-group label { position: absolute; top: 6px; left: 14px; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; pointer-events: none; }
         .float-input-group input, .float-input-group select { padding-top: 22px; padding-bottom: 10px; }
 
         #toast-container { position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s forwards; opacity: 0; display: flex; align-items: center; gap: 8px; }
+        .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(-20px); pointer-events: auto; display: flex; align-items: center; gap: 8px; }
         @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
 
+        .timeline-item { position: relative; padding-left: 24px; padding-bottom: 24px; border-left: 2px solid #e2e8f0; }
+        .timeline-item:last-child { border-left: none; padding-bottom: 0; }
+        .timeline-item.active { border-left-color: #10b981; }
+        .timeline-dot { position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 2px solid #fff; box-shadow: 0 0 0 2px #e2e8f0; }
+        .timeline-item.active .timeline-dot { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+
         .safe-top { padding-top: calc(10px + env(safe-area-inset-top)); }
+        .safe-bottom { padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
+        body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-[#f8fafc]">
 
     <div id="toast-container"></div>
 
-    <nav class="sticky top-0 z-40 glass-nav px-6 gpu safe-top pb-4 pt-2">
+    <nav class="sticky top-0 z-40 glass-nav px-5 gpu safe-top pb-3 pt-2">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 p-1.5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md border border-slate-100 p-1">
                     <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
                 </div>
                 <div>
                     <h1 id="shopTitle" class="text-[12px] font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">LOADING...</h1>
-                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.4em] mt-1.5 opacity-70">Professional Suite 8.2</p>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1.5 leading-none">RMS Cloud v8.0</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="window.location.replace('settings.html')" class="w-10 h-10 flex items-center justify-center bg-white rounded-2xl border border-slate-200 tap-effect shadow-sm text-slate-400">
+            <div class="flex gap-1.5">
+                <button onclick="window.location.assign('settings.html')" class="w-9 h-9 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
-                <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center bg-white rounded-2xl border border-slate-200 tap-effect shadow-sm text-slate-400">
+                <button onclick="refreshData()" class="w-9 h-9 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
                     <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
+                </button>
+                <button onclick="logout()" class="w-9 h-9 flex items-center justify-center bg-rose-50 rounded-xl text-rose-500 border border-rose-100 tap-effect shadow-sm">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-md mx-auto px-5 pt-4 space-y-6">
+    <div class="max-w-md mx-auto p-4 space-y-6">
         
-        <main id="dashboardView" class="view-section active space-y-6">
-            <div class="grid grid-cols-2 gap-3">
-                <div class="stat-glow-green col-span-2 rounded-[2rem] p-6 text-white relative overflow-hidden tap-effect">
-                    <div class="relative z-10">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Revenue (Paid)</p>
-                        <h2 class="text-3xl font-black mt-1 italic leading-none font-num">RM <span id="stat-month-paid">0</span></h2>
-                    </div>
-                    <i data-lucide="trending-up" class="absolute -right-4 -bottom-4 w-24 h-24 opacity-10 rotate-12"></i>
+        <main id="dashboardView" class="view-section active space-y-5">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-4 shadow-lg shadow-emerald-500/20 text-center relative overflow-hidden tap-effect">
+                    <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-paid">0</span></p>
+                    <p class="text-[7px] font-bold text-emerald-100 uppercase mt-1 tracking-widest">Paid</p>
                 </div>
-                <div class="stat-glow-red rounded-[1.5rem] p-4 text-white relative overflow-hidden tap-effect">
-                    <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Unpaid</p>
-                    <h2 class="text-lg font-black mt-1 italic font-num">RM <span id="stat-month-pending">0</span></h2>
+                <div class="bg-gradient-to-br from-rose-500 to-rose-700 rounded-2xl p-4 shadow-lg shadow-rose-500/20 text-center relative overflow-hidden tap-effect">
+                    <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-pending">0</span></p>
+                    <p class="text-[7px] font-bold text-rose-100 uppercase mt-1 tracking-widest">Unpaid</p>
                 </div>
-                <div class="stat-glow-dark rounded-[1.5rem] p-4 text-white relative overflow-hidden tap-effect">
-                    <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Jobs</p>
-                    <h2 class="text-lg font-black mt-1 italic font-num"><span id="stat-month-jobs">0</span></h2>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-950 rounded-2xl p-4 shadow-lg shadow-slate-900/20 text-center relative overflow-hidden tap-effect">
+                    <p class="text-[14px] font-black text-white font-num"><span id="stat-month-jobs">0</span></p>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase mt-1 tracking-widest">Jobs</p>
                 </div>
             </div>
 
             <div class="relative group">
-                <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="Cari Rekod Pelanggan..." 
-                       class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-[1.5rem] text-xs font-bold shadow-sm outline-none focus:border-slate-900 transition-all font-num tracking-wide">
-                <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="SEARCH RECORD..." 
+                       class="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold shadow-sm outline-none focus:ring-2 focus:ring-slate-900/5 transition-all font-num tracking-wide">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within:text-slate-900"></i>
             </div>
 
-            <div class="flex p-1.5 bg-white border border-slate-200 rounded-2xl gap-1.5 shadow-sm">
-                <button onclick="filterInvoices('all')" id="f-all" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all tab-active tap-effect">Semua</button>
-                <button onclick="filterInvoices('paid')" id="f-paid" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all text-slate-500 hover:text-slate-800 tap-effect">Paid</button>
-                <button onclick="filterInvoices('outstanding')" id="f-pending" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all text-slate-500 hover:text-slate-800 tap-effect">Unpaid</button>
+            <div class="flex p-1.5 bg-slate-200/50 rounded-2xl gap-1.5 backdrop-blur-md">
+                <button onclick="filterInvoices('all')" id="f-all" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tab-active tap-effect">All</button>
+                <button onclick="filterInvoices('paid')" id="f-paid" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-400 hover:text-slate-600 tap-effect">Paid</button>
+                <button onclick="filterInvoices('outstanding')" id="f-pending" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-400 hover:text-slate-600 tap-effect">Unpaid</button>
             </div>
 
-            <div id="invoiceContainer" class="space-y-3 min-h-[40vh]"></div>
+            <div id="invoiceContainer" class="space-y-3 pb-8 min-h-[50vh]">
+                </div>
+            
+            <div class="text-center pt-2">
+                 <p class="text-[8px] text-slate-300 font-bold uppercase tracking-widest">Showing Latest 50 Records</p>
+            </div>
         </main>
 
         <main id="reportsView" class="view-section">
@@ -126,50 +154,142 @@
                 <button onclick="openSubReport('performance')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between tap-effect">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><i data-lucide="bar-chart-2"></i></div>
-                        <div class="text-left"><h3 class="text-sm font-black uppercase text-slate-900">Performance</h3><p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Job Volume & Trends</p></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase text-slate-900">Performance</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Job Volume & Trends</p>
+                        </div>
                     </div>
                     <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
                 </button>
                 <button onclick="openSubReport('profit')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between tap-effect">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><i data-lucide="trending-up"></i></div>
-                        <div class="text-left"><h3 class="text-sm font-black uppercase text-slate-900">Profit Analysis</h3><p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Revenue vs Cost</p></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase text-slate-900">Profit Analysis</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Revenue vs Cost</p>
+                        </div>
                     </div>
                     <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
                 </button>
             </div>
-            <div id="performanceContainer" class="hidden"><button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button><div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 border-b border-slate-100"><tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-slate-400">Jobs</th><th class="pr-6 text-right text-[9px] font-black uppercase text-slate-400">Total</th></tr></thead><tbody id="reportTableBody" class="text-slate-800 text-[11px] font-bold font-num"></tbody></table></div></div>
-            <div id="profitContainer" class="hidden"><button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button><div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50 border-b border-slate-100"><tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-rose-400">Cost</th><th class="pr-6 text-right text-[9px] font-black uppercase text-emerald-500">Nett</th></tr></thead><tbody id="profitTableBody" class="text-[11px] font-bold font-num"></tbody><tfoot class="bg-slate-900 text-white font-num"><tr><td class="pl-6 py-4 text-[9px] uppercase font-bold text-white/50">Total Profit</td><td colspan="2" id="total-net-profit" class="text-right pr-6 py-4 text-lg font-black italic">RM 0</td></tr></tfoot></table></div></div>
+
+            <div id="performanceContainer" class="hidden">
+                <button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-slate-400">Jobs</th><th class="pr-6 text-right text-[9px] font-black uppercase text-slate-400">Total</th></tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="text-slate-800 text-[11px] font-bold font-num"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="profitContainer" class="hidden">
+                <button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                     <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-rose-400">Cost</th><th class="pr-6 text-right text-[9px] font-black uppercase text-emerald-500">Nett</th></tr>
+                        </thead>
+                        <tbody id="profitTableBody" class="text-[11px] font-bold font-num"></tbody>
+                        <tfoot class="bg-slate-900 text-white font-num">
+                            <tr><td class="pl-6 py-4 text-[9px] uppercase font-bold text-white/50">Total Profit</td><td colspan="2" id="total-net-profit" class="text-right pr-6 py-4 text-lg font-black italic">RM 0</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </main>
 
         <main id="toolsView" class="view-section">
             <div id="toolsMenu" class="space-y-4 pt-2">
                 <button onclick="openSubTool('receipt')" class="w-full bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-900/20 text-white flex items-center justify-between tap-effect">
-                    <div class="flex items-center gap-4"><div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><i data-lucide="printer"></i></div><div class="text-left"><h3 class="text-sm font-black uppercase">Smart Receipt</h3><p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">PDF & WhatsApp</p></div></div><i data-lucide="chevron-right" class="w-5 h-5 text-white/20"></i>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><i data-lucide="printer"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase">Smart Receipt</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">PDF & WhatsApp</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-white/20"></i>
                 </button>
                 <button onclick="openSubTool('track')" class="w-full bg-white border border-slate-200 p-6 rounded-[2rem] shadow-sm text-slate-900 flex items-center justify-between tap-effect">
-                    <div class="flex items-center gap-4"><div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center"><i data-lucide="radar"></i></div><div class="text-left"><h3 class="text-sm font-black uppercase">Live Tracker</h3><p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Trace by Phone</p></div></div><i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center"><i data-lucide="radar"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase">Live Tracker</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Trace by Phone</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
                 </button>
             </div>
-            <div id="toolReceiptContainer" class="hidden"><button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button><div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 text-center space-y-6"><div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg"><i data-lucide="printer"></i></div><div class="space-y-4"><div class="float-input-group text-left"><input type="tel" id="toolReceiptPhone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none font-num rounded-2xl"><label>No. Telefon Pelanggan</label></div><div class="grid grid-cols-1 gap-3"><button onclick="handleTools('whatsapp')" class="w-full bg-[#25D366] text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg shadow-green-500/20"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button><button onclick="handleTools('pdf')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg"><i data-lucide="download" class="w-4 h-4"></i> Download PDF</button></div></div></div></div>
-            <div id="toolTrackContainer" class="hidden"><button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button><div class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-100 space-y-6"><div class="relative"><input type="tel" id="toolTrackPhone" placeholder="Masukkan No. Phone..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 pr-20 text-sm font-bold outline-none font-num"><button onclick="trackStatus()" class="absolute right-2 top-2 bottom-2 bg-orange-500 text-white px-5 rounded-xl font-bold text-[10px] uppercase tap-effect">Check</button></div><div id="trackResult" class="hidden"><div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6"><div class="flex justify-between items-start"><h4 id="trName" class="font-black text-xs uppercase text-slate-900"></h4><span id="trNo" class="text-[9px] font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-num"></span></div><p id="trDevice" class="text-[10px] text-slate-500 font-bold mt-1"></p></div><div class="space-y-0 px-2 pl-4" id="timelineContainer"></div></div><div id="trackEmpty" class="text-center py-12 opacity-40"><i data-lucide="radar" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sedia untuk dikesan</p></div></div></div>
+
+            <div id="toolReceiptContainer" class="hidden">
+                <button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 text-center space-y-6">
+                    <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg"><i data-lucide="printer"></i></div>
+                    <div class="space-y-4">
+                         <div class="float-input-group text-left">
+                            <input type="tel" id="toolReceiptPhone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none font-num rounded-2xl">
+                            <label>No. Telefon Pelanggan</label>
+                         </div>
+                         <div class="grid grid-cols-1 gap-3">
+                            <button onclick="handleTools('whatsapp')" class="w-full bg-[#25D366] text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg shadow-green-500/20"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button>
+                            <button onclick="handleTools('pdf')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg"><i data-lucide="download" class="w-4 h-4"></i> Download PDF</button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="toolTrackContainer" class="hidden">
+                <button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
+                <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-100 space-y-6">
+                     <div class="relative">
+                        <input type="tel" id="toolTrackPhone" placeholder="Masukkan No. Phone..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 pr-20 text-sm font-bold outline-none font-num">
+                        <button onclick="trackStatus()" class="absolute right-2 top-2 bottom-2 bg-orange-500 text-white px-5 rounded-xl font-bold text-[10px] uppercase tap-effect">Check</button>
+                     </div>
+                     <div id="trackResult" class="hidden">
+                         <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6">
+                             <div class="flex justify-between items-start">
+                                 <h4 id="trName" class="font-black text-xs uppercase text-slate-900"></h4>
+                                 <span id="trNo" class="text-[9px] font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-num"></span>
+                             </div>
+                             <p id="trDevice" class="text-[10px] text-slate-500 font-bold mt-1"></p>
+                         </div>
+                         <div class="space-y-0 px-2 pl-4" id="timelineContainer"></div>
+                     </div>
+                     <div id="trackEmpty" class="text-center py-12 opacity-40">
+                         <i data-lucide="radar" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
+                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sedia untuk dikesan</p>
+                     </div>
+                </div>
+            </div>
         </main>
     </div>
 
-    <div class="fixed bottom-6 left-6 right-6 z-40">
-        <div class="max-w-md mx-auto floating-nav rounded-[2.5rem] py-3 px-8 flex justify-between items-center shadow-2xl">
-            <button onclick="showPage('dashboard')" id="nav-dash" class="text-white flex flex-col items-center gap-1 opacity-100 transition-colors">
+    <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-6 gpu safe-bottom">
+        <div class="max-w-md mx-auto grid grid-cols-4 items-end h-14 pb-2">
+            <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors nav-item-active">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
-                <span class="text-[7px] font-black uppercase tracking-tighter">Home</span>
+                <span class="text-[9px] font-black uppercase tracking-tight">Home</span>
             </button>
             
-            <button onclick="openAddModal()" class="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center -mt-10 border-4 border-[#0f172a] shadow-xl active:scale-90 transition-all">
-                <i data-lucide="plus" class="w-6 h-6"></i>
+            <button onclick="openAddModal()" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-900">
+                <div class="w-5 h-5 bg-slate-900 text-white rounded-md flex items-center justify-center shadow-md">
+                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[9px] font-black uppercase tracking-tight">New</span>
             </button>
             
-            <button onclick="showPage('tools')" id="nav-tools" class="text-slate-400 flex flex-col items-center gap-1 transition-colors">
-                <i data-lucide="box" class="w-5 h-5"></i>
-                <span class="text-[7px] font-black uppercase tracking-tighter">Tools</span>
+            <button onclick="showPage('reports')" id="nav-report" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Data</span>
+            </button>
+            
+            <button onclick="showPage('tools')" id="nav-tools" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="wrench" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Tools</span>
             </button>
         </div>
     </div>
@@ -177,26 +297,62 @@
     <div id="invoiceModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end sm:justify-center gpu">
         <div class="bg-[#f8fafc] w-full max-w-md mx-auto h-[92vh] sm:h-[85vh] sm:rounded-3xl rounded-t-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative">
             <div class="px-6 py-5 bg-white/80 backdrop-blur-md border-b border-slate-100 flex justify-between items-center shrink-0 sticky top-0 z-10">
-                <div><h2 id="modalTitle" class="text-sm font-black uppercase text-slate-900">Initiate Job</h2><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Maklumat Customer</p></div>
+                <div>
+                    <h2 id="modalTitle" class="text-sm font-black uppercase text-slate-900">Initiate Job</h2>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Maklumat Customer</p>
+                </div>
                 <button onclick="toggleModal(false)" class="w-9 h-9 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 border border-slate-100 tap-effect"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
+            
             <div class="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
                 <input type="hidden" id="editId">
                 <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 space-y-4">
-                    <div class="float-input-group"><input type="text" id="custName" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none"><label>Nama Pelanggan</label></div>
+                    <div class="float-input-group">
+                        <input type="text" id="custName" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none focus:bg-white transition-colors">
+                        <label>Nama Pelanggan</label>
+                    </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="float-input-group"><input type="tel" id="custPhone" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none font-num"><label>No. Phone</label></div>
-                        <div class="float-input-group"><select id="warranty" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none"><option value="No Warranty">No Warranty</option><option value="3 Hari">3 Hari</option><option value="1 Minggu">1 Minggu</option><option value="1 Bulan">1 Bulan</option></select><label></label></div>
+                        <div class="float-input-group">
+                            <input type="tel" id="custPhone" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none font-num">
+                            <label>No. Phone</label>
+                        </div>
+                        <div class="float-input-group">
+                            <select id="warranty" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none">
+                                <option value="No Warranty">No Warranty</option>
+                                <option value="3 Hari">3 Hari</option>
+                                <option value="1 Minggu">1 Minggu</option>
+                                <option value="1 Bulan">1 Bulan</option>
+                            </select>
+                            <label></label>
+                        </div>
                     </div>
                 </div>
-                <div class="space-y-3"><div class="flex justify-between items-end px-1"><h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Item/Service</h4><button onclick="addRow()" class="text-[9px] font-bold text-white bg-slate-900 px-4 py-2 rounded-xl uppercase tracking-wide tap-effect shadow-md">+ Item</button></div><div id="itemRowsContainer" class="space-y-3 pb-20"></div></div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-end px-1">
+                        <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Item/Service</h4>
+                        <button onclick="addRow()" class="text-[9px] font-bold text-white bg-slate-900 px-4 py-2 rounded-xl uppercase tracking-wide tap-effect shadow-md">
+                            + Item
+                        </button>
+                    </div>
+                    <div id="itemRowsContainer" class="space-y-3 pb-20"></div>
+                </div>
             </div>
+
             <div class="p-5 bg-white border-t border-slate-100 shrink-0 safe-bottom">
                 <div class="flex justify-between items-center mb-4">
-                    <select id="initialStatus" class="bg-slate-100 text-slate-700 py-2 px-3 rounded-xl text-[10px] font-black uppercase outline-none"><option value="outstanding">Unpaid</option><option value="paid">Paid</option></select>
-                    <div class="text-right"><p class="text-[8px] font-bold text-slate-400 uppercase mb-0.5">Grand Total</p><p class="text-2xl font-black text-slate-900 italic font-num">RM <span id="grandTotal">0.00</span></p></div>
+                    <select id="initialStatus" class="bg-slate-100 text-slate-700 py-2 px-3 rounded-xl text-[10px] font-black uppercase outline-none">
+                        <option value="outstanding">Unpaid</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                    <div class="text-right">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-0.5">Grand Total</p>
+                        <p class="text-2xl font-black text-slate-900 italic font-num">RM <span id="grandTotal">0.00</span></p>
+                    </div>
                 </div>
-                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-slate-900/20 tap-effect flex items-center justify-center gap-2">Simpan <i data-lucide="check" class="w-4 h-4"></i></button>
+                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-slate-900/20 tap-effect flex items-center justify-center gap-2">
+                    Simpan <i data-lucide="check" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -204,14 +360,36 @@
     <div id="actionModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end gpu">
         <div class="bg-white rounded-t-[2.5rem] w-full p-6 pb-10 shadow-2xl space-y-5 safe-bottom">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto"></div>
-            <div class="text-center"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tindakan Untuk</p><h2 id="actionTargetName" class="font-black text-lg uppercase text-slate-900 italic mt-1 truncate px-4"></h2></div>
-            <div class="bg-slate-50 p-1 rounded-2xl border border-slate-200"><select id="updateRepairStatus" onchange="updateLiveStatus(activeId, this.value)" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-black outline-none shadow-sm text-slate-700"><option value="Received">1. Received</option><option value="Waiting">2. Waiting</option><option value="Diagnosis">3. Diagnosis</option><option value="Repairing">4. Repairing</option><option value="Ready">5. Ready</option><option value="Collected">6. Collected</option></select></div>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="btnToggleStatus" class="col-span-2 p-4 rounded-2xl font-black text-[10px] uppercase shadow-lg tap-effect flex justify-between items-center px-6 transition-all duration-300"></button>
-                <button onclick="handleAction('getlink')" class="p-4 bg-blue-50 text-blue-600 rounded-2xl font-black text-[9px] uppercase border border-blue-100 flex justify-center items-center gap-2 tap-effect"><i data-lucide="link" class="w-4 h-4"></i> Link</button>
-                <button onclick="handleAction('edit')" class="p-4 bg-amber-50 text-amber-600 rounded-2xl font-black text-[9px] uppercase border border-amber-100 flex justify-center items-center gap-2 tap-effect"><i data-lucide="edit-3" class="w-4 h-4"></i> Edit</button>
+            <div class="text-center">
+                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tindakan Untuk</p>
+                 <h2 id="actionTargetName" class="font-black text-lg uppercase text-slate-900 italic mt-1 truncate px-4"></h2>
             </div>
-             <button onclick="handleAction('delete')" class="w-full p-4 text-rose-500 font-black text-[10px] uppercase border border-rose-100 rounded-2xl tap-effect">Hapus Rekod</button>
+            
+            <div class="bg-slate-50 p-1 rounded-2xl border border-slate-200">
+                <select id="updateRepairStatus" onchange="updateLiveStatus(activeId, this.value)" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-black outline-none shadow-sm text-slate-700">
+                    <option value="Received">1. Received</option>
+                    <option value="Waiting">2. Waiting</option>
+                    <option value="Diagnosis">3. Diagnosis</option>
+                    <option value="Repairing">4. Repairing</option>
+                    <option value="Ready">5. Ready</option>
+                    <option value="Collected">6. Collected</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button id="btnToggleStatus" class="col-span-2 p-4 rounded-2xl font-black text-[10px] uppercase shadow-lg tap-effect flex justify-between items-center px-6 transition-all duration-300">
+                    </button>
+
+                <button onclick="handleAction('getlink')" class="p-4 bg-blue-50 text-blue-600 rounded-2xl font-black text-[9px] uppercase border border-blue-100 flex justify-center items-center gap-2 tap-effect">
+                    <i data-lucide="link" class="w-4 h-4"></i> Link
+                </button>
+                <button onclick="handleAction('edit')" class="p-4 bg-amber-50 text-amber-600 rounded-2xl font-black text-[9px] uppercase border border-amber-100 flex justify-center items-center gap-2 tap-effect">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
+                </button>
+            </div>
+             <button onclick="handleAction('delete')" class="w-full p-4 text-rose-500 font-black text-[10px] uppercase border border-rose-100 rounded-2xl tap-effect">
+                Hapus Rekod
+            </button>
             <button onclick="closeActionMenu()" class="w-full py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Batal</button>
         </div>
     </div>
@@ -221,6 +399,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Fail:', err));
+            });
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
             authDomain: "rms-cloudnas.firebaseapp.com",
@@ -235,7 +419,7 @@
 
         let currentUser = null;
         let allInvoices = [], currentFilter = 'all', activeId = null, searchTimeout = null;
-        let shopName = "RMS CLOUD"; 
+        let shopName = "RMS CLOUD";
 
         auth.onAuthStateChanged(async user => {
             if (!user) {
@@ -246,7 +430,7 @@
                     const userDoc = await db.collection('users').doc(user.uid).get();
                     if(userDoc.exists) {
                         const data = userDoc.data();
-                        shopName = data.shopName; 
+                        shopName = data.shopName;
                         const demoTag = data.role === 'guest' ? '<span class="text-amber-500 text-[8px] ml-1">[DEMO]</span>' : '';
                         document.getElementById('shopTitle').innerHTML = `${data.shopName} <span class="text-red-600">CLOUD</span> ${demoTag}`;
                     }
@@ -278,22 +462,22 @@
             const icon = type === 'success' ? 'check-circle' : 'alert-circle'; const color = type === 'success' ? 'text-emerald-400' : 'text-rose-400';
             toast.className = 'toast'; toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 ${color}"></i> <span>${msg}</span>`;
             container.appendChild(toast); lucide.createIcons(); if(navigator.vibrate) navigator.vibrate(50);
-            setTimeout(() => { toast.style.opacity='0'; setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
         function showPage(p) {
             ['dashboardView', 'reportsView', 'toolsView'].forEach(v => { const el = document.getElementById(v); el.classList.remove('active'); setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 200); });
             const target = document.getElementById(p + 'View'); target.style.display = 'block'; void target.offsetWidth; target.classList.add('active');
             
-            document.querySelectorAll('button[id^="nav-"]').forEach(b => { b.classList.remove('text-white', 'opacity-100'); b.classList.add('text-slate-400'); });
-            const navId = p === 'dashboard' ? 'nav-dash' : p === 'tools' ? 'nav-tools' : '';
-            if(navId) { const activeBtn = document.getElementById(navId); activeBtn.classList.add('text-white', 'opacity-100'); activeBtn.classList.remove('text-slate-400'); }
+            document.querySelectorAll('button[id^="nav-"]').forEach(b => { b.classList.remove('nav-item-active'); b.classList.add('text-slate-400'); });
+            const navId = p === 'dashboard' ? 'nav-dash' : p === 'reports' ? 'nav-report' : p === 'tools' ? 'nav-tools' : '';
+            if(navId) { const activeBtn = document.getElementById(navId); activeBtn.classList.add('nav-item-active'); activeBtn.classList.remove('text-slate-400'); }
             window.scrollTo({top: 0, behavior: 'smooth'}); lucide.createIcons();
         }
 
         function filterInvoices(type) {
             currentFilter = type; const ids = {all: 'f-all', paid: 'f-paid', outstanding: 'f-pending'};
-            Object.keys(ids).forEach(k => { const el = document.getElementById(ids[k]); if(k === type) { el.classList.add('bg-slate-900', 'text-white'); el.classList.remove('text-slate-500'); } else { el.classList.remove('bg-slate-900', 'text-white'); el.classList.add('text-slate-500'); } });
+            Object.keys(ids).forEach(k => { const el = document.getElementById(ids[k]); if(k === type) el.classList.add('tab-active'); else el.classList.remove('tab-active'); });
             updateDashboard();
         }
 
