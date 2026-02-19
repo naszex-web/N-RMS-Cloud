@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f8fafc">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <title>Tetapan - NASZEX CLOUD</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    
+    <style>
+        :root { --primary: #0f172a; --accent: #ef4444; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc;
+            color: #1e293b; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+            overscroll-behavior-y: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .font-num { font-family: 'Inter', sans-serif; }
+
+        .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
+
+        .glass-nav { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
+        
+        .tap-effect { transition: transform 0.1s; cursor: pointer; }
+        .tap-effect:active { transform: scale(0.95); }
+        
+        .nav-item-active { color: #0f172a !important; }
+
+        /* Toast */
+        #toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(-20px); pointer-events: auto; display: flex; align-items: center; gap: 8px; }
+        @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
+
+        @supports (padding: max(0px)) {
+            .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)) !important; }
+            .safe-bottom { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-32 bg-[#f8fafc]">
+
+    <div id="toast-container"></div>
+
+    <nav class="sticky top-0 z-40 glass-nav px-5 py-3 gpu safe-top">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <button onclick="window.location.href='index.html'" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                <div>
+                    <h1 class="text-[14px] font-black uppercase text-slate-900 leading-none">Tetapan</h1>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 leading-none">Akaun & Sistem</p>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-md mx-auto p-4 space-y-6 mt-2">
+        
+        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5 relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-slate-50 rounded-full opacity-50"></div>
+            
+            <div class="w-16 h-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-slate-900/20 shrink-0 z-10">
+                <i data-lucide="user" class="w-7 h-7 text-white"></i>
+            </div>
+            <div class="z-10">
+                <h2 id="userNameDisplay" class="text-lg font-black text-slate-900 uppercase leading-tight">Memuatkan...</h2>
+                <p id="userRoleDisplay" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1 bg-emerald-50 inline-block px-2 py-0.5 rounded-md">-</p>
+                <p id="userEmailDisplay" class="text-[10px] font-medium text-slate-400 mt-1 font-num hidden"></p>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">Sistem App</h3>
+            
+            <div class="bg-white rounded-[1.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                <button onclick="clearCache()" class="w-full p-5 flex items-center justify-between tap-effect border-b border-slate-50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <h4 class="text-xs font-black text-slate-900 uppercase">Clear Cache</h4>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Segarkan data memori</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+                </button>
+                
+                <div class="w-full p-5 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center"><i data-lucide="info" class="w-4 h-4"></i></div>
+                        <div class="text-left">
+                            <h4 class="text-xs font-black text-slate-900 uppercase">Versi Sistem</h4>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">NASZEX RMS v7.1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-6">
+            <button onclick="logoutApp()" id="btnLogout" class="w-full bg-white border-2 border-rose-100 text-rose-500 hover:bg-rose-50 hover:border-rose-200 p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest tap-effect flex items-center justify-center gap-2 transition-colors">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Log Keluar Akaun
+            </button>
+        </div>
+        
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-4 py-2 safe-bottom gpu">
+        <div class="max-w-md mx-auto grid grid-cols-5 items-end h-14 pb-2">
+            <button onclick="window.location.href='index.html'" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Home</span>
+            </button>
+            
+            <button onclick="window.location.href='index.html'" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-900 opacity-50">
+                <div class="w-5 h-5 bg-slate-900 text-white rounded-md flex items-center justify-center shadow-md">
+                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[9px] font-black uppercase tracking-tight">New</span>
+            </button>
+            
+            <button onclick="window.location.href='index.html'" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Data</span>
+            </button>
+            
+            <button onclick="window.location.href='index.html'" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+                <i data-lucide="wrench" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Tools</span>
+            </button>
+
+            <button class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors nav-item-active">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                <span class="text-[9px] font-black uppercase tracking-tight">Setting</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        // Guna config Firebase yang sama macam index.html/login.html
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg", 
+            authDomain: "invoicely-52db9.firebaseapp.com", 
+            projectId: "invoicely-52db9", 
+            storageBucket: "invoicely-52db9.firebasestorage.app", 
+            messagingSenderId: "512282448037", 
+            appId: "1:512282448037:web:ad9600a2aa477c3533fd4c" 
+        };
+        
+        // Elak ralat kalau firebase dah initialize dari cache
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+
+        // Gatekeeper & Profil Paparan
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.replace('login.html');
+            } else {
+                // Tentukan paparan ikut jenis user
+                if (user.isAnonymous) {
+                    document.getElementById('userNameDisplay').innerText = "Guest User";
+                    document.getElementById('userRoleDisplay').innerText = "Akaun Demo";
+                    document.getElementById('userRoleDisplay').className = "text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1 bg-amber-50 inline-block px-2 py-0.5 rounded-md";
+                } else {
+                    document.getElementById('userNameDisplay').innerText = "Admin NASZEX";
+                    document.getElementById('userRoleDisplay').innerText = "Administrator";
+                    document.getElementById('userEmailDisplay').innerText = user.email;
+                    document.getElementById('userEmailDisplay').classList.remove('hidden');
+                }
+            }
+        });
+
+        // Fungsi Logout
+        function logoutApp() {
+            const btn = document.getElementById('btnLogout');
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...`;
+            lucide.createIcons();
+            
+            auth.signOut().then(() => {
+                // Akan automatik di-redirect oleh onAuthStateChanged
+                showToast("Log keluar berjaya.");
+            }).catch(error => {
+                showToast("Ralat: " + error.message, "error");
+                btn.innerHTML = `<i data-lucide="log-out" class="w-4 h-4"></i> Log Keluar Akaun`;
+                lucide.createIcons();
+            });
+        }
+
+        // Fungsi tambahan untuk nampak real
+        function clearCache() {
+            showToast("Menyegarkan memori cache...");
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1000);
+        }
+
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+            const color = type === 'success' ? 'text-emerald-400' : 'text-rose-400';
+            toast.className = 'toast';
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 ${color}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            if(navigator.vibrate) navigator.vibrate(50);
+            setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+    </script>
+</body>
+</html>
