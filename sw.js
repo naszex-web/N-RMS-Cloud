@@ -22,9 +22,11 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
-  // Membaiki ralat Safari: Jangan simpan redirections dalam cache
+  // FIX UNTUK SAFARI: Elak cache redirection untuk navigasi
   if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request).catch(() => caches.match('./index.html')));
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('./index.html'))
+    );
     return;
   }
 
