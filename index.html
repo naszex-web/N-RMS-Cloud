@@ -422,32 +422,28 @@
 
         // --- Bahagian Script di index.html ---
 let currentUser = null;
-let shopProfile = { shopName: "NASZEX" };
 
-// 1. GATEKEEPER DENGAN PERSISTENCE CHECK
 auth.onAuthStateChanged(async user => {
     if (!user) {
-        // Confirm memang tak login, baru tendang
         window.location.replace('login.html');
     } else {
         currentUser = user;
         
-        // 2. Tarik Profil Kedai (Branding Dinamik)
+        // Ambil profil kedai (Branding)
         try {
             const userDoc = await db.collection('users').doc(user.uid).get();
             if(userDoc.exists) {
-                shopProfile = userDoc.data();
-                document.getElementById('shopTitle').innerHTML = `${shopProfile.shopName} <span class="text-red-600">CLOUD</span>`;
+                const data = userDoc.data();
+                document.getElementById('shopTitle').innerHTML = `${data.shopName} <span class="text-red-600">CLOUD</span>`;
             }
-        } catch(e) { console.error("Profile Error:", e); }
+        } catch(e) { console.error(e); }
 
-        // 3. Jalankan Listener Data (Data Isolation)
         initRealtimeInvoices();
     }
 });
 
 function initRealtimeInvoices() {
-    // PENTING: .where("uid", "==", ...) pastikan data tak bercampur
+    // PENTING: Index diperlukan di Console untuk query ini (uid + createdAt)
     db.collection("invoices")
       .where("uid", "==", currentUser.uid)
       .orderBy("createdAt", "desc")
@@ -455,33 +451,16 @@ function initRealtimeInvoices() {
       .onSnapshot(s => {
           allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}));
           updateDashboard();
-      }, error => {
-          console.error("Firestore Error:", error);
-          if(error.code === 'failed-precondition') {
-              showToast("Sila aktifkan Index di Console!", "error");
+      }, err => {
+          // Jika naik error index, sistem akan tunjuk 'Admin Note'
+          if(err.code === 'failed-precondition') {
+              // Kod modal Admin Note anda di sini
           }
       });
 }
 
-// Kemaskini fungsi Simpan
-async function saveAndGenerate() {
-    // ... logic form ...
-    const data = {
-        uid: currentUser.uid, // Wajib simpan UID pencipta resit
-        customerName: n,
-        customerPhone: p,
-        // ... data lain ...
-    };
-    // ... logic Firestore add/update ...
-}
-
-// Fungsi Logout Rasmi
 function logout() {
-    if(confirm("Log keluar dari sistem?")) {
-        auth.signOut().then(() => {
-            window.location.replace('login.html');
-        });
-    }
+    if(confirm("Log keluar?")) auth.signOut().then(() => window.location.replace('login.html'));
 }
 
         async function refreshData() {
