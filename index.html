@@ -37,10 +37,8 @@
         
         .font-num { font-family: 'Inter', sans-serif; }
 
-        /* --- 90Hz SMOOTH ENGINE & GPU --- */
         .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
 
-        /* Modal Animation - Spring Physics */
         .modal-wrapper {
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
             transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none;
@@ -48,15 +46,12 @@
         }
         .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
-        /* Page Transitions */
         .view-section { display: none; opacity: 0; transform: scale(0.99); transition: opacity 0.2s ease, transform 0.2s ease; will-change: opacity, transform; }
         .view-section.active { display: block; opacity: 1; transform: scale(1); }
 
-        /* List Animation */
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .list-anim { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
 
-        /* UI Elements */
         .glass-nav { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
         .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
         
@@ -66,34 +61,24 @@
         .tab-active { background: #0f172a !important; color: #fff !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
         .nav-item-active { color: #ef4444 !important; }
 
-        /* Inputs */
         .float-input-group { position: relative; width: 100%; transition: 0.3s; }
         .float-input-group label { position: absolute; top: 6px; left: 14px; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; pointer-events: none; }
         .float-input-group input, .float-input-group select { padding-top: 22px; padding-bottom: 10px; }
 
-        /* Toast */
         #toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(-20px); pointer-events: auto; display: flex; align-items: center; gap: 8px; }
         @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* Timeline Specifics */
         .timeline-item { position: relative; padding-left: 24px; padding-bottom: 24px; border-left: 2px solid #e2e8f0; }
         .timeline-item:last-child { border-left: none; padding-bottom: 0; }
         .timeline-item.active { border-left-color: #10b981; }
         .timeline-dot { position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 2px solid #fff; box-shadow: 0 0 0 2px #e2e8f0; }
         .timeline-item.active .timeline-dot { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
 
-        /* --- SAFE AREA ADJUSTMENTS DENGAN MAX() --- */
         @supports (padding: max(0px)) {
-            .safe-top { 
-                padding-top: max(0.75rem, env(safe-area-inset-top)) !important; 
-            }
-            .safe-bottom { 
-                padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
-            }
-            .modal-safe-bottom {
-                padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important;
-            }
+            .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)) !important; }
+            .safe-bottom { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important; }
+            .modal-safe-bottom { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important; }
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -428,32 +413,35 @@
             });
         }
 
+        // Fix Icon Hilang sebab Bfcache Safari
+        document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); });
+        window.addEventListener("pageshow", () => { lucide.createIcons(); });
+
         const firebaseConfig = {
-  apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
-  authDomain: "rms-cloudnas.firebaseapp.com",
-  databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "rms-cloudnas",
-  storageBucket: "rms-cloudnas.firebasestorage.app",
-  messagingSenderId: "142738217487",
-  appId: "1:142738217487:web:2c2a08c40b77447484a17a"
-};
+            apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
+            authDomain: "rms-cloudnas.firebaseapp.com",
+            databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rms-cloudnas",
+            storageBucket: "rms-cloudnas.firebasestorage.app",
+            messagingSenderId: "142738217487",
+            appId: "1:142738217487:web:2c2a08c40b77447484a17a"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // --- GATEKEEPER LOGIC (UPDATED) ---
+        // --- GATEKEEPER LOGIC (UPDATED + AUTO REFRESH) ---
         const auth = firebase.auth();
         auth.onAuthStateChanged(user => {
             if (!user) {
-                // Belum login: Tendang terus ke login.html (Layar gelap masih tutup skrin)
                 window.location.replace('login.html');
             } else {
-                // Dah login: Buang layar gelap perlahan-lahan dan tunjuk Dashboard
                 const splash = document.getElementById('gatekeeperSplash');
                 if (splash) {
                     splash.style.opacity = '0';
                     setTimeout(() => {
                         splash.style.display = 'none';
-                    }, 500); // Tunggu 500ms untuk efek fade-out siap
+                        refreshData(); // Panggil fungsi auto-refresh di sini
+                    }, 500); 
                 }
             }
         });
