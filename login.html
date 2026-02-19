@@ -3,65 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <title>Masuk - RMS Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: white; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f172a; 
+            color: white; 
+            overscroll-behavior-y: contain; 
+        }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .input-field { background: #0f172a; border: 1px solid #334155; color: white; transition: all 0.3s; }
-        .input-field:focus { border-color: #ef4444; outline: none; }
+        .input-field:focus { border-color: #ef4444; outline: none; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); }
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 bg-slate-950">
-    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
     <div class="w-full max-w-sm fade-in">
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2rem] shadow-2xl mb-4 border border-slate-700">
-                <img src="logo.png" class="w-12 h-12 object-contain" alt="Logo">
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2.5rem] shadow-2xl mb-5 border border-slate-700 p-3">
+                <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
             </div>
             <h1 class="text-2xl font-black tracking-tighter text-white uppercase leading-none">RMS <span class="text-red-500">Cloud</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Sistem Pengurusan v8.2</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Professional Repair Suite</p>
         </div>
 
         <div class="glass-card rounded-[3rem] p-8 shadow-2xl space-y-6">
-            
             <div class="space-y-4">
-                <h2 class="text-xs font-black italic text-center uppercase tracking-widest text-slate-400">Log Masuk Rasmi</h2>
+                <h2 class="text-[10px] font-black italic text-center uppercase tracking-[0.2em] text-slate-400">Admin Authentication</h2>
                 <div>
-                    <input type="text" id="username" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase" placeholder="USERNAME">
+                    <input type="text" id="username" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase tracking-widest" placeholder="USERNAME">
                 </div>
                 <div>
-                    <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase" placeholder="PASSWORD">
+                    <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase tracking-widest" placeholder="PASSWORD">
                 </div>
-                <button onclick="loginAdmin()" id="btnAdmin" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-lg transition-all active:scale-95 tracking-widest">
-                    Masuk (Admin)
+                <button onclick="loginAdmin()" id="btnAdmin" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-lg transition-all active:scale-95 tracking-[0.2em]">
+                    Log Masuk
                 </button>
             </div>
 
-            <div class="flex items-center gap-4 py-1 opacity-40">
+            <div class="flex items-center gap-4 py-1 opacity-20">
                 <div class="flex-1 h-px bg-slate-600"></div>
-                <span class="text-[8px] font-black uppercase tracking-widest">Atau</span>
+                <span class="text-[8px] font-black uppercase">atau</span>
                 <div class="flex-1 h-px bg-slate-600"></div>
             </div>
 
-            <div>
-                <button onclick="loginGuest()" id="btnGuest" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-700 tracking-widest">
-                    <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-                    Cuba Sebagai Guest
-                </button>
-            </div>
-
+            <button onclick="loginGuest()" id="btnGuest" class="w-full bg-slate-800/50 hover:bg-slate-700 text-slate-300 font-black uppercase text-[10px] py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-700 tracking-widest">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                Cuba Sebagai Guest
+            </button>
         </div>
+        
+        <p class="text-center text-[8px] font-bold text-slate-600 mt-10 uppercase tracking-widest">Powered by NASZEX CLOUD ENGINE</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
@@ -77,6 +89,7 @@
 
         lucide.createIcons();
 
+        // Auto-redirect
         auth.onAuthStateChanged(user => {
             if (user && window.location.pathname.includes('login.html')) {
                 window.location.replace('index.html');
@@ -89,10 +102,10 @@
             const btn = document.getElementById('btnAdmin');
 
             if (u === 'ADMIN' && p === 'ADMIN') {
-                btn.innerHTML = "Memproses..."; btn.disabled = true;
+                btn.innerHTML = "Authenticating..."; btn.disabled = true;
                 
-                // Kitaran Rahsia: Jadikan Admin sebagai akaun kekal Firebase
-                const adminEmail = "admin@naszexcloud.com";
+                // Email & Password yang kau dah add kat Console tadi
+                const adminEmail = "admin@naszex.com";
                 const adminPass = "naszexadmin123";
 
                 try {
@@ -100,58 +113,44 @@
                     await auth.signInWithEmailAndPassword(adminEmail, adminPass);
                     window.location.replace('index.html');
                 } catch (e) {
-                    // Kalau first time, dia akan auto-create
-                    if (e.code === 'auth/user-not-found') {
-                        try {
-                            const res = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
-                            await db.collection('users').doc(res.user.uid).set({
-                                shopName: "NASZEX GSM",
-                                role: "admin",
-                                joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                            window.location.replace('index.html');
-                        } catch (err) {
-                            showToast("Ralat. Sila pastikan Email Provider diaktifkan.", "error");
-                            btn.innerHTML = "Masuk (Admin)"; btn.disabled = false;
-                        }
-                    } else {
-                        showToast("Ralat: " + e.message, "error");
-                        btn.innerHTML = "Masuk (Admin)"; btn.disabled = false;
-                    }
+                    console.error(e);
+                    showToast("Ralat: " + e.code, "error");
+                    btn.innerHTML = "Log Masuk"; btn.disabled = false;
                 }
             } else {
-                showToast("Username atau Password Salah", "error");
+                showToast("ID atau Password Salah!", "error");
             }
         }
 
         async function loginGuest() {
             const btn = document.getElementById('btnGuest');
-            btn.innerHTML = "Membuka Demo..."; btn.disabled = true;
+            btn.innerHTML = "Setting up Demo..."; btn.disabled = true;
 
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 const res = await auth.signInAnonymously();
                 
+                // Register profile guest
                 const doc = await db.collection('users').doc(res.user.uid).get();
                 if (!doc.exists) {
                     await db.collection('users').doc(res.user.uid).set({
-                        shopName: "GUEST DEMO",
+                        shopName: "GUEST REPAIR",
                         role: "guest",
                         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
                 window.location.replace('index.html');
             } catch (e) { 
-                showToast("Sila aktifkan Anonymous Provider di Firebase.", "error");
-                btn.innerHTML = `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i> Cuba Sebagai Guest`;
-                btn.disabled = false;
+                showToast("Guest failed: " + e.code, "error");
+                btn.innerHTML = "Cuba Sebagai Guest"; btn.disabled = false;
             }
         }
 
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white px-6 py-3 rounded-full text-[10px] font-black uppercase shadow-lg text-center tracking-widest`;
+            const bg = type === 'success' ? 'bg-emerald-500' : 'bg-rose-500';
+            toast.className = `${bg} text-white px-6 py-3 rounded-full text-[10px] font-black uppercase shadow-lg text-center tracking-widest fade-in`;
             toast.innerText = msg;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
