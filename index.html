@@ -428,22 +428,15 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        
+
         let allInvoices = [], currentFilter = 'all', activeId = null;
         let searchTimeout = null;
-        let unsubscribe = null; // Pembolehubah untuk fungsi data isolation
+        let unsubscribe = null;
 
-        const statusDescriptions = {
-            'Received': 'Peranti diterima, menunggu giliran.',
-            'Waiting': 'Dalam senarai menunggu (Queue).',
-            'Diagnosis': 'Juruteknik sedang mencari punca kerosakan.',
-            'Repairing': 'Sedang dibaiki (Hardware/Software).',
-            'Ready': 'Siap dibaiki & sedia untuk diambil.',
-            'Collected': 'Telah diambil oleh pelanggan.'
-        };
-
-        // --- GATEKEEPER & DATA FETCHER (PRIVACY ENABLED) ---
+        // --- GATEKEEPER LOGIC (SESI SESSION STORAGE) & DATA FETCHER ---
         const splash = document.getElementById('gatekeeperSplash');
+        
+        // Kalau dah pernah lalu skrin ni untuk sesi ni, terus hilangkan
         if (sessionStorage.getItem('rms_session')) {
             if(splash) splash.style.display = 'none';
         }
@@ -453,6 +446,7 @@
             if (!user) {
                 window.location.replace('login.html');
             } else {
+                // Kalau baru pertama kali buka dalam sesi ni, tunjuk efek fade out
                 if (!sessionStorage.getItem('rms_session')) {
                     if (splash) {
                         splash.style.opacity = '0';
@@ -463,20 +457,25 @@
                     }
                 }
 
-                // TARIK DATA SPESIFIK UNTUK USER INI SAHAJA
                 if(unsubscribe) unsubscribe();
                 unsubscribe = db.collection("invoices")
                     .where("uid", "==", user.uid)
                     .onSnapshot(s => {
-                        // Susun rekod secara lokal mengelak masalah Index di Firebase
                         allInvoices = s.docs.map(d=>({id:d.id, ...d.data()}))
                                             .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
                         updateDashboard();
-                    }, error => {
-                        console.error("Firebase Auth Rules blocked access or network error:", error);
                     });
             }
         });
+
+        const statusDescriptions = {
+            'Received': 'Peranti diterima, menunggu giliran.',
+            'Waiting': 'Dalam senarai menunggu (Queue).',
+            'Diagnosis': 'Juruteknik sedang mencari punca kerosakan.',
+            'Repairing': 'Sedang dibaiki (Hardware/Software).',
+            'Ready': 'Siap dibaiki & sedia untuk diambil.',
+            'Collected': 'Telah diambil oleh pelanggan.'
+        };
 
         function showToast(msg, type='success') {
             const container = document.getElementById('toast-container');
@@ -517,14 +516,13 @@
             lucide.createIcons();
         }
 
-        // UPDATE REFRESH BUTTON UNTUK PATUH PADA RULES
         async function refreshData() {
             const btnIcon = document.getElementById('refresh-icon');
             btnIcon.classList.add('animate-spin');
             try {
                 const user = firebase.auth().currentUser;
                 if(!user) return;
-                
+
                 const s = await db.collection("invoices").where("uid", "==", user.uid).get();
                 allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}))
                                     .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
@@ -734,7 +732,6 @@
             showToast("Rekod Dijumpai");
         }
 
-        // UPDATE UNTUK PRIVACY UID
         async function saveAndGenerate() {
             const btn = document.getElementById('btnSave');
             btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...`; lucide.createIcons();
@@ -742,8 +739,8 @@
             if(!n || !p) { showToast("Sila isi Nama & Phone!", "error"); btn.innerText = "Simpan Rekod"; return; }
             
             const user = firebase.auth().currentUser;
-            if (!user) { showToast("Sesi tamat. Sila log masuk semula.", "error"); return; }
-            
+            if(!user) return;
+
             const items = [];
             document.querySelectorAll('.item-entry').forEach(r => {
                 const name = r.querySelector('.item-name').value;
@@ -753,32 +750,30 @@
                     modal: parseFloat(r.querySelector('.modal-price').value)||0, discount: parseFloat(r.querySelector('.discount').value)||0
                 });
             });
-
             const data = {
-                uid: user.uid, // SISTEM PENGASINGAN DATA
+                uid: user.uid,
                 customerName: n, customerPhone: p, warranty: document.getElementById('warranty').value,
                 status: document.getElementById('initialStatus').value, total: document.getElementById('grandTotal').innerText, items: items
             };
             const editId = document.getElementById('editId').value;
-
             try {
                 if(editId) { 
                     await db.collection("invoices").doc(editId).update(data); 
                     showToast("Rekod Dikemaskini");
+                    const idx = allInvoices.findIndex(x => x.id === editId);
+                    if(idx !== -1) allInvoices[idx] = { ...allInvoices[idx], ...data };
                 }
                 else {
                     const lastNo = allInvoices.reduce((max, i) => Math.max(max, parseInt(i.invoiceNo?.split('-')[1]||0)), 0);
                     data.invoiceNo = "NX-" + (lastNo + 1).toString().padStart(4, '0');
                     data.repairStatus = 'Received'; data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    
-                    await db.collection("invoices").add(data);
+                    const docRef = await db.collection("invoices").add(data);
+                    allInvoices.unshift({ id: docRef.id, ...data });
                     showToast("Job Sheet Dicipta");
                 }
+                updateDashboard();
                 toggleModal(false);
-            } catch(e) { 
-                console.error(e); 
-                showToast("Gagal Disimpan: Masalah Privasi/Rangkaian", "error"); 
-            }
+            } catch(e) { console.error(e); showToast("Ralat Sistem", "error"); }
             btn.innerHTML = `Simpan <i data-lucide="check" class="w-4 h-4"></i>`;
         }
 
@@ -787,11 +782,8 @@
             if(show) { m.classList.remove('hidden'); requestAnimationFrame(()=>m.classList.add('active')); }
             else { m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 250); }
         }
-
-        // UPDATE UNTUK SEKATAN GUEST
         function openAddModal() {
             const user = firebase.auth().currentUser;
-            
             if (user && user.isAnonymous && allInvoices.length >= 3) {
                 showToast("Demo terhad kepada 3 rekod sahaja.", "error");
                 return;
@@ -801,8 +793,7 @@
             document.getElementById('editId').value = "";
             document.getElementById('custName').value = ""; document.getElementById('custPhone').value = "";
             document.getElementById('itemRowsContainer').innerHTML = ""; addRow();
-            document.getElementById('grandTotal').innerText = "0.00"; 
-            toggleModal(true);
+            document.getElementById('grandTotal').innerText = "0.00"; toggleModal(true);
         }
 
         function openActionMenu(id) {
@@ -821,6 +812,7 @@
                 btn.innerHTML = `<span>OUTSTANDING</span><i data-lucide="x-circle" class="w-4 h-4 text-rose-500"></i>`;
                 btn.onclick = async () => {
                     await db.collection("invoices").doc(id).update({status: 'outstanding'});
+                    i.status = 'outstanding'; updateDashboard();
                     showToast("Status: OUTSTANDING"); closeActionMenu();
                 };
             } else {
@@ -828,6 +820,7 @@
                 btn.innerHTML = `<span>PAID</span><i data-lucide="check-circle" class="w-4 h-4 text-white"></i>`;
                 btn.onclick = async () => {
                     await db.collection("invoices").doc(id).update({status: 'paid'});
+                    i.status = 'paid'; updateDashboard();
                     showToast("Status: PAID"); closeActionMenu();
                 };
             }
@@ -841,6 +834,8 @@
         
         async function updateLiveStatus(id, val) { 
             await db.collection("invoices").doc(id).update({repairStatus: val}); 
+            const i = allInvoices.find(x=>x.id===id); if(i) i.repairStatus = val;
+            updateDashboard();
             showToast(`Status: ${val}`); 
         }
 
@@ -911,6 +906,8 @@
             }
             if(type === 'delete' && confirm("Hapus rekod ini?")) { 
                 db.collection("invoices").doc(activeId).delete(); 
+                allInvoices = allInvoices.filter(x=>x.id !== activeId);
+                updateDashboard();
                 showToast("Rekod Dihapus"); 
             }
             if(type === 'getlink') { navigator.clipboard.writeText(window.location.origin + "/view?id=" + activeId); showToast("Link Disalin"); }
