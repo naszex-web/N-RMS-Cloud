@@ -41,7 +41,6 @@
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Safe Area untuk PWA Notch */
         .safe-padding {
             padding-top: max(1.5rem, env(safe-area-inset-top));
             padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
@@ -116,19 +115,17 @@
         // LOGIC SPLASH SCREEN
         window.addEventListener('load', () => {
             const splash = document.getElementById('splashScreen');
-            
             setTimeout(() => {
                 splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                }, 700);
+                setTimeout(() => { splash.style.display = 'none'; }, 700);
             }, 1500); 
         });
 
-        // KONFIGURASI FIREBASE
+        // KONFIGURASI FIREBASE (Sync dengan projek rms-cloudnas)
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
             authDomain: "rms-cloudnas.firebaseapp.com",
+            databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "rms-cloudnas",
             storageBucket: "rms-cloudnas.firebasestorage.app",
             messagingSenderId: "142738217487",
@@ -142,7 +139,6 @@
 
         // GATEKEEPER
         auth.onAuthStateChanged(user => {
-            // Kalau user dah wujud, terus redirect sebelum splash screen habis
             if (user && window.location.pathname.includes('login.html')) {
                 window.location.replace('index.html');
             }
@@ -164,7 +160,6 @@
                     await auth.signInWithEmailAndPassword(adminEmail, adminPass);
                     window.location.replace('index.html');
                 } catch (e) {
-                    // Update error checking untuk versi Firebase terbaru
                     if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-login-credentials' || e.code === 'auth/invalid-credential') {
                         try {
                             const res = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
@@ -173,7 +168,7 @@
                             });
                             window.location.replace('index.html');
                         } catch (err) {
-                            showToast("Pastikan Email Provider On dalam Firebase", "error");
+                            showToast("Gagal Daftar Admin: " + err.message, "error");
                             btn.innerHTML = "Log Masuk"; btn.disabled = false;
                         }
                     } else {
@@ -201,7 +196,7 @@
                 }
                 window.location.replace('index.html');
             } catch (e) { 
-                showToast("Sila ON Anonymous Provider di Firebase", "error");
+                showToast("Ralat Guest: " + e.message, "error");
                 btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Cuba Sebagai Guest`; btn.disabled = false;
             }
         }
