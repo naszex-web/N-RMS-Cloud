@@ -39,10 +39,10 @@
             <div class="space-y-4">
                 <h2 class="text-[10px] font-black italic text-center uppercase tracking-[0.2em] text-slate-400">Admin Authentication</h2>
                 <div>
-                    <input type="text" id="username" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase tracking-widest" placeholder="USERNAME">
+                    <input type="text" id="username" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest" placeholder="Username / Email">
                 </div>
                 <div>
-                    <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest" placeholder="PASSWORD">
+                    <input type="password" id="password" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest" placeholder="Password">
                 </div>
                 <button onclick="loginAdmin()" id="btnAdmin" class="w-full bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-xl shadow-red-900/20 transition-all active:scale-95 tracking-[0.2em]">
                     Log Masuk
@@ -83,11 +83,13 @@
         });
 
         async function loginAdmin() {
-            const u = document.getElementById('username').value.trim().toUpperCase();
-            const p = document.getElementById('password').value.trim(); // FIX: Dibuang toUpperCase()
+            // FIX: Buang toUpperCase() supaya sistem baca huruf dengan tepat
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim(); 
             const btn = document.getElementById('btnAdmin');
 
-            if (u === 'ADMIN' && p === 'ADMIN') {
+            // Kita buat semakan ini tak kira huruf besar atau kecil (untuk kemudahan kalau guna ADMIN)
+            if (u.toUpperCase() === 'ADMIN' && p.toUpperCase() === 'ADMIN') {
                 btn.innerHTML = "Authenticating..."; btn.disabled = true;
                 
                 const adminEmail = "admin@naszex.com";
@@ -114,7 +116,9 @@
                         btn.innerHTML = "Log Masuk"; btn.disabled = false;
                     }
                 }
-            } else { showToast("ID atau Password Salah!", "error"); }
+            } else { 
+                showToast("ID atau Password Salah!", "error"); 
+            }
         }
 
         async function loginGuest() {
