@@ -29,12 +29,12 @@
         <div class="glass-card rounded-[3rem] p-10 shadow-2xl space-y-6 text-center">
             <div>
                 <h2 class="text-xl font-black italic">Selamat Datang</h2>
-                <p class="text-xs text-slate-400 font-bold mt-1">Pilih cara untuk akses sistem anda</p>
+                <p class="text-xs text-slate-400 font-bold mt-1">Guna akaun Google untuk akses sistem</p>
             </div>
 
             <div class="space-y-3">
                 <button onclick="signInGoogle()" id="btnGoogle" class="w-full bg-white text-slate-900 font-black uppercase text-[10px] py-4 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-all active:scale-95">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-4 h-4" alt="">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-4 h-4" alt="Google">
                     Sign in with Google
                 </button>
 
@@ -43,10 +43,6 @@
                     Try as Guest (Demo)
                 </button>
             </div>
-
-            <p class="text-[9px] text-slate-500 font-bold px-4 leading-relaxed">
-                Dengan log masuk, anda bersetuju dengan Terma & Syarat RMS Cloud.
-            </p>
         </div>
     </div>
 
@@ -68,6 +64,7 @@
 
         lucide.createIcons();
 
+        // Redirect jika sudah login
         auth.onAuthStateChanged(user => {
             if (user) window.location.replace('index.html');
         });
