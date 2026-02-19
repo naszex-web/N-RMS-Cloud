@@ -1,23 +1,35 @@
-const CACHE_NAME = 'rms-v8-cache';
-const urlsToCache = ['./index.html', './login.html', './settings.html', './manifest.json', './logo.png'];
+const CACHE_NAME = 'rms-v8.1-cache';
+const ASSETS = [
+  './',
+  './index.html',
+  './login.html',
+  './settings.html',
+  './manifest.json',
+  './logo.png'
+];
 
-self.addEventListener('install', event => {
-    self.skipWaiting();
-    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
 });
 
-self.addEventListener('fetch', event => {
-    // Strategi: Cuba Internet dulu, kalau gagal baru guna Cache
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request).catch(() => caches.match('./index.html'))
-        );
-        return;
-    }
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(
+    keys.map(k => k !== CACHE_NAME && caches.delete(k))
+  )));
+});
 
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request);
-        })
-    );
+self.addEventListener('fetch', e => {
+  // Hanya uruskan request GET
+  if (e.request.method !== 'GET') return;
+
+  // Elakkan simpan redirections dalam cache (Penting untuk Safari)
+  if (e.request.mode === 'navigate') {
+    e.respondWith(fetch(e.request).catch(() => caches.match('./index.html')));
+    return;
+  }
+
+  e.respondWith(
+    caches.match(e.request).then(res => res || fetch(e.request))
+  );
 });
