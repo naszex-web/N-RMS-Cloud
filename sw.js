@@ -20,10 +20,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Hanya uruskan request GET
   if (e.request.method !== 'GET') return;
 
-  // Elakkan simpan redirections dalam cache (Penting untuk Safari)
+  // Membaiki ralat Safari: Jangan simpan redirections dalam cache
   if (e.request.mode === 'navigate') {
     e.respondWith(fetch(e.request).catch(() => caches.match('./index.html')));
     return;
