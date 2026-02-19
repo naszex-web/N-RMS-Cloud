@@ -212,6 +212,12 @@
                 showToast("Ralat: " + error.message, "error");
                 btn.innerHTML = `<i data-lucide="log-out" class="w-4 h-4"></i> Log Keluar Akaun`;
                 lucide.createIcons();
+                        lucide.createIcons();
+
+        // Fix Icon Hilang sebab Bfcache
+        document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); });
+        window.addEventListener("pageshow", () => { lucide.createIcons(); });
+
             });
         }
 
