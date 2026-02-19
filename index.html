@@ -418,15 +418,14 @@
         window.addEventListener("pageshow", () => { lucide.createIcons(); });
 
         const firebaseConfig = {
-            const firebaseConfig = {
-  apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
-  authDomain: "rms-cloudnas.firebaseapp.com",
-  databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "rms-cloudnas",
-  storageBucket: "rms-cloudnas.firebasestorage.app",
-  messagingSenderId: "142738217487",
-  appId: "1:142738217487:web:2c2a08c40b77447484a17a"
-};
+            apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
+            authDomain: "rms-cloudnas.firebaseapp.com",
+            databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rms-cloudnas",
+            storageBucket: "rms-cloudnas.firebasestorage.app",
+            messagingSenderId: "142738217487",
+            appId: "1:142738217487:web:2c2a08c40b77447484a17a"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
