@@ -75,26 +75,40 @@
     <div id="toast-container" class="fixed top-[max(2.5rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
     <div class="w-full max-w-sm fade-in">
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2.5rem] shadow-2xl mb-5 border border-slate-700 p-3">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2.5rem] shadow-2xl mb-4 border border-slate-700 p-3">
                 <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
             </div>
             <h1 class="text-2xl font-black tracking-tighter text-white uppercase leading-none">RMS <span class="text-red-500">Cloud</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Professional Repair Suite</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Repair Management</p>
         </div>
 
         <div class="glass-card rounded-[3rem] p-8 shadow-2xl space-y-6 relative overflow-hidden">
-            <div class="space-y-4 relative z-10">
-                <h2 class="text-[10px] font-black italic text-center uppercase tracking-[0.2em] text-slate-400">Admin Authentication</h2>
-                <div>
-                    <input type="text" id="username" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest text-center" placeholder="Username / Email">
+            
+            <div class="space-y-4 relative z-10" id="authForm">
+                <h2 id="formTitle" class="text-[10px] font-black italic text-center uppercase tracking-[0.2em] text-slate-400 mb-6">Log Masuk Akaun</h2>
+                
+                <div id="shopNameContainer" class="hidden transition-all duration-300">
+                    <input type="text" id="shopName" autocapitalize="words" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-wide text-center" placeholder="Nama Kedai (Cth: NASZEX GSM)">
                 </div>
+                
                 <div>
-                    <input type="password" id="password" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest text-center" placeholder="Password">
+                    <input type="email" id="email" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-wide text-center" placeholder="Alamat Emel">
                 </div>
-                <button onclick="loginAdmin()" id="btnAdmin" class="w-full bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-xl shadow-red-900/20 transition-all active:scale-95 tracking-[0.2em]">
+                
+                <div>
+                    <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest text-center" placeholder="Kata Laluan">
+                </div>
+                
+                <button onclick="handleAuth()" id="btnAuth" class="w-full bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-xl shadow-red-900/20 transition-all active:scale-95 tracking-[0.2em] mt-2 flex justify-center items-center gap-2">
                     Log Masuk
                 </button>
+
+                <div class="text-center pt-2">
+                    <button onclick="toggleAuthMode()" class="text-[10px] font-bold text-slate-400 hover:text-white transition-colors" id="toggleText">
+                        Belum ada akaun? <span class="text-red-500">Daftar sekarang</span>
+                    </button>
+                </div>
             </div>
 
             <div class="flex items-center gap-4 py-1 opacity-20 relative z-10">
@@ -121,7 +135,7 @@
             }, 1500); 
         });
 
-        // KONFIGURASI FIREBASE (Sync dengan projek rms-cloudnas)
+        // KONFIGURASI FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
             authDomain: "rms-cloudnas.firebaseapp.com",
@@ -144,63 +158,111 @@
             }
         });
 
-        async function loginAdmin() {
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim(); 
-            const btn = document.getElementById('btnAdmin');
+        // KAWALAN MODE LOGIN / REGISTER
+        let isLoginMode = true;
 
-            if (u.toUpperCase() === 'ADMIN' && p.toUpperCase() === 'ADMIN') {
-                btn.innerHTML = "Authenticating..."; btn.disabled = true;
-                
-                const adminEmail = "admin@naszex.com";
-                const adminPass = "naszexadmin123";
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const shopContainer = document.getElementById('shopNameContainer');
+            const formTitle = document.getElementById('formTitle');
+            const btnAuth = document.getElementById('btnAuth');
+            const toggleText = document.getElementById('toggleText');
 
-                try {
-                    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                    await auth.signInWithEmailAndPassword(adminEmail, adminPass);
-                    window.location.replace('index.html');
-                } catch (e) {
-                    if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-login-credentials' || e.code === 'auth/invalid-credential') {
-                        try {
-                            const res = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
-                            await db.collection('users').doc(res.user.uid).set({
-                                shopName: "NASZEX GSM", role: "admin", joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                            window.location.replace('index.html');
-                        } catch (err) {
-                            showToast("Gagal Daftar Admin: " + err.message, "error");
-                            btn.innerHTML = "Log Masuk"; btn.disabled = false;
-                        }
-                    } else {
-                        showToast("Ralat: " + e.message, "error");
-                        btn.innerHTML = "Log Masuk"; btn.disabled = false;
-                    }
-                }
-            } else { 
-                showToast("ID atau Password Salah!", "error"); 
+            if (isLoginMode) {
+                shopContainer.classList.add('hidden');
+                formTitle.innerText = "Log Masuk Akaun";
+                btnAuth.innerHTML = "Log Masuk";
+                toggleText.innerHTML = 'Belum ada akaun? <span class="text-red-500">Daftar sekarang</span>';
+            } else {
+                shopContainer.classList.remove('hidden');
+                formTitle.innerText = "Daftar Akaun Baru";
+                btnAuth.innerHTML = "Daftar & Masuk";
+                toggleText.innerHTML = 'Sudah ada akaun? <span class="text-red-500">Log masuk</span>';
             }
         }
 
+        // FUNGSI UTAMA EMAIL/PASSWORD (LOGIN & REGISTER)
+        async function handleAuth() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const shopName = document.getElementById('shopName').value.trim();
+            const btn = document.getElementById('btnAuth');
+
+            if (!email || !password) {
+                return showToast("Sila isi Emel & Kata Laluan!", "error");
+            }
+
+            if (!isLoginMode && !shopName) {
+                return showToast("Sila isi Nama Kedai!", "error");
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...`;
+            lucide.createIcons();
+
+            try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                
+                if (isLoginMode) {
+                    // PROSES LOGIN
+                    await auth.signInWithEmailAndPassword(email, password);
+                } else {
+                    // PROSES DAFTAR BARU
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    // Simpan profil kedai dalam database
+                    await db.collection('users').doc(res.user.uid).set({
+                        shopName: shopName,
+                        role: "admin",
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                window.location.replace('index.html');
+                
+            } catch (error) {
+                let errorMsg = "Sistem Ralat";
+                if (error.code === 'auth/email-already-in-use') errorMsg = "Emel telah didaftarkan!";
+                else if (error.code === 'auth/invalid-email') errorMsg = "Format emel salah!";
+                else if (error.code === 'auth/weak-password') errorMsg = "Kata laluan sekurang-kurangnya 6 aksara!";
+                else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') errorMsg = "Emel atau Kata Laluan salah!";
+                else errorMsg = error.message;
+
+                showToast(errorMsg, "error");
+                btn.disabled = false;
+                btn.innerHTML = isLoginMode ? "Log Masuk" : "Daftar & Masuk";
+            }
+        }
+
+        // FUNGSI GUEST MODE (ANONYMOUS)
         async function loginGuest() {
             const btn = document.getElementById('btnGuest');
-            btn.innerHTML = "Setting up Demo..."; btn.disabled = true;
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyiapkan Demo...`;
+            lucide.createIcons();
 
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 const res = await auth.signInAnonymously();
+                
+                // Semak kalau guest ni dah pernah masuk, kalau belum kita buatkan profil sikit
                 const doc = await db.collection('users').doc(res.user.uid).get();
                 if (!doc.exists) {
                     await db.collection('users').doc(res.user.uid).set({
-                        shopName: "GUEST REPAIR", role: "guest", joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        shopName: "GUEST REPAIR", 
+                        role: "guest", 
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
                 window.location.replace('index.html');
             } catch (e) { 
-                showToast("Ralat Guest: " + e.message, "error");
-                btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Cuba Sebagai Guest`; btn.disabled = false;
+                showToast("Gagal masuk mode Guest: " + e.message, "error");
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Cuba Sebagai Guest`;
+                lucide.createIcons();
             }
         }
 
+        // FUNGSI TOAST NOTIFIKASI
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
