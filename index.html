@@ -113,7 +113,7 @@
 
     <div class="max-w-md mx-auto p-4 space-y-6">
         
-        <main id="dashboardView" class="view-section active space-y-5">
+        <main id="dashboardView" class="view-section space-y-5">
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-4 shadow-lg shadow-emerald-500/20 text-center relative overflow-hidden tap-effect">
                     <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-paid">0</span></p>
@@ -270,7 +270,7 @@
 
     <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-4 py-2 safe-bottom gpu">
         <div class="max-w-md mx-auto grid grid-cols-5 items-end h-14 pb-2">
-            <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors nav-item-active">
+            <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors text-slate-400">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Home</span>
             </button>
@@ -433,10 +433,9 @@
         let searchTimeout = null;
         let unsubscribe = null;
 
-        // --- GATEKEEPER LOGIC (SESI SESSION STORAGE) & DATA FETCHER ---
+        // --- GATEKEEPER LOGIC & DATA FETCHER ---
         const splash = document.getElementById('gatekeeperSplash');
         
-        // Kalau dah pernah lalu skrin ni untuk sesi ni, terus hilangkan
         if (sessionStorage.getItem('rms_session')) {
             if(splash) splash.style.display = 'none';
         }
@@ -446,7 +445,6 @@
             if (!user) {
                 window.location.replace('login.html');
             } else {
-                // Kalau baru pertama kali buka dalam sesi ni, tunjuk efek fade out
                 if (!sessionStorage.getItem('rms_session')) {
                     if (splash) {
                         splash.style.opacity = '0';
@@ -455,6 +453,14 @@
                             sessionStorage.setItem('rms_session', 'true');
                         }, 500); 
                     }
+                }
+
+                // --- BACA URL HASH UNTUK TERUS BUKA TAB YANG BETUL ---
+                const hash = window.location.hash.replace('#', '');
+                if (['dashboard', 'reports', 'tools'].includes(hash)) {
+                    showPage(hash);
+                } else {
+                    showPage('dashboard');
                 }
 
                 if(unsubscribe) unsubscribe();
@@ -491,6 +497,11 @@
         }
 
         function showPage(p) {
+            // Update URL hash secara senyap supaya browser ingat
+            if(window.location.hash !== '#' + p) {
+                window.history.replaceState(null, null, '#' + p);
+            }
+
             const views = ['dashboardView', 'reportsView', 'toolsView'];
             views.forEach(v => {
                 const el = document.getElementById(v);
@@ -509,8 +520,10 @@
             
             const navId = p === 'dashboard' ? 'nav-dash' : p === 'reports' ? 'nav-report' : 'nav-tools';
             const activeBtn = document.getElementById(navId);
-            activeBtn.classList.add('nav-item-active');
-            activeBtn.classList.remove('text-slate-400');
+            if(activeBtn) {
+                activeBtn.classList.add('nav-item-active');
+                activeBtn.classList.remove('text-slate-400');
+            }
             
             window.scrollTo({top: 0, behavior: 'smooth'});
             lucide.createIcons();
