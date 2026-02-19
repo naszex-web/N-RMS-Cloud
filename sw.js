@@ -1,10 +1,8 @@
-const CACHE_NAME = 'rms-v8.1-cache';
+const CACHE_NAME = 'rms-v8.2-cache';
 const ASSETS = [
   './',
   './index.html',
   './login.html',
-  './settings.html',
-  './manifest.json',
   './logo.png'
 ];
 
@@ -22,11 +20,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
-  // FIX UNTUK SAFARI: Elak cache redirection untuk navigasi
+  // Fix Safari Redirect
   if (e.request.mode === 'navigate') {
-    e.respondWith(
-      fetch(e.request).catch(() => caches.match('./index.html'))
-    );
+    e.respondWith(fetch(e.request).catch(() => caches.match('./index.html')));
     return;
   }
 
