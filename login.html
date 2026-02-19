@@ -24,6 +24,29 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+
+    <div id="splashScreen" class="fixed inset-0 z-[999] bg-[#0f172a] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative flex flex-col items-center mt-[-10vh]">
+            <div class="absolute w-32 h-32 bg-red-600/20 rounded-full blur-2xl animate-pulse"></div>
+            
+            <div class="relative w-24 h-24 bg-slate-800/80 rounded-[2.5rem] p-4 mb-6 shadow-2xl backdrop-blur-md border border-slate-700 flex items-center justify-center animate-bounce" style="animation-duration: 2s;">
+                <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
+            </div>
+            
+            <h1 class="text-3xl font-black tracking-tighter text-white uppercase leading-none">NASZEX <span class="text-red-500">CLOUD</span></h1>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-3">Professional Suite</p>
+            
+            <div class="mt-12 flex gap-2">
+                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" style="animation-delay: 0s"></div>
+                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
+                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10">
+            <p class="text-[8px] font-black text-slate-600 uppercase tracking-widest">Initializing System...</p>
+        </div>
+    </div>
     <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
     <div class="w-full max-w-sm fade-in">
@@ -64,6 +87,22 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
+        // LOGIC SPLASH SCREEN
+        window.addEventListener('load', () => {
+            const splash = document.getElementById('splashScreen');
+            
+            // Delay 1.5 saat sebelum mula pudar
+            setTimeout(() => {
+                splash.style.opacity = '0'; // Pudar perlahan
+                
+                // Buang elemen lepas habis pudar (700ms)
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 700);
+            }, 1500); 
+        });
+
+        // KONFIGURASI FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
             authDomain: "rms-cloudnas.firebaseapp.com",
@@ -78,17 +117,16 @@
 
         lucide.createIcons();
 
+        // GATEKEEPER
         auth.onAuthStateChanged(user => {
             if (user && window.location.pathname.includes('login.html')) window.location.replace('index.html');
         });
 
         async function loginAdmin() {
-            // FIX: Buang toUpperCase() supaya sistem baca huruf dengan tepat
             const u = document.getElementById('username').value.trim();
             const p = document.getElementById('password').value.trim(); 
             const btn = document.getElementById('btnAdmin');
 
-            // Kita buat semakan ini tak kira huruf besar atau kecil (untuk kemudahan kalau guna ADMIN)
             if (u.toUpperCase() === 'ADMIN' && p.toUpperCase() === 'ADMIN') {
                 btn.innerHTML = "Authenticating..."; btn.disabled = true;
                 
