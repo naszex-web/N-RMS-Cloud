@@ -162,14 +162,15 @@
         lucide.createIcons();
 
         // Guna config Firebase yang sama macam index.html/login.html
-        const firebaseConfig = { 
-            apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg", 
-            authDomain: "invoicely-52db9.firebaseapp.com", 
-            projectId: "invoicely-52db9", 
-            storageBucket: "invoicely-52db9.firebasestorage.app", 
-            messagingSenderId: "512282448037", 
-            appId: "1:512282448037:web:ad9600a2aa477c3533fd4c" 
-        };
+        const firebaseConfig = {
+  apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
+  authDomain: "rms-cloudnas.firebaseapp.com",
+  databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rms-cloudnas",
+  storageBucket: "rms-cloudnas.firebasestorage.app",
+  messagingSenderId: "142738217487",
+  appId: "1:142738217487:web:2c2a08c40b77447484a17a"
+};
         
         // Elak ralat kalau firebase dah initialize dari cache
         if (!firebase.apps.length) {
