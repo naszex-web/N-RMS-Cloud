@@ -20,18 +20,18 @@
     <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
     <div class="w-full max-w-sm fade-in">
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2rem] shadow-2xl mb-5 border border-slate-700">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2rem] shadow-2xl mb-4 border border-slate-700">
                 <img src="logo.png" class="w-12 h-12 object-contain" alt="Logo">
             </div>
             <h1 class="text-2xl font-black tracking-tighter text-white uppercase leading-none">RMS <span class="text-red-500">Cloud</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Sistem Pengurusan V8.2</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Sistem Pengurusan v8.2</p>
         </div>
 
         <div class="glass-card rounded-[3rem] p-8 shadow-2xl space-y-6">
             
             <div class="space-y-4">
-                <h2 class="text-sm font-black italic text-center uppercase tracking-widest text-slate-300">Admin Login</h2>
+                <h2 class="text-xs font-black italic text-center uppercase tracking-widest text-slate-400">Log Masuk Rasmi</h2>
                 <div>
                     <input type="text" id="username" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase" placeholder="USERNAME">
                 </div>
@@ -39,13 +39,13 @@
                     <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold uppercase" placeholder="PASSWORD">
                 </div>
                 <button onclick="loginAdmin()" id="btnAdmin" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-lg transition-all active:scale-95 tracking-widest">
-                    Log Masuk
+                    Masuk (Admin)
                 </button>
             </div>
 
-            <div class="flex items-center gap-4 py-2 opacity-50">
+            <div class="flex items-center gap-4 py-1 opacity-40">
                 <div class="flex-1 h-px bg-slate-600"></div>
-                <span class="text-[9px] font-black uppercase tracking-widest">Atau</span>
+                <span class="text-[8px] font-black uppercase tracking-widest">Atau</span>
                 <div class="flex-1 h-px bg-slate-600"></div>
             </div>
 
@@ -63,14 +63,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script>
-        // MASUKKAN API KEY FIREBASE KAU DI SINI
         const firebaseConfig = {
-            apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg",
-            authDomain: "invoicely-52db9.firebaseapp.com",
-            projectId: "invoicely-52db9",
-            storageBucket: "invoicely-52db9.firebasestorage.app",
-            messagingSenderId: "512282448037",
-            appId: "1:512282448037:web:ad9600a2aa477c3533fd4c"
+            apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
+            authDomain: "rms-cloudnas.firebaseapp.com",
+            projectId: "rms-cloudnas",
+            storageBucket: "rms-cloudnas.firebasestorage.app",
+            messagingSenderId: "142738217487",
+            appId: "1:142738217487:web:2c2a08c40b77447484a17a"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -78,7 +77,6 @@
 
         lucide.createIcons();
 
-        // Redirect automatik kalau dah pernah login
         auth.onAuthStateChanged(user => {
             if (user && window.location.pathname.includes('login.html')) {
                 window.location.replace('index.html');
@@ -93,8 +91,8 @@
             if (u === 'ADMIN' && p === 'ADMIN') {
                 btn.innerHTML = "Memproses..."; btn.disabled = true;
                 
-                // Kitaran Rahsia: Kita linkkan ADMIN ke satu email khas supaya data tak hilang
-                const adminEmail = "admin@naszex.com";
+                // Kitaran Rahsia: Jadikan Admin sebagai akaun kekal Firebase
+                const adminEmail = "admin@naszexcloud.com";
                 const adminPass = "naszexadmin123";
 
                 try {
@@ -102,7 +100,7 @@
                     await auth.signInWithEmailAndPassword(adminEmail, adminPass);
                     window.location.replace('index.html');
                 } catch (e) {
-                    // Kalau first time, sistem akan auto-create akaun admin ni
+                    // Kalau first time, dia akan auto-create
                     if (e.code === 'auth/user-not-found') {
                         try {
                             const res = await auth.createUserWithEmailAndPassword(adminEmail, adminPass);
@@ -113,12 +111,12 @@
                             });
                             window.location.replace('index.html');
                         } catch (err) {
-                            showToast("Ralat. Pastikan Email/Password diaktifkan di Firebase.", "error");
-                            btn.innerHTML = "Log Masuk"; btn.disabled = false;
+                            showToast("Ralat. Sila pastikan Email Provider diaktifkan.", "error");
+                            btn.innerHTML = "Masuk (Admin)"; btn.disabled = false;
                         }
                     } else {
-                        showToast("Domain belum dibenarkan di Firebase.", "error");
-                        btn.innerHTML = "Log Masuk"; btn.disabled = false;
+                        showToast("Ralat: " + e.message, "error");
+                        btn.innerHTML = "Masuk (Admin)"; btn.disabled = false;
                     }
                 }
             } else {
@@ -137,17 +135,16 @@
                 const doc = await db.collection('users').doc(res.user.uid).get();
                 if (!doc.exists) {
                     await db.collection('users').doc(res.user.uid).set({
-                        shopName: "KEDAI DEMO GUEST",
+                        shopName: "GUEST DEMO",
                         role: "guest",
                         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
                 window.location.replace('index.html');
             } catch (e) { 
-                showToast("Ralat. Pastikan Anonymous diaktifkan di Firebase.", "error");
+                showToast("Sila aktifkan Anonymous Provider di Firebase.", "error");
                 btn.innerHTML = `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i> Cuba Sebagai Guest`;
                 btn.disabled = false;
-                lucide.createIcons();
             }
         }
 
