@@ -3,155 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NASZEX GSM - OFFICIAL RECEIPT</title>
+    <title>NASZEX CLOUD - OFFICIAL RECEIPT</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;700&display=swap');
+        :root { --primary: #0f172a; --accent: #ef4444; }
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f1f5f9;
-            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
-            color: #0f172a; 
-            -webkit-font-smoothing: antialiased;
+            background: #f8fafc; color: #1e293b; 
+            -webkit-tap-highlight-color: transparent; user-select: none; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased;
         }
+        
+        .font-num { font-family: 'Inter', sans-serif; }
+        .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
 
-        .mono { font-family: 'Roboto Mono', monospace; }
-
-        .receipt-card { 
-            background: #ffffff; 
-            border-radius: 1.5rem; 
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.03); 
-            position: relative;
-            overflow: hidden;
-        }
+        .dash-card-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
 
         /* --- STAMP EFFECT --- */
         .paid-stamp {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-12deg);
-            border: 0.4rem double #dc2626;
-            color: #dc2626;
-            font-size: 4rem;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 0.4rem solid rgba(16, 185, 129, 0.2); /* Emerald-500 tint */
+            color: rgba(16, 185, 129, 0.15);
+            font-size: 5rem;
             font-weight: 900;
             padding: 0.5rem 2rem;
             text-transform: uppercase;
-            border-radius: 0.8rem;
-            opacity: 0.15;
+            border-radius: 1rem;
             z-index: 0;
             pointer-events: none;
             display: none; /* JS will toggle this */
-            mask-image: url("data:image/svg+xml;utf8,<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><filter id='noise'><feTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23noise)' opacity='0.5'/></svg>");
+            letter-spacing: 0.1em;
+            text-shadow: 2px 2px 0px rgba(16, 185, 129, 0.05);
+        }
+        .paid-stamp::after {
+            content: "LUNAS";
+            position: absolute;
+            bottom: -15px;
+            right: 10px;
+            font-size: 1rem;
+            color: rgba(16, 185, 129, 0.3);
+            letter-spacing: 0.2em;
         }
 
         /* --- PROGRESS TRACKER --- */
         .step-icon { 
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-            background: #f1f5f9; color: #94a3b8; border: 2px solid #f1f5f9;
+            background: #f8fafc; color: #cbd5e1; border: 2px solid #f1f5f9;
         }
         .step-active .step-icon { 
-            transform: scale(1.1); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: scale(1.15); 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
-        /* Dynamic Colors for Steps */
-        .s-Received.step-active .step-icon { background: #fee2e2; color: #ef4444; border-color: #fee2e2; }
-        .s-Waiting.step-active .step-icon { background: #ffedd5; color: #f97316; border-color: #ffedd5; }
-        .s-Diagnosis.step-active .step-icon { background: #dbeafe; color: #3b82f6; border-color: #dbeafe; }
-        .s-Repairing.step-active .step-icon { background: #f3e8ff; color: #a855f7; border-color: #f3e8ff; }
-        .s-Ready.step-active .step-icon { background: #d1fae5; color: #10b981; border-color: #d1fae5; }
+        /* Dynamic Colors for Steps (Matching Index Badges) */
+        .s-Received.step-active .step-icon { background: #f1f5f9; color: #334155; border-color: #e2e8f0; }
+        .s-Diagnosing.step-active .step-icon { background: #faf5ff; color: #7e22ce; border-color: #f3e8ff; }
+        .s-Waiting.step-active .step-icon { background: #fffbeb; color: #b45309; border-color: #fef3c7; }
+        .s-Repairing.step-active .step-icon { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
+        .s-Testing.step-active .step-icon { background: #eef2ff; color: #4338ca; border-color: #e0e7ff; }
+        .s-Completed.step-active .step-icon { background: #34d399; color: #ffffff; border-color: #10b981; animation: pulse-soft 2s infinite; }
+        .s-Collected.step-active .step-icon { background: #1e293b; color: #ffffff; border-color: #0f172a; }
 
-        .progress-bar-bg { background: #e2e8f0; }
-        .progress-bar-fill { transition: width 1s ease, background-color 0.5s ease; }
+        @keyframes pulse-soft {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
 
-        /* --- UTILS --- */
-        .dashed-line { background-image: linear-gradient(to right, #cbd5e1 50%, rgba(255,255,255,0) 0%); background-position: bottom; background-size: 10px 2px; background-repeat: repeat-x; }
-        .loading-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 50; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .progress-bar-bg { background: #f1f5f9; border-radius: 99px; }
+        .progress-bar-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; border-radius: 99px; }
+
+        .dashed-line { background-image: linear-gradient(to right, #e2e8f0 50%, rgba(255,255,255,0) 0%); background-position: bottom; background-size: 8px 1px; background-repeat: repeat-x; }
+        
+        .loading-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 50; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.4s; }
+        
+        @supports (padding: max(0px)) {
+            .safe-top { padding-top: max(1.5rem, env(safe-area-inset-top)) !important; }
+            .safe-bottom { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important; }
+        }
     </style>
 </head>
-<body class="min-h-screen py-8 px-4 sm:px-0">
+<body class="min-h-screen pb-12 safe-top safe-bottom">
 
     <div id="loader" class="loading-overlay">
-        <div class="flex flex-col items-center animate-pulse">
-            <img src="logo2.png" class="w-16 h-16 object-contain mb-4 drop-shadow-xl" alt="Loading...">
-            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Loading Data...</p>
+        <div class="flex flex-col items-center animate-pulse gap-3">
+            <div class="w-16 h-16 bg-white rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-slate-900/10">
+                <span class="text-slate-900 font-black text-2xl italic">NX</span>
+            </div>
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Loading Data...</p>
         </div>
     </div>
 
-    <div id="receiptContent" class="max-w-md mx-auto hidden opacity-0 transition-opacity duration-700 ease-in-out">
+    <div id="receiptContent" class="max-w-md mx-auto px-4 space-y-5 opacity-0 transition-opacity duration-500 ease-out hidden pt-4">
         
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center mb-4">
-                <img src="logo2.png" class="w-24 h-auto object-contain drop-shadow-2xl" alt="NASZEX Logo">
-            </div>
-            
-            <h1 class="text-xl font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">NASZEX <span class="text-red-600">GSM</span></h1>
-            <div class="flex items-center justify-center gap-2 mt-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Professional Repair & Unlock Service</p>
-            </div>
-        </div>
-
-        <div class="receipt-card p-6 mb-4">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Repair Status</h3>
-                <span id="textStatus" class="text-[10px] font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-600 uppercase">Checking...</span>
-            </div>
-            
-            <div class="relative px-2">
-                <div class="absolute top-4 left-5 right-5 h-1 progress-bar-bg rounded-full -z-10"></div>
-                <div id="progressLine" class="absolute top-4 left-5 h-1 bg-slate-400 rounded-full -z-10 progress-bar-fill" style="width: 0%"></div>
-
-                <div class="flex justify-between items-start">
-                    <div id="step-Received" class="s-Received flex flex-col items-center gap-2 w-10">
-                        <div class="step-icon w-8 h-8 rounded-full flex items-center justify-center bg-white z-10">
-                            <i data-lucide="package" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <span class="text-[7px] font-bold uppercase text-slate-400 text-center leading-tight">In</span>
-                    </div>
-                    <div id="step-Waiting" class="s-Waiting flex flex-col items-center gap-2 w-10">
-                        <div class="step-icon w-8 h-8 rounded-full flex items-center justify-center bg-white z-10">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <span class="text-[7px] font-bold uppercase text-slate-400 text-center leading-tight">Wait</span>
-                    </div>
-                    <div id="step-Diagnosis" class="s-Diagnosis flex flex-col items-center gap-2 w-10">
-                        <div class="step-icon w-8 h-8 rounded-full flex items-center justify-center bg-white z-10">
-                            <i data-lucide="microscope" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <span class="text-[7px] font-bold uppercase text-slate-400 text-center leading-tight">Check</span>
-                    </div>
-                    <div id="step-Repairing" class="s-Repairing flex flex-col items-center gap-2 w-10">
-                        <div class="step-icon w-8 h-8 rounded-full flex items-center justify-center bg-white z-10">
-                            <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <span class="text-[7px] font-bold uppercase text-slate-400 text-center leading-tight">Fix</span>
-                    </div>
-                    <div id="step-Ready" class="s-Ready flex flex-col items-center gap-2 w-10">
-                        <div class="step-icon w-8 h-8 rounded-full flex items-center justify-center bg-white z-10">
-                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <span class="text-[7px] font-bold uppercase text-slate-400 text-center leading-tight">Done</span>
-                    </div>
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center mb-3">
+                <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/5 gpu">
+                    <img id="bizLogoImage" src="" class="w-full h-full object-cover rounded-2xl hidden" alt="Logo">
+                    <span id="bizLogoText" class="text-slate-900 font-black text-xl italic">NX</span>
                 </div>
             </div>
+            <h1 id="bizNameDisplay" class="text-lg font-black uppercase tracking-[0.1em] text-slate-900 leading-none">NASZEX CLOUD</h1>
+            <div class="flex items-center justify-center gap-1.5 mt-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                <p class="text-[8px] font-bold text-slate-500 uppercase tracking-[0.2em]">Live Tracking System</p>
+            </div>
         </div>
 
-        <div class="receipt-card p-0 mb-8">
-            <div class="bg-slate-900 p-6 text-white relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
+        <div class="bg-white rounded-[1.5rem] shadow-sm border border-slate-200 overflow-hidden relative">
+            
+            <div class="dash-card-gradient p-6 text-white relative">
+                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
                 <div class="flex justify-between items-start relative z-10">
                     <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Receipt No</p>
-                        <h2 id="invoiceNo" class="text-lg font-bold mono tracking-tight text-white">NX-0000</h2>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">No. Rujukan / Invois</p>
+                        <h2 id="invoiceNo" class="text-xl font-black font-num tracking-tight text-white">NX-0000</h2>
                     </div>
                     <div class="text-right">
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date</p>
-                        <p id="receiptDate" class="text-sm font-bold mono text-white">--/--/--</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tarikh</p>
+                        <p id="receiptDate" class="text-xs font-bold font-num text-white mt-1">--/--/--</p>
                     </div>
                 </div>
             </div>
@@ -160,42 +139,88 @@
                 <div id="paidStamp" class="paid-stamp">PAID</div>
 
                 <div class="flex items-center gap-4 mb-6 pb-6 dashed-line">
-                    <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
                         <i data-lucide="user" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Customer</p>
-                        <h3 id="custName" class="text-sm font-black text-slate-800 uppercase">Loading...</h3>
-                        <p id="custPhone" class="text-xs font-medium text-slate-500 mono mt-0.5">---</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Maklumat Pelanggan</p>
+                        <h3 id="custName" class="text-[13px] font-black text-slate-900 uppercase leading-tight mt-0.5">Memuatkan...</h3>
+                        <p id="custPhone" class="text-[10px] font-bold text-slate-500 font-num tracking-wider mt-1">---</p>
                     </div>
                 </div>
 
-                <div class="space-y-4 mb-6">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Service Details</p>
+                <div class="mb-6 pb-6 dashed-line">
+                    <div class="flex justify-between items-end mb-5">
+                        <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Status Semasa</h3>
+                        <span id="textStatus" class="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md text-slate-600 bg-slate-100">Menyemak...</span>
+                    </div>
+                    
+                    <div class="relative px-2 mt-2">
+                        <div class="absolute top-3.5 left-4 right-4 h-[3px] progress-bar-bg -z-10"></div>
+                        <div id="progressLine" class="absolute top-3.5 left-4 h-[3px] bg-slate-300 progress-bar-fill -z-10" style="width: 0%"></div>
+
+                        <div class="flex justify-between items-start">
+                            <div id="step-Received" class="s-Received flex flex-col items-center gap-1.5 w-10">
+                                <div class="step-icon w-7 h-7 rounded-full flex items-center justify-center bg-white z-10 relative">
+                                    <i data-lucide="inbox" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <span class="text-[7px] font-bold uppercase tracking-wider text-slate-400 text-center leading-tight">Terima</span>
+                            </div>
+                            <div id="step-Diagnosing" class="s-Diagnosing flex flex-col items-center gap-1.5 w-10">
+                                <div class="step-icon w-7 h-7 rounded-full flex items-center justify-center bg-white z-10 relative">
+                                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <span class="text-[7px] font-bold uppercase tracking-wider text-slate-400 text-center leading-tight">Check</span>
+                            </div>
+                            <div id="step-Repairing" class="s-Repairing flex flex-col items-center gap-1.5 w-10">
+                                <div class="step-icon w-7 h-7 rounded-full flex items-center justify-center bg-white z-10 relative">
+                                    <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <span class="text-[7px] font-bold uppercase tracking-wider text-slate-400 text-center leading-tight">Baiki</span>
+                            </div>
+                            <div id="step-Completed" class="s-Completed flex flex-col items-center gap-1.5 w-10">
+                                <div class="step-icon w-7 h-7 rounded-full flex items-center justify-center bg-white z-10 relative">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <span class="text-[7px] font-bold uppercase tracking-wider text-slate-400 text-center leading-tight">Siap</span>
+                            </div>
+                            <div id="step-Collected" class="s-Collected flex flex-col items-center gap-1.5 w-10">
+                                <div class="step-icon w-7 h-7 rounded-full flex items-center justify-center bg-white z-10 relative">
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <span class="text-[7px] font-bold uppercase tracking-wider text-slate-400 text-center leading-tight">Tuntut</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[8px] text-center text-slate-400 mt-4 leading-relaxed px-4">*Sila muat semula (refresh) halaman ini untuk melihat status terkini secara langsung.</p>
+                </div>
+
+                <div class="space-y-4 mb-2">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Senarai Baiki / Alat Ganti</h3>
                     <div id="itemsList" class="space-y-3">
                         </div>
                 </div>
+            </div>
 
-                <div class="bg-slate-50 -mx-6 -mb-6 p-6 border-t border-slate-100">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase">Warranty</span>
-                        <div class="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-800">
-                            <i data-lucide="shield-check" class="w-3 h-3 text-emerald-500"></i>
-                            <span id="warrantyInfo">--</span>
-                        </div>
+            <div class="bg-slate-50 p-6 border-t border-slate-100">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Waranti</span>
+                    <div class="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-800 bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-500"></i>
+                        <span id="warrantyInfo">--</span>
                     </div>
-                    <div class="flex justify-between items-end mt-4">
-                        <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Amount</span>
-                        <span class="text-3xl font-black text-slate-900 mono tracking-tighter">RM<span id="grandTotal">0.00</span></span>
-                    </div>
+                </div>
+                <div class="flex justify-between items-end mt-4">
+                    <span class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1">Jumlah Keseluruhan</span>
+                    <span class="text-3xl font-black text-slate-900 font-num tracking-tight italic">RM <span id="grandTotal">0.00</span></span>
                 </div>
             </div>
         </div>
 
-        <div class="text-center opacity-60 space-y-1 pb-10">
-             <p class="text-[9px] font-medium text-slate-500 uppercase">NASZEX GSM • KT0597422-T</p>
-             <p class="text-[9px] font-medium text-slate-400">Tasek Gelugor, Penang</p>
-                <p class="text-[9px] font-medium text-slate-400">Alor Setar, Kedah</p>
+        <div class="text-center opacity-60 space-y-1 pt-4 pb-8">
+             <p id="bizFooterNameSSM" class="text-[9px] font-black text-slate-500 uppercase tracking-widest">NASZEX CLOUD</p>
+             <p id="bizFooterAddress" class="text-[9px] font-bold text-slate-400 mt-1 uppercase">Malaysia</p>
+             <p id="bizFooterPhone" class="text-[9px] font-bold text-slate-400 font-num tracking-widest mt-1"></p>
         </div>
 
     </div>
@@ -206,127 +231,196 @@
     <script>
         lucide.createIcons();
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyCSg9tH4E-71u8b3oFf5j9pDvhoNHZYnZg", 
-            authDomain: "invoicely-52db9.firebaseapp.com", 
-            projectId: "invoicely-52db9", 
-            storageBucket: "invoicely-52db9.firebasestorage.app", 
-            messagingSenderId: "512282448037", 
-            appId: "1:512282448037:web:ad9600a2aa477c3533fd4c" 
+        // --- FIREBASE CONFIG (Sama dengan index & setting) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
+            authDomain: "rms-cloudnas.firebaseapp.com",
+            databaseURL: "https://rms-cloudnas-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rms-cloudnas",
+            storageBucket: "rms-cloudnas.firebasestorage.app",
+            messagingSenderId: "142738217487",
+            appId: "1:142738217487:web:2c2a08c40b77447484a17a"
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.firestore();
 
+        // 1. Load Business Profile Global
+        async function loadBusinessInfo() {
+            try {
+                const doc = await db.collection('settings').doc('business_profile').get();
+                if (doc.exists) {
+                    const bizData = doc.data();
+                    const bizName = bizData.name || 'NASZEX CLOUD';
+                    const bizSSM = bizData.ssm ? ` • ${bizData.ssm}` : '';
+                    
+                    document.getElementById('bizNameDisplay').innerText = bizName;
+                    document.getElementById('bizFooterNameSSM').innerText = `${bizName}${bizSSM}`;
+                    document.getElementById('bizFooterAddress').innerText = bizData.address || '';
+                    document.getElementById('bizFooterPhone').innerText = bizData.phone ? `TEL / WA: ${bizData.phone}` : '';
+                    
+                    if(bizData.logoUrl) {
+                        const logoImg = document.getElementById('bizLogoImage');
+                        logoImg.src = bizData.logoUrl;
+                        logoImg.classList.remove('hidden');
+                        document.getElementById('bizLogoText').classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading business profile:", error);
+            }
+        }
+
+        // 2. Load Invoice Data
         async function loadInvoice() {
+            // Initiate Business Info First
+            await loadBusinessInfo();
+
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
             
             if (!id) {
-                console.log("No ID, View Mode Only");
+                console.warn("Tiada ID Invois disertakan di URL. Memaparkan Demo.");
             }
 
             try {
                 let data = {};
                 if(id) {
                     const doc = await db.collection("invoices").doc(id).get();
-                    if (doc.exists) data = doc.data();
+                    if (doc.exists) {
+                        data = doc.data();
+                    } else {
+                        throw new Error("Rekod tidak dijumpai");
+                    }
                 }
 
                 // Populate Fields
                 document.getElementById('invoiceNo').innerText = data.invoiceNo || 'NX-DEMO';
                 document.getElementById('custName').innerText = data.customerName || 'Nama Pelanggan';
-                document.getElementById('custPhone').innerText = data.customerPhone || '01X-XXXXXXX';
-                document.getElementById('grandTotal').innerText = data.total ? parseFloat(data.total).toFixed(2) : '0.00';
-                document.getElementById('warrantyInfo').innerText = data.warranty || 'No Warranty';
                 
+                // Format Phone Number
+                const phone = data.customerPhone || '01X-XXXXXXX';
+                document.getElementById('custPhone').innerText = phone.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2 $3");
+                
+                document.getElementById('grandTotal').innerText = data.total ? parseFloat(data.total).toFixed(2) : '0.00';
+                document.getElementById('warrantyInfo').innerText = data.warranty && data.warranty !== 'Tiada Waranti' ? data.warranty : 'Tiada';
+                
+                // Date Formatting
                 if(data.createdAt) {
                     const d = new Date(data.createdAt.seconds * 1000);
                     document.getElementById('receiptDate').innerText = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
                 } else {
                     const d = new Date();
-                    document.getElementById('receiptDate').innerText = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+                    document.getElementById('receiptDate').innerText = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
                 }
 
-                // --- LOGIC TRACKER ---
-                const repairStatus = data.repairStatus || 'Received';
-                const steps = ['Received', 'Waiting', 'Diagnosis', 'Repairing', 'Ready'];
-                let statusIdx = steps.indexOf(repairStatus);
-                if (repairStatus === 'Collected') statusIdx = 4; // Max out
-
-                // Update Text Badge
-                const textStatus = document.getElementById('textStatus');
-                textStatus.innerText = repairStatus;
+                // --- LOGIC TRACKER (PIPELINE) ---
+                const rawStatus = data.repairStatus || 'Received';
                 
-                // Color Mapping
-                const colors = ['#ef4444', '#f97316', '#3b82f6', '#a855f7', '#10b981'];
-                const activeColor = colors[statusIdx] || '#94a3b8';
+                // Mapping full pipeline to 5 UI steps
+                // Full: Received -> Diagnosing -> Waiting Part -> In Repair -> Testing -> Completed -> Collected -> Cancelled
+                let uiStepStatus = 'Received';
+                let statusColorClass = 'text-slate-600 bg-slate-100'; // Default
+                let stepPercent = 0;
 
-                // Update Line Width & Color
-                const line = document.getElementById('progressLine');
-                const percent = Math.min((statusIdx / 4) * 100, 100);
-                line.style.width = `${percent}%`;
-                line.style.backgroundColor = activeColor;
-                textStatus.style.color = activeColor;
-                textStatus.style.backgroundColor = activeColor + '15'; 
+                const statusLabel = document.getElementById('textStatus');
+                
+                if (rawStatus === 'Received') { uiStepStatus = 'Received'; stepPercent = 0; statusColorClass = 'text-slate-700 bg-slate-200'; }
+                else if (rawStatus === 'Diagnosing') { uiStepStatus = 'Diagnosing'; stepPercent = 25; statusColorClass = 'text-purple-700 bg-purple-100'; }
+                else if (rawStatus === 'Waiting Part') { uiStepStatus = 'Diagnosing'; stepPercent = 25; statusColorClass = 'text-amber-700 bg-amber-100'; } // Tumpang UI step Diagnosing
+                else if (rawStatus === 'In Repair') { uiStepStatus = 'Repairing'; stepPercent = 50; statusColorClass = 'text-blue-700 bg-blue-100'; }
+                else if (rawStatus === 'Testing') { uiStepStatus = 'Repairing'; stepPercent = 50; statusColorClass = 'text-indigo-700 bg-indigo-100'; } // Tumpang UI step Repairing
+                else if (rawStatus === 'Completed') { uiStepStatus = 'Completed'; stepPercent = 75; statusColorClass = 'text-emerald-700 bg-emerald-100'; }
+                else if (rawStatus === 'Collected') { uiStepStatus = 'Collected'; stepPercent = 100; statusColorClass = 'text-white bg-slate-800'; }
+                else if (rawStatus === 'Cancelled') { uiStepStatus = 'Received'; stepPercent = 0; statusColorClass = 'text-rose-700 bg-rose-100'; }
 
-                // Update Steps UI
-                steps.forEach((s, idx) => {
-                    const el = document.getElementById('step-' + s);
-                    if(idx <= statusIdx) {
-                        el.classList.add('step-active');
-                    }
-                });
+                // Update Text Badge Status
+                statusLabel.innerText = rawStatus;
+                statusLabel.className = `text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${statusColorClass}`;
 
-                // --- STAMP LOGIC ---
+                // Process Line UI (Only if not Cancelled)
+                if (rawStatus !== 'Cancelled') {
+                    const line = document.getElementById('progressLine');
+                    line.style.width = `${stepPercent}%`;
+                    
+                    // Activate Steps
+                    const uiStepsOrder = ['Received', 'Diagnosing', 'Repairing', 'Completed', 'Collected'];
+                    const currentUiIdx = uiStepsOrder.indexOf(uiStepStatus);
+                    
+                    uiStepsOrder.forEach((stepName, idx) => {
+                        const el = document.getElementById('step-' + stepName);
+                        if(idx <= currentUiIdx) {
+                            el.classList.add('step-active');
+                        }
+                    });
+                    
+                    // Specific color for the progress line based on highest active step
+                    const lineColors = ['#cbd5e1', '#d8b4fe', '#93c5fd', '#34d399', '#334155'];
+                    line.style.backgroundColor = lineColors[currentUiIdx];
+                }
+
+                // --- STAMP LOGIC (PAID) ---
                 if (data.status === 'paid') {
                     document.getElementById('paidStamp').style.display = 'block';
                 }
 
-                // --- ITEMS LIST RENDER (FIXED) ---
+                // --- ITEMS LIST RENDER ---
                 const itemsCont = document.getElementById('itemsList');
                 itemsCont.innerHTML = "";
                 const items = data.items || [];
                 
                 if(items.length === 0) {
-                     itemsCont.innerHTML = `<p class="text-[10px] text-slate-400 italic">Tiada item disenaraikan.</p>`;
+                     itemsCont.innerHTML = `<p class="text-[10px] text-slate-400 italic font-bold">Tiada item direkodkan.</p>`;
                 }
 
                 items.forEach(item => {
                     const lineTotal = (parseFloat(item.kos) * parseFloat(item.qty)).toFixed(2);
                     const disc = parseFloat(item.discount || 0);
                     
-                    const description = item.description ? `<p class="text-[10px] font-medium text-slate-400 mt-1 leading-snug tracking-wide italic">${item.description}</p>` : '';
+                    const descriptionHTML = item.description 
+                        ? `<p class="text-[9px] font-bold text-slate-500 mt-1 leading-snug tracking-wide line-clamp-2">${item.description}</p>` 
+                        : '';
                     
                     itemsCont.insertAdjacentHTML('beforeend', `
-                        <div class="pb-3 border-b border-dashed border-slate-100 last:border-0 last:pb-0">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1 pr-4">
-                                    <p class="text-[11px] font-extrabold text-slate-800 uppercase leading-snug tracking-tight">${item.name}</p>
-                                    ${description} 
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-2 last:mb-0">
+                            <div class="flex justify-between items-start gap-4">
+                                <div class="flex-1">
+                                    <p class="text-[11px] font-black text-slate-900 uppercase leading-snug tracking-tight">${item.name}</p>
+                                    ${descriptionHTML} 
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-[11px] font-bold text-slate-900 mono">RM ${lineTotal}</p>
-                                    ${disc > 0 ? `<p class="text-[8px] font-bold text-rose-500 italic">-RM${disc}</p>` : ''}
-                                    ${item.qty > 1 ? `<p class="text-[8px] font-bold text-slate-400">x${item.qty}</p>` : ''}
+                                <div class="text-right shrink-0">
+                                    <p class="text-[11px] font-black text-slate-900 font-num">RM ${lineTotal}</p>
+                                    ${item.qty > 1 ? `<p class="text-[8px] font-bold text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded inline-block mt-1 uppercase font-num">Qty: ${item.qty}</p>` : ''}
+                                    ${disc > 0 ? `<p class="text-[8px] font-black text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded inline-block mt-1 font-num uppercase">- RM${disc}</p>` : ''}
                                 </div>
                             </div>
                         </div>
                     `);
                 });
 
-                // Show Content
+                // Tunjuk kandungan selepas selesai bind data
                 setTimeout(() => {
                     document.getElementById('loader').classList.add('opacity-0', 'pointer-events-none');
                     const content = document.getElementById('receiptContent');
                     content.classList.remove('hidden');
-                    // Small delay to trigger transition
+                    // Guna requestAnimationFrame untuk kelancaran CSS Transition opacity
                     requestAnimationFrame(() => content.classList.remove('opacity-0'));
-                    lucide.createIcons();
-                }, 800);
+                }, 600);
 
-            } catch (error) { console.error(error); }
+            } catch (error) { 
+                console.error(error); 
+                document.getElementById('loader').innerHTML = `
+                    <div class="text-center">
+                        <i data-lucide="alert-triangle" class="w-10 h-10 text-rose-500 mx-auto mb-3"></i>
+                        <p class="text-[11px] font-black uppercase text-slate-900 tracking-widest">Ralat Sistem</p>
+                        <p class="text-[9px] font-bold text-slate-500 mt-1">Gagal memuat turun data invois. Sila semak pautan.</p>
+                    </div>`;
+                lucide.createIcons();
+            }
         }
-        window.onload = loadInvoice;
+        
+        // Mula proses sebaik DOM siap
+        window.addEventListener('DOMContentLoaded', loadInvoice);
     </script>
 </body>
 </html>
