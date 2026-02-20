@@ -5,31 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0b1120">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
 
     <title>Masuk - RMS Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #0f172a; 
+            background-color: #0b1120; 
             color: white; 
             overscroll-behavior-y: contain; 
         }
         .glass-card { 
-            background: rgba(30, 41, 59, 0.7); 
+            background: rgba(15, 23, 42, 0.7); 
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
         .input-field { 
-            background: #0f172a; 
-            border: 1px solid #334155; 
+            background: #0b1120; 
+            border: 1px solid #1e293b; 
             color: white; 
             transition: all 0.3s; 
         }
@@ -38,8 +39,8 @@
             outline: none; 
             box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); 
         }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .safe-padding {
             padding-top: max(1.5rem, env(safe-area-inset-top));
@@ -47,76 +48,79 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 safe-padding bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+<body class="min-h-screen flex items-center justify-center p-6 safe-padding bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-blend-overlay">
 
-    <div id="splashScreen" class="fixed inset-0 z-[999] bg-[#0f172a] flex flex-col items-center justify-center transition-opacity duration-700">
+    <div id="splashScreen" class="fixed inset-0 z-[999] bg-[#0b1120] flex flex-col items-center justify-center transition-all duration-700">
         <div class="relative flex flex-col items-center mt-[-10vh]">
-            <div class="absolute w-32 h-32 bg-red-600/20 rounded-full blur-2xl animate-pulse"></div>
+            <div class="absolute w-40 h-40 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
             
-            <div class="relative w-24 h-24 bg-slate-800/80 rounded-[2.5rem] p-4 mb-6 shadow-2xl backdrop-blur-md border border-slate-700 flex items-center justify-center animate-bounce" style="animation-duration: 2s;">
-                <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
+            <div class="relative w-28 h-28 bg-[#0f172a]/90 rounded-full p-1.5 mb-8 shadow-[0_0_40px_rgba(220,38,38,0.2)] backdrop-blur-md border border-red-500/20 flex items-center justify-center overflow-hidden">
+                <img src="logo.png" class="w-full h-full object-cover rounded-full" alt="Logo">
             </div>
             
-            <h1 class="text-3xl font-black tracking-tighter text-white uppercase leading-none">NASZEX <span class="text-red-500">CLOUD</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-3">Professional Suite</p>
+            <h1 class="text-4xl font-black tracking-tighter text-white uppercase leading-none drop-shadow-xl">NASZEX <span class="text-red-500">CLOUD</span></h1>
+            <div class="h-px w-20 bg-gradient-to-r from-transparent via-red-500 to-transparent mt-5 mb-3 opacity-70"></div>
+            <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.5em]">Professional Suite</p>
             
             <div class="mt-12 flex gap-2">
-                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" style="animation-delay: 0s"></div>
-                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
-                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
             </div>
         </div>
         
-        <div class="absolute bottom-10 pb-[env(safe-area-inset-bottom)]">
-            <p class="text-[8px] font-black text-slate-600 uppercase tracking-widest">Initializing System...</p>
+        <div class="absolute bottom-12 pb-[env(safe-area-inset-bottom)]">
+            <p class="text-[8px] font-black text-slate-600 uppercase tracking-widest">Initializing Secure System...</p>
         </div>
     </div>
 
     <div id="toast-container" class="fixed top-[max(2.5rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none"></div>
 
-    <div class="w-full max-w-sm fade-in">
+    <div class="w-full max-w-sm fade-in opacity-0" style="animation-delay: 0.5s;">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-800 rounded-[2.5rem] shadow-2xl mb-4 border border-slate-700 p-3">
-                <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-900 rounded-full shadow-2xl mb-4 border border-slate-700/50 p-1 overflow-hidden">
+                <img src="logo.png" class="w-full h-full object-cover rounded-full" alt="Logo">
             </div>
             <h1 class="text-2xl font-black tracking-tighter text-white uppercase leading-none">RMS <span class="text-red-500">Cloud</span></h1>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-3">Repair Management</p>
+            <p class="text-slate-500 text-[9px] font-black uppercase tracking-[0.3em] mt-3">Repair Management System</p>
         </div>
 
-        <div class="glass-card rounded-[3rem] p-8 shadow-2xl space-y-6 relative overflow-hidden">
+        <div class="glass-card rounded-[2.5rem] p-8 space-y-6 relative">
             
             <div class="space-y-4 relative z-10" id="authForm">
-                <h2 id="formTitle" class="text-[10px] font-black italic text-center uppercase tracking-[0.2em] text-slate-400 mb-6">Log Masuk Akaun</h2>
-                
-                <div id="shopNameContainer" class="hidden transition-all duration-300">
-                    <input type="text" id="shopName" autocapitalize="words" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-wide text-center" placeholder="Nama Kedai (Cth: NASZEX GSM)">
+                <div class="flex items-center justify-center gap-2 mb-6">
+                    <i data-lucide="lock" class="w-3 h-3 text-slate-500"></i>
+                    <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Private Access</h2>
                 </div>
                 
                 <div>
-                    <input type="email" id="email" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-wide text-center" placeholder="Alamat Emel">
+                    <input type="text" id="email" autocapitalize="none" autocorrect="off" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-wide text-center" placeholder="Username / Emel">
                 </div>
                 
                 <div>
                     <input type="password" id="password" class="input-field w-full rounded-2xl px-5 py-4 text-xs font-bold tracking-widest text-center" placeholder="Kata Laluan">
                 </div>
                 
-                <button onclick="handleAuth()" id="btnAuth" class="w-full bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-xl shadow-red-900/20 transition-all active:scale-95 tracking-[0.2em] mt-2 flex justify-center items-center gap-2">
-                    Log Masuk
+                <button onclick="handleAuth()" id="btnAuth" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 text-white font-black uppercase text-[10px] py-4 rounded-2xl shadow-[0_10px_20px_-10px_rgba(220,38,38,0.5)] transition-all active:scale-95 tracking-[0.2em] mt-2 flex justify-center items-center gap-2 border border-red-500/50">
+                    Masuk Ke Sistem
                 </button>
 
-                <div class="text-center pt-2">
-                    <button onclick="toggleAuthMode()" class="text-[10px] font-bold text-slate-400 hover:text-white transition-colors" id="toggleText">
-                        Belum ada akaun? <span class="text-red-500">Daftar sekarang</span>
-                    </button>
+                <div class="text-center pt-3">
+                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center justify-center gap-1.5">
+                        <i data-lucide="info" class="w-3 h-3"></i> Contact admin to get account
+                    </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 py-1 opacity-20 relative z-10">
-                <div class="flex-1 h-px bg-slate-600"></div><span class="text-[8px] font-black uppercase">atau</span><div class="flex-1 h-px bg-slate-600"></div>
+            <div class="flex items-center gap-4 py-1 relative z-10">
+                <div class="flex-1 h-px bg-slate-700"></div>
+                <span class="text-[8px] font-black uppercase tracking-[0.2em] text-slate-500">Atau</span>
+                <div class="flex-1 h-px bg-slate-700"></div>
             </div>
 
-            <button onclick="loginGuest()" id="btnGuest" class="w-full bg-slate-800/50 hover:bg-slate-700 text-slate-300 font-black uppercase text-[10px] py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-700 tracking-widest relative z-10">
-                <i data-lucide="user-plus" class="w-4 h-4"></i> Cuba Sebagai Guest
+            <button onclick="loginGuest()" id="btnGuest" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black uppercase text-[11px] py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-600 tracking-widest relative z-10 ring-1 ring-slate-500/30">
+                <i data-lucide="users" class="w-5 h-5 text-emerald-400"></i>
+                Teruskan Sebagai Guest
             </button>
         </div>
     </div>
@@ -131,11 +135,12 @@
             const splash = document.getElementById('splashScreen');
             setTimeout(() => {
                 splash.style.opacity = '0';
+                splash.style.transform = 'scale(1.05)';
                 setTimeout(() => { splash.style.display = 'none'; }, 700);
-            }, 1500); 
+            }, 1800); 
         });
 
-        // KONFIGURASI FIREBASE
+        // KONFIGURASI FIREBASE KEKAL SAMA
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
             authDomain: "rms-cloudnas.firebaseapp.com",
@@ -158,42 +163,34 @@
             }
         });
 
-        // KAWALAN MODE LOGIN / REGISTER
-        let isLoginMode = true;
+        // ==========================================
+        // FUNGSI AUTO ISI PASSWORD & AUTO LOGIN UNTUK "ADMINNAS"
+        // ==========================================
+        const emailInput = document.getElementById('email');
+        const passInput = document.getElementById('password');
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            const shopContainer = document.getElementById('shopNameContainer');
-            const formTitle = document.getElementById('formTitle');
-            const btnAuth = document.getElementById('btnAuth');
-            const toggleText = document.getElementById('toggleText');
-
-            if (isLoginMode) {
-                shopContainer.classList.add('hidden');
-                formTitle.innerText = "Log Masuk Akaun";
-                btnAuth.innerHTML = "Log Masuk";
-                toggleText.innerHTML = 'Belum ada akaun? <span class="text-red-500">Daftar sekarang</span>';
-            } else {
-                shopContainer.classList.remove('hidden');
-                formTitle.innerText = "Daftar Akaun Baru";
-                btnAuth.innerHTML = "Daftar & Masuk";
-                toggleText.innerHTML = 'Sudah ada akaun? <span class="text-red-500">Log masuk</span>';
+        emailInput.addEventListener('input', function(e) {
+            if (e.target.value === 'ADMINNAS') {
+                passInput.value = 'ADMINNAS';
             }
-        }
+        });
 
-        // FUNGSI UTAMA EMAIL/PASSWORD (LOGIN & REGISTER)
+        // ==========================================
+        // FUNGSI LOGIN PRIVATE ACCOUNT NASZC
+        // ==========================================
         async function handleAuth() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const shopName = document.getElementById('shopName').value.trim();
+            let userVal = emailInput.value.trim();
+            const passVal = passInput.value.trim();
             const btn = document.getElementById('btnAuth');
 
-            if (!email || !password) {
-                return showToast("Sila isi Emel & Kata Laluan!", "error");
+            if (!userVal || !passVal) {
+                return showToast("Sila isi maklumat log masuk!", "error");
             }
 
-            if (!isLoginMode && !shopName) {
-                return showToast("Sila isi Nama Kedai!", "error");
+            // MAGIC TRANSLATE: Kalau taip ADMINNAS, tukar ke format emel firebase
+            if (userVal === 'ADMINNAS' && passVal === 'ADMINNAS') {
+                userVal = 'admin@naszex.com'; 
+                // Pastikan kau create user 'admin@naszex.com' pass 'ADMINNAS' dalam Firebase panel.
             }
 
             btn.disabled = true;
@@ -202,49 +199,38 @@
 
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                
-                if (isLoginMode) {
-                    // PROSES LOGIN
-                    await auth.signInWithEmailAndPassword(email, password);
-                } else {
-                    // PROSES DAFTAR BARU
-                    const res = await auth.createUserWithEmailAndPassword(email, password);
-                    // Simpan profil kedai dalam database
-                    await db.collection('users').doc(res.user.uid).set({
-                        shopName: shopName,
-                        role: "admin",
-                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-                
+                await auth.signInWithEmailAndPassword(userVal, passVal);
                 window.location.replace('index.html');
-                
             } catch (error) {
-                let errorMsg = "Sistem Ralat";
-                if (error.code === 'auth/email-already-in-use') errorMsg = "Emel telah didaftarkan!";
-                else if (error.code === 'auth/invalid-email') errorMsg = "Format emel salah!";
-                else if (error.code === 'auth/weak-password') errorMsg = "Kata laluan sekurang-kurangnya 6 aksara!";
-                else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') errorMsg = "Emel atau Kata Laluan salah!";
-                else errorMsg = error.message;
+                let errorMsg = "Akses Ditolak";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMsg = "Maklumat salah. Contact Admin!";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = "Format emel tidak sah!";
+                } else {
+                    errorMsg = error.message;
+                }
 
                 showToast(errorMsg, "error");
                 btn.disabled = false;
-                btn.innerHTML = isLoginMode ? "Log Masuk" : "Daftar & Masuk";
+                btn.innerHTML = "Masuk Ke Sistem";
             }
         }
 
-        // FUNGSI GUEST MODE (ANONYMOUS)
+        // ==========================================
+        // FUNGSI GUEST MODE (ANONYMOUS FIREBASE)
+        // ==========================================
         async function loginGuest() {
             const btn = document.getElementById('btnGuest');
             btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyiapkan Demo...`;
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyiapkan Akses...`;
             lucide.createIcons();
 
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 const res = await auth.signInAnonymously();
                 
-                // Semak kalau guest ni dah pernah masuk, kalau belum kita buatkan profil sikit
+                // Set data guest
                 const doc = await db.collection('users').doc(res.user.uid).get();
                 if (!doc.exists) {
                     await db.collection('users').doc(res.user.uid).set({
@@ -255,9 +241,9 @@
                 }
                 window.location.replace('index.html');
             } catch (e) { 
-                showToast("Gagal masuk mode Guest: " + e.message, "error");
+                showToast("Sistem ralat. Sila cuba sebentar lagi.", "error");
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i> Cuba Sebagai Guest`;
+                btn.innerHTML = `<i data-lucide="users" class="w-5 h-5 text-emerald-400"></i> Teruskan Sebagai Guest`;
                 lucide.createIcons();
             }
         }
@@ -266,7 +252,7 @@
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'} text-white px-6 py-3 rounded-full text-[10px] font-black uppercase shadow-lg text-center tracking-widest fade-in pointer-events-auto`;
+            toast.className = `${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'} text-white px-6 py-3 rounded-full text-[10px] font-black uppercase shadow-[0_10px_20px_-5px_rgba(0,0,0,0.5)] text-center tracking-widest fade-in pointer-events-auto border border-white/10`;
             toast.innerText = msg;
             container.appendChild(toast);
             setTimeout(() => {
