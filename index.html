@@ -22,12 +22,11 @@
     <style>
         :root { --primary: #0f172a; --accent: #ef4444; }
         
-        /* Buang kesan highlight/kelip biru bila tekan butang di mobile */
         * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #f8fafc; color: #1e293b; 
+            background: #f1f5f9; color: #1e293b; 
             user-select: none; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased;
         }
         
@@ -40,17 +39,18 @@
         .modal-wrapper { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none; will-change: transform, opacity; }
         .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
-        /* Smooth View Transitions (Tiada lagi blank screen/collapse) */
+        /* Smooth View Transitions */
         .view-section { 
             display: none; 
             opacity: 0;
+            width: 100%;
         }
         .view-section.active { 
             display: block; 
-            animation: fadeInView 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeInView 0.25s ease-out forwards;
         }
         @keyframes fadeInView {
-            0% { opacity: 0; transform: translateY(10px); }
+            0% { opacity: 0; transform: translateY(4px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
@@ -58,7 +58,14 @@
         .list-anim { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
 
         .glass-nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
+        
+        /* Fixed Bottom Nav CSS untuk PWA */
+        .glass-bottom { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
+            border-top: 1px solid rgba(226, 232, 240, 0.8); 
+            padding-bottom: env(safe-area-inset-bottom);
+        }
         
         .tap-effect { transition: transform 0.1s; cursor: pointer; }
         .tap-effect:active { transform: scale(0.95); }
@@ -78,7 +85,6 @@
 
         @supports (padding: max(0px)) {
             .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)) !important; }
-            .safe-bottom { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important; }
             .modal-safe-bottom { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important; }
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -86,7 +92,7 @@
         .dash-card-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     </style>
 </head>
-<body class="bg-[#f8fafc] overflow-x-hidden">
+<body class="bg-[#f1f5f9] overflow-x-hidden">
 
     <div id="toast-container"></div>
 
@@ -113,18 +119,21 @@
         </div>
     </nav>
 
-    <div class="max-w-md mx-auto relative pb-32 pt-2">
+    <div class="max-w-md mx-auto relative pb-28 pt-2 min-h-[85vh]">
         
         <main id="dashboardView" class="view-section space-y-5 p-4 pt-4">
             
-            <div class="flex justify-between items-end px-1">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Hai 👋</h2>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Status Now</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-xl font-black text-emerald-600 font-num" id="todayJobs">0</p>
-                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Job</p>
+            <div class="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-[1.5rem] p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="flex justify-between items-end relative z-10">
+                    <div>
+                        <h2 class="text-2xl font-black tracking-tight">Hai, NASZC 👋</h2>
+                        <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest mt-1">Status Hari Ini</p>
+                    </div>
+                    <div class="text-right bg-black/20 px-3 py-2 rounded-xl backdrop-blur-sm">
+                        <p class="text-2xl font-black text-white font-num leading-none" id="todayJobs">0</p>
+                        <p class="text-[8px] font-bold text-blue-200 uppercase tracking-widest mt-1">Jobs Masuk</p>
+                    </div>
                 </div>
             </div>
 
@@ -136,7 +145,7 @@
                         <span class="text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">Paid</span>
                     </div>
                     <p class="text-2xl font-black font-num relative z-10 tracking-tight">RM <span id="stat-month-paid">0</span></p>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 relative z-10">Hasil Bulan Ini</p>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 relative z-10">Bulan Ini</p>
                 </div>
                 
                 <div class="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-sm text-slate-900 relative overflow-hidden tap-effect">
@@ -152,11 +161,11 @@
             <div class="space-y-3 pt-2">
                 <div class="relative group">
                     <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="Cari nama, phone atau item..." 
-                           class="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-[11px] font-bold shadow-sm outline-none focus:border-slate-400 transition-all font-num tracking-wide">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within:text-slate-900"></i>
+                           class="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-[1.2rem] text-[11px] font-bold shadow-sm outline-none focus:border-blue-500 transition-all font-num tracking-wide">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within:text-blue-500"></i>
                 </div>
 
-                <div class="flex p-1.5 bg-slate-200/50 rounded-2xl gap-1.5 backdrop-blur-md">
+                <div class="flex p-1.5 bg-slate-200/50 rounded-2xl gap-1.5 backdrop-blur-md border border-slate-200/50">
                     <button onclick="filterInvoices('all')" id="f-all" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tab-active tap-effect">Semua Rekod</button>
                     <button onclick="filterInvoices('outstanding')" id="f-pending" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-500 hover:text-slate-700 tap-effect">Unpaid / Aktif</button>
                     <button onclick="filterInvoices('paid')" id="f-paid" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-500 hover:text-slate-700 tap-effect">Selesai (Paid)</button>
@@ -235,21 +244,21 @@
         <main id="toolsView" class="view-section p-4 pt-4 space-y-6">
             <div>
                 <h2 class="text-2xl font-black text-slate-900 tracking-tight">Smart Tools</h2>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Price list & Generate</p>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Price list & Generate Receipt</p>
             </div>
 
             <div class="space-y-4">
                 
                 <div class="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden shadow-sm">
-                    <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <div class="bg-gradient-to-r from-amber-50 to-white px-5 py-4 border-b border-amber-100 flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <i data-lucide="cpu" class="w-5 h-5 text-amber-500"></i>
+                            <div class="bg-amber-100 p-2 rounded-xl text-amber-600"><i data-lucide="cpu" class="w-5 h-5"></i></div>
                             <div>
-                                <h3 class="text-[11px] font-black uppercase text-slate-900">Services</h3>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Price list</p>
+                                <h3 class="text-[11px] font-black uppercase text-slate-900">Katalog Servis</h3>
+                                <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Hardware & Software</p>
                             </div>
                         </div>
-                        <button onclick="openServiceModal()" class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-md tap-effect">+ Tambah</button>
+                        <button onclick="openServiceModal()" class="text-[9px] font-black text-white uppercase tracking-widest bg-amber-500 shadow-md shadow-amber-500/20 px-3 py-1.5 rounded-lg tap-effect">+ Tambah</button>
                     </div>
                     <div id="serviceCatalogList" class="divide-y divide-slate-50 max-h-60 overflow-y-auto">
                         <div class="p-5 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">Memuatkan Data...</div>
@@ -257,20 +266,20 @@
                 </div>
 
                 <div class="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden shadow-sm mt-4">
-                     <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                     <div class="bg-gradient-to-r from-emerald-50 to-white px-5 py-4 border-b border-emerald-100 flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <i data-lucide="layers" class="w-5 h-5 text-emerald-500"></i>
+                            <div class="bg-emerald-100 p-2 rounded-xl text-emerald-600"><i data-lucide="layers" class="w-5 h-5"></i></div>
                             <div>
-                                <h3 class="text-[11px] font-black uppercase text-slate-900">Lcd / Battery / Backglass / Charging Port</h3>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Price & Part</p>
+                                <h3 class="text-[11px] font-black uppercase text-slate-900">Matriks Harga Part</h3>
+                                <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">LCD / Battery / Backglass</p>
                             </div>
                         </div>
-                        <button onclick="openMatrixModal()" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2.5 py-1 rounded-md tap-effect">+ Tambah</button>
+                        <button onclick="openMatrixModal()" class="text-[9px] font-black text-white uppercase tracking-widest bg-emerald-500 shadow-md shadow-emerald-500/20 px-3 py-1.5 rounded-lg tap-effect">+ Tambah</button>
                     </div>
-                    <div class="p-3 border-b border-slate-50">
+                    <div class="p-3 border-b border-slate-50 bg-slate-50/50">
                         <div class="relative">
                             <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                            <input type="text" id="searchBrand" onkeyup="filterMatrix()" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[10px] font-bold uppercase rounded-xl py-2.5 pl-9 pr-3 outline-none focus:border-emerald-500 focus:bg-white transition-all placeholder:normal-case placeholder:font-medium" placeholder="Cari jenama... (cth: Apple)">
+                            <input type="text" id="searchBrand" onkeyup="filterMatrix()" class="w-full bg-white border border-slate-200 text-slate-900 text-[10px] font-bold uppercase rounded-xl py-2.5 pl-9 pr-3 outline-none focus:border-emerald-500 transition-all placeholder:normal-case placeholder:font-medium shadow-sm" placeholder="Cari jenama... (cth: Apple)">
                         </div>
                     </div>
                     <div id="matrixCatalogList" class="grid grid-cols-2 gap-3 p-3 max-h-80 overflow-y-auto">
@@ -280,10 +289,10 @@
 
                 <div class="bg-slate-900 rounded-[1.5rem] overflow-hidden shadow-xl shadow-slate-900/20">
                     <div class="px-5 py-4 border-b border-white/10 flex items-center gap-3">
-                        <i data-lucide="printer" class="w-5 h-5 text-white"></i>
+                        <div class="bg-white/10 p-2 rounded-xl text-white"><i data-lucide="printer" class="w-5 h-5"></i></div>
                         <div>
-                            <h3 class="text-[11px] font-black uppercase text-white">Generate Receipt</h3>
-                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Print & Send</p>
+                            <h3 class="text-[11px] font-black uppercase text-white">Generate Receipt PDF</h3>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Cari & Jana Terus</p>
                         </div>
                     </div>
                     <div class="p-5 space-y-4">
@@ -300,25 +309,25 @@
 
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-4 py-2 safe-bottom gpu">
-        <div class="max-w-md mx-auto grid grid-cols-4 items-end h-14 pb-2 relative">
-            <button onclick="window.location.hash='dashboard'" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors text-slate-900 nav-item-active">
+    <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-4 gpu">
+        <div class="max-w-md mx-auto grid grid-cols-4 items-center h-[60px] relative">
+            <button onclick="window.location.hash='dashboard'" id="nav-dash" class="group flex flex-col items-center justify-center gap-1 tap-effect transition-colors text-slate-900 nav-item-active">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Home</span>
             </button>
             
-            <button onclick="window.location.hash='newjob'" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-900">
-                <div class="w-10 h-10 bg-slate-900 text-white rounded-[1rem] flex items-center justify-center shadow-lg shadow-slate-900/30 transform -translate-y-2 border-4 border-white">
-                     <i data-lucide="plus" class="w-4 h-4"></i>
+            <button onclick="window.location.hash='newjob'" class="group flex flex-col items-center justify-center tap-effect text-slate-900">
+                <div class="w-11 h-11 bg-slate-900 text-white rounded-[1rem] flex items-center justify-center shadow-lg shadow-slate-900/30 transform -translate-y-2 border-4 border-[#f1f5f9]">
+                     <i data-lucide="plus" class="w-5 h-5"></i>
                 </div>
             </button>
             
-            <button onclick="window.location.hash='reports'" id="nav-reports" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+            <button onclick="window.location.hash='reports'" id="nav-reports" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-400 transition-colors">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Data</span>
             </button>
             
-            <button onclick="window.location.hash='tools'" id="nav-tools" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+            <button onclick="window.location.hash='tools'" id="nav-tools" class="group flex flex-col items-center justify-center gap-1 tap-effect text-slate-400 transition-colors">
                 <i data-lucide="wrench" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Tools</span>
             </button>
@@ -382,14 +391,14 @@
                         <p class="text-2xl font-black text-slate-900 italic font-num">RM <span id="grandTotal">0.00</span></p>
                     </div>
                 </div>
-                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-emerald-600/20 tap-effect flex items-center justify-center gap-2">
+                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-blue-600/20 tap-effect flex items-center justify-center gap-2">
                     SAVE <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="actionModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end gpu">
+    <div id="actionModal" class="fixed inset-0 z-[55] bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end gpu">
         <div class="bg-white rounded-t-[2.5rem] w-full p-6 pb-10 shadow-2xl space-y-5 modal-safe-bottom">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-2"></div>
             
@@ -414,29 +423,31 @@
                 <p class="text-[8px] text-center text-slate-400 mt-2">*Perubahan status akan mencadangkan notifikasi WhatsApp.</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 pt-2">
-                <button id="btnToggleStatus" class="col-span-2 p-4 rounded-2xl font-black text-[11px] uppercase shadow-md tap-effect flex justify-between items-center px-6 transition-all duration-300">
-                </button>
+            <button id="btnToggleStatus" class="w-full p-4 rounded-2xl font-black text-[11px] uppercase shadow-md tap-effect flex justify-between items-center px-6 transition-all duration-300"></button>
 
-                <button onclick="handleAction('receipt')" class="p-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-lg shadow-slate-900/20 flex justify-center items-center gap-2 tap-effect">
-                    <i data-lucide="printer" class="w-4 h-4"></i> Print / Send
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="handleAction('receipt')" class="p-3 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-lg shadow-slate-900/20 flex flex-col justify-center items-center gap-1.5 tap-effect">
+                    <i data-lucide="printer" class="w-4 h-4"></i> PDF
                 </button>
-                <button onclick="handleAction('edit')" class="p-4 bg-white text-slate-700 rounded-2xl font-black text-[9px] uppercase border border-slate-200 flex justify-center items-center gap-2 tap-effect">
+                <button onclick="handleAction('link')" class="p-3 bg-blue-50 text-blue-600 rounded-2xl font-black text-[9px] uppercase shadow-sm border border-blue-100 flex flex-col justify-center items-center gap-1.5 tap-effect">
+                    <i data-lucide="link" class="w-4 h-4"></i> Share Link
+                </button>
+                <button onclick="handleAction('edit')" class="p-3 bg-white text-slate-700 rounded-2xl font-black text-[9px] uppercase border border-slate-200 flex flex-col justify-center items-center gap-1.5 tap-effect">
                     <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
                 </button>
             </div>
             
             <button onclick="handleAction('delete')" class="w-full py-4 text-rose-500 font-black text-[10px] uppercase tracking-widest tap-effect">
-                Delete
+                Delete Rekod
             </button>
             <button onclick="closeActionMenu()" class="w-full bg-slate-100 py-3 text-[10px] font-bold text-slate-500 uppercase rounded-xl tracking-widest tap-effect">Tutup</button>
         </div>
     </div>
 
-        <div id="serviceModal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end sm:justify-center gpu">
+    <div id="serviceModal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end sm:justify-center gpu">
         <div class="bg-white w-full max-w-md mx-auto rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl modal-safe-bottom max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="text-sm font-black text-slate-900 uppercase">New Servis</h3>
+                <h3 class="text-sm font-black text-slate-900 uppercase">Katalog Servis Baru</h3>
                 <button onclick="closeServiceModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 tap-effect">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
@@ -481,7 +492,7 @@
                     </div>
                 </div>
                 <button onclick="saveNewService()" id="btnSaveSvc" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] py-4 rounded-xl flex items-center justify-center gap-2 tap-effect tracking-widest mt-4 shadow-lg shadow-blue-600/20">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i> SAVE
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> SIMPAN KE KATALOG
                 </button>
             </div>
         </div>
@@ -490,7 +501,7 @@
     <div id="matrixModal" class="fixed inset-0 z-[60] bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end sm:justify-center gpu">
         <div class="bg-white w-full max-w-md mx-auto rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl modal-safe-bottom max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="text-sm font-black text-slate-900 uppercase">Add New Matrix</h3>
+                <h3 class="text-sm font-black text-slate-900 uppercase">Harga Sparepart</h3>
                 <button onclick="closeMatrixModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 tap-effect">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
@@ -511,11 +522,11 @@
                     <input type="text" id="matGrade" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs" placeholder="Cth: LCD - OLED / Bateri - Ori">
                 </div>
                 <div>
-                    <label class="input-label">Harga (RM)</label>
+                    <label class="input-label">Harga Modal (RM)</label>
                     <input type="number" id="matPrice" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs font-num" placeholder="-">
                 </div>
                 <button onclick="saveNewMatrix()" id="btnSaveMat" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] py-4 rounded-xl flex items-center justify-center gap-2 tap-effect tracking-widest mt-4 shadow-lg shadow-emerald-600/20">
-                    <i data-lucide="layers" class="w-4 h-4"></i> SAVE
+                    <i data-lucide="layers" class="w-4 h-4"></i> SIMPAN HARGA
                 </button>
             </div>
         </div>
@@ -526,13 +537,13 @@
             <div class="flex justify-between items-center mb-5 shrink-0">
                 <div>
                     <h3 id="brandDetailsTitle" class="text-sm font-black text-slate-900 uppercase">Brand</h3>
-                    <p class="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">Senarai Sparepart</p>
+                    <p class="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">Senarai Sparepart Terkini</p>
                 </div>
                 <button onclick="closeBrandDetails()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 tap-effect">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
-            <div id="brandDetailsList" class="overflow-y-auto space-y-2 flex-1 pb-4">
+            <div id="brandDetailsList" class="overflow-y-auto space-y-2 flex-1 pb-4 no-scrollbar">
             </div>
         </div>
     </div>
@@ -545,7 +556,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => { 
             lucide.createIcons(); 
-            handleRouting(); // Render routing awal-awal, tak perlu tunggu firebase
+            handleRouting(); 
         });
         
         // --- FIREBASE CONFIG ---
@@ -576,8 +587,8 @@
                 showPage(hash);
             } else if (hash === 'newjob') {
                 showPage('dashboard');
-                setTimeout(openAddModal, 50); // Buka modal secara lancar
-                window.history.replaceState(null, null, '#dashboard'); // Reset URL
+                setTimeout(openAddModal, 50); 
+                window.history.replaceState(null, null, '#dashboard'); 
             }
         }
         window.addEventListener('hashchange', handleRouting);
@@ -587,10 +598,8 @@
             const views = ['dashboardView', 'reportsView', 'toolsView'];
             const target = document.getElementById(p + 'View');
             
-            // Jangan reload kalau page yang sama ditekan
             if (!target || target.classList.contains('active')) return;
 
-            // Sembunyikan semua, aktifkan target
             views.forEach(v => {
                 const el = document.getElementById(v);
                 if (el) el.classList.remove('active');
@@ -598,7 +607,6 @@
             target.classList.add('active');
             window.scrollTo({top: 0, behavior: 'instant'});
 
-            // Reset dan set butang nav bawah
             document.querySelectorAll('button[id^="nav-"]').forEach(b => {
                 b.classList.remove('nav-item-active');
                 b.classList.add('text-slate-400');
@@ -616,8 +624,6 @@
                 window.location.replace('login.html');
             } else {
                 loadGlobalSettings();
-
-                // Load Data Firebase
                 if(unsubscribe) unsubscribe();
                 unsubscribe = db.collection("invoices")
                     .where("uid", "==", user.uid)
@@ -710,41 +716,45 @@
 
             filtered.forEach((i, index) => {
                 const isPaid = i.status === 'paid';
-                const statusColor = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
                 
-                const pColor = {
-                    'Received': 'bg-slate-200 text-slate-700', 'Diagnosing': 'bg-purple-100 text-purple-700',
-                    'Waiting Part': 'bg-amber-100 text-amber-700', 'In Repair': 'bg-blue-100 text-blue-700',
-                    'Testing': 'bg-indigo-100 text-indigo-700', 'Completed': 'bg-emerald-400 text-white animate-pulse',
-                    'Collected': 'bg-slate-800 text-white', 'Cancelled': 'bg-rose-200 text-rose-800'
-                };
-                const badgeColor = pColor[i.repairStatus] || 'bg-slate-100 text-slate-600';
+                // Reka bentuk gaya kad berdasarkan status repair (Vibrant Design)
+                let bgTint = 'bg-white', bColor = 'border-slate-100', iconBg = 'bg-slate-100 text-slate-500';
+                
+                if (i.repairStatus === 'Received') { bgTint = 'bg-slate-50'; bColor = 'border-l-[4px] border-l-slate-400 border-t-slate-100 border-r-slate-100 border-b-slate-100'; iconBg = 'bg-slate-200 text-slate-700'; }
+                else if (i.repairStatus === 'Diagnosing') { bgTint = 'bg-purple-50/50'; bColor = 'border-l-[4px] border-l-purple-400 border-t-purple-50 border-r-purple-50 border-b-purple-50'; iconBg = 'bg-purple-100 text-purple-600'; }
+                else if (i.repairStatus === 'Waiting Part') { bgTint = 'bg-amber-50/50'; bColor = 'border-l-[4px] border-l-amber-400 border-t-amber-50 border-r-amber-50 border-b-amber-50'; iconBg = 'bg-amber-100 text-amber-600'; }
+                else if (i.repairStatus === 'In Repair') { bgTint = 'bg-blue-50/50'; bColor = 'border-l-[4px] border-l-blue-400 border-t-blue-50 border-r-blue-50 border-b-blue-50'; iconBg = 'bg-blue-100 text-blue-600'; }
+                else if (i.repairStatus === 'Testing') { bgTint = 'bg-indigo-50/50'; bColor = 'border-l-[4px] border-l-indigo-400 border-t-indigo-50 border-r-indigo-50 border-b-indigo-50'; iconBg = 'bg-indigo-100 text-indigo-600'; }
+                else if (i.repairStatus === 'Completed') { bgTint = 'bg-emerald-50/30'; bColor = 'border-l-[4px] border-l-emerald-500 border-t-emerald-50 border-r-emerald-50 border-b-emerald-50'; iconBg = 'bg-emerald-400 text-white animate-pulse'; }
+                else if (i.repairStatus === 'Collected') { bgTint = 'bg-slate-50'; bColor = 'border border-slate-200 opacity-70'; iconBg = 'bg-slate-800 text-white'; }
+                else if (i.repairStatus === 'Cancelled') { bgTint = 'bg-rose-50/30'; bColor = 'border border-rose-100 opacity-60'; iconBg = 'bg-rose-100 text-rose-500'; }
+
+                const statusBadge = isPaid 
+                    ? `<span class="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 mt-1 inline-block">PAID</span>` 
+                    : `<span class="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-rose-100 text-rose-700 mt-1 inline-block">UNPAID</span>`;
+                
                 const delay = index < 10 ? index * 0.05 : 0; 
-                
-                // Ambil model item
                 let deviceDesc = "Servis Umum";
                 if(i.items && i.items.length > 0) deviceDesc = i.items[0].name.substring(0,30);
                 
-                // Tarikh format
                 const d = i.createdAt?.toDate ? i.createdAt.toDate() : new Date();
                 const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
                 
                 container.insertAdjacentHTML('beforeend', `
-                <div onclick="openActionMenu('${i.id}')" style="animation-delay: ${delay}s" class="list-anim bg-white p-4 rounded-2xl shadow-sm border border-slate-100 tap-effect flex justify-between items-center group relative overflow-hidden">
-                    ${i.repairStatus === 'Completed' ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>' : ''}
+                <div onclick="openActionMenu('${i.id}')" style="animation-delay: ${delay}s" class="list-anim ${bgTint} p-4 rounded-2xl shadow-sm border ${bColor} tap-effect flex justify-between items-center group">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-[1rem] ${badgeColor} flex flex-col items-center justify-center shadow-sm">
-                            <i data-lucide="wrench" class="w-5 h-5 mb-0.5 opacity-80"></i>
+                        <div class="w-11 h-11 rounded-xl ${iconBg} flex flex-col items-center justify-center shadow-sm">
+                            <i data-lucide="wrench" class="w-5 h-5 mb-0.5"></i>
                         </div>
                         <div>
                             <h4 class="text-[12px] font-black uppercase text-slate-900 leading-tight">${i.customerName}</h4>
                             <p class="text-[10px] font-bold text-slate-600 mt-0.5">${deviceDesc}</p>
-                            <p class="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-wider">${dateStr} • ${(i.repairStatus||'NEW').substring(0,10)}</p>
+                            <p class="text-[8px] font-black text-slate-400 mt-1 uppercase tracking-wider">${dateStr} • ${(i.repairStatus||'NEW').substring(0,12)}</p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-[14px] font-black italic text-slate-900 font-num">RM ${Math.round(i.total)}</p>
-                        <span class="text-[8px] font-bold uppercase px-2 py-0.5 rounded ${statusColor} mt-1 inline-block">${i.status}</span>
+                        <p class="text-[14px] font-black italic text-slate-900 font-num tracking-tight">RM ${Math.round(i.total)}</p>
+                        ${statusBadge}
                     </div>
                 </div>`);
             });
@@ -908,7 +918,6 @@
             doc.text(inv.customerName, 120, 74); 
             doc.text(`Telefon: ${inv.customerPhone}`, 120, 80);
 
-            // Sertakan description jika ada
             const rows = (inv.items||[]).map(x => [
                 x.name + (x.description ? `\n( ${x.description} )` : ''), 
                 x.qty, 
@@ -933,7 +942,6 @@
             doc.setFontSize(9); doc.setTextColor(100); doc.setFont("helvetica", "normal");
             doc.text(`Waranti: ${inv.warranty || 'Tiada'}`, 15, finalY);
 
-            // Footer Notes
             doc.setFontSize(8); doc.setTextColor(150);
             let termY = 260;
             doc.text("TERMA & SYARAT:", 15, termY);
@@ -1029,17 +1037,18 @@
             document.getElementById('updateRepairStatus').value = i.repairStatus || 'Received';
             const btn = document.getElementById('btnToggleStatus'); btn.onclick = null;
             if (i.status === 'paid') {
-                btn.className = "col-span-2 p-4 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl font-black text-[10px] uppercase shadow-sm tap-effect flex justify-between items-center px-6 transition-all";
+                btn.className = "w-full p-4 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl font-black text-[10px] uppercase shadow-sm tap-effect flex justify-between items-center px-6 transition-all";
                 btn.innerHTML = `<span>Tukar ke UNPAID</span><i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-400"></i>`;
                 btn.onclick = async () => { await db.collection("invoices").doc(id).update({status: 'outstanding'}); i.status = 'outstanding'; updateDashboard(); showToast("Status Ditukar: UNPAID"); closeActionMenu(); };
             } else {
-                btn.className = "col-span-2 p-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-emerald-500/30 tap-effect flex justify-between items-center px-6 transition-all";
+                btn.className = "w-full p-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-emerald-500/30 tap-effect flex justify-between items-center px-6 transition-all";
                 btn.innerHTML = `<span>Sahkan BAYARAN (PAID)</span><i data-lucide="check-circle" class="w-4 h-4 text-white"></i>`;
                 btn.onclick = async () => { await db.collection("invoices").doc(id).update({status: 'paid'}); i.status = 'paid'; updateDashboard(); showToast("Bayaran Disahkan!"); closeActionMenu(); };
             }
             const m = document.getElementById('actionModal'); m.classList.remove('hidden'); requestAnimationFrame(()=>m.classList.add('active')); lucide.createIcons();
         }
         function closeActionMenu() { const m = document.getElementById('actionModal'); m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 300); }
+        
         function handleAction(type) {
             if(type === 'edit') {
                 const i = allInvoices.find(x=>x.id===activeId); if(!i) return;
@@ -1057,16 +1066,36 @@
                 db.collection("invoices").doc(activeId).delete(); showToast("Rekod Dihapus"); closeActionMenu();
             }
             if(type === 'receipt') { generateInvoicePDF(allInvoices.find(x=>x.id===activeId)); closeActionMenu(); }
+            
+            // FUNGSI SHARE LINK BARU
+            if(type === 'link') {
+                const i = allInvoices.find(x=>x.id===activeId); if(!i) return;
+                const urlObj = new URL(window.location.href);
+                const baseUrl = urlObj.origin + urlObj.pathname.replace('index.html', '');
+                const finalUrl = `${baseUrl}view.html?id=${activeId}`;
+                
+                const msg = `Salam ${i.customerName}, klik pautan di bawah untuk melihat status semasa baik pulih peranti anda secara *Live*:\n\n${finalUrl}\n\nTerima kasih dari NASZEX CLOUD.`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: `Resit Live: ${i.invoiceNo}`,
+                        text: msg
+                    }).catch(err => {
+                        navigator.clipboard.writeText(msg); showToast("Pautan Disalin!");
+                    });
+                } else {
+                    navigator.clipboard.writeText(msg); showToast("Pautan Disalin!");
+                }
+                closeActionMenu();
+            }
         }
 
-           // --- TOOLS: KATALOG SERVIS & MATRIKS HARGA LOGIC ---
-
+        // --- TOOLS: KATALOG SERVIS & MATRIKS HARGA LOGIC ---
         function openServiceModal() { 
             const m = document.getElementById('serviceModal');
             m.classList.remove('hidden');
             requestAnimationFrame(() => m.classList.add('active'));
         }
-        
         function closeServiceModal() { 
             const m = document.getElementById('serviceModal');
             m.classList.remove('active');
@@ -1080,7 +1109,6 @@
             m.classList.remove('hidden');
             requestAnimationFrame(() => m.classList.add('active'));
         }
-        
         function closeMatrixModal() { 
             const m = document.getElementById('matrixModal');
             m.classList.remove('active');
@@ -1118,7 +1146,6 @@
             setTimeout(() => m.classList.add('hidden'), 300);
         }
 
-
         async function saveNewService() {
             const name = document.getElementById('svcName').value.trim(), category = document.getElementById('svcCategory').value;
             const laborBase = document.getElementById('svcLabor').value.trim(), estTime = document.getElementById('svcTime').value, warranty = document.getElementById('svcWarranty').value;
@@ -1128,13 +1155,31 @@
                 await db.collection('settings').doc('service_catalog').collection('items').add({ name, category, laborBase: parseFloat(laborBase), estTime, warranty, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 showToast("Servis ditambah!"); closeServiceModal();
             } catch (error) { showToast("Ralat menyimpan data", "error"); } 
-            finally { btn.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i> Simpan Ke Katalog`; lucide.createIcons(); }
+            finally { btn.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i> SIMPAN KE KATALOG`; lucide.createIcons(); }
         }
 
         async function deleteService(id) { if(confirm("Padam servis ini dari katalog?")) { try { await db.collection('settings').doc('service_catalog').collection('items').doc(id).delete(); showToast("Servis dipadam."); } catch (error) { showToast("Gagal memadam servis.", "error"); } } }
 
-        function openMatrixModal() { document.getElementById('matrixModal').classList.add('active'); }
-        function closeMatrixModal() { document.getElementById('matrixModal').classList.remove('active'); document.getElementById('matBrand').value = ''; document.getElementById('matModel').value = ''; document.getElementById('matGrade').value = ''; document.getElementById('matPrice').value = ''; }
+        async function loadServiceCatalog() {
+            const listContainer = document.getElementById('serviceCatalogList');
+            try {
+                db.collection('settings').doc('service_catalog').collection('items').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                    listContainer.innerHTML = '';
+                    if (snapshot.empty) { listContainer.innerHTML = `<div class="p-5 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">Tiada Servis Didaftarkan</div>`; return; }
+                    snapshot.forEach(doc => {
+                        const s = doc.data(); const color = s.category === 'Hardware' ? 'text-amber-500 bg-amber-50' : (s.category === 'Software' ? 'text-blue-500 bg-blue-50' : 'text-purple-500 bg-purple-50');
+                        listContainer.innerHTML += `
+                            <div class="p-4 flex items-center justify-between group border-b border-slate-50 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center ${color}"><i data-lucide="${s.category === 'Hardware' ? 'cpu' : (s.category === 'Software' ? 'smartphone' : 'activity')}" class="w-4 h-4"></i></div>
+                                    <div><h4 class="text-[11px] font-black text-slate-900">${s.name}</h4><div class="flex gap-2 mt-1"><span class="text-[8px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded uppercase font-num">RM${parseFloat(s.laborBase).toFixed(2)}</span><span class="text-[8px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded uppercase">${s.estTime}</span></div></div>
+                                </div>
+                                <button onclick="deleteService('${doc.id}')" class="w-7 h-7 bg-rose-50 text-rose-500 rounded-md flex items-center justify-center tap-effect"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>`;
+                    }); lucide.createIcons();
+                });
+            } catch (error) { listContainer.innerHTML = `<div class="p-5 text-center text-rose-500 text-[10px] font-bold tracking-widest uppercase">Gagal memuat katalog</div>`; }
+        }
 
         async function loadPricingMatrix() {
             const listContainer = document.getElementById('matrixCatalogList');
@@ -1167,22 +1212,6 @@
             });
         }
 
-        function openBrandDetails(brand) {
-            document.getElementById('brandDetailsTitle').innerText = brand;
-            const container = document.getElementById('brandDetailsList'); container.innerHTML = '';
-            globalMatrixData.filter(m => m.brand.toUpperCase() === brand).forEach(m => {
-                container.innerHTML += `
-                    <div class="bg-slate-50 border border-slate-100 rounded-[1rem] p-3 flex justify-between items-center group">
-                        <div><h4 class="text-[11px] font-black text-slate-900">${m.model}</h4>
-                            <div class="flex gap-2 mt-1"><span class="text-[8px] font-bold text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded uppercase">${m.grade}</span><span class="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-num">RM${parseFloat(m.price).toFixed(2)}</span></div>
-                        </div>
-                        <button onclick="deleteMatrix('${m.id}')" class="w-8 h-8 bg-white border border-rose-100 text-rose-500 rounded-lg flex items-center justify-center tap-effect"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>`;
-            });
-            lucide.createIcons(); document.getElementById('brandDetailsModal').classList.add('active');
-        }
-        function closeBrandDetails() { document.getElementById('brandDetailsModal').classList.remove('active'); }
-
         async function saveNewMatrix() {
             const brand = document.getElementById('matBrand').value.trim(), model = document.getElementById('matModel').value.trim(), grade = document.getElementById('matGrade').value.trim(), price = document.getElementById('matPrice').value.trim();
             if (!brand || !model || !grade || !price) return showToast("Sila isi semua maklumat!", "error");
@@ -1191,7 +1220,7 @@
                 await db.collection('settings').doc('pricing_matrix').collection('items').add({ brand, model, grade, price: parseFloat(price), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 showToast("Matriks harga ditambah!"); closeMatrixModal();
             } catch (error) { showToast("Ralat menyimpan data matriks", "error"); } 
-            finally { btn.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> Simpan Matriks`; lucide.createIcons(); }
+            finally { btn.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> SIMPAN HARGA`; lucide.createIcons(); }
         }
 
         async function deleteMatrix(id) { if(confirm("Padam matriks harga ini?")) { try { await db.collection('settings').doc('pricing_matrix').collection('items').doc(id).delete(); showToast("Matriks dipadam."); closeBrandDetails(); } catch (error) { showToast("Gagal memadam matriks.", "error"); } } }
