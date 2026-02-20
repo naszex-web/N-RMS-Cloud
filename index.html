@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#f8fafc">
+    <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
     
-    <title>NASZEX CLOUD - RMS FINAL v7.1</title>
+    <title>NASZEX CLOUD - RMS v2.0 PRO</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -18,283 +17,305 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root { --primary: #0f172a; --accent: #ef4444; }
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #f8fafc;
-            color: #1e293b; 
-            -webkit-tap-highlight-color: transparent; 
-            user-select: none;
-            overscroll-behavior-y: none;
-            -webkit-font-smoothing: antialiased;
+            background: #f8fafc; color: #1e293b; 
+            -webkit-tap-highlight-color: transparent; user-select: none; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased;
         }
         
         .font-num { font-family: 'Inter', sans-serif; }
-
         .gpu { transform: translate3d(0,0,0); backface-visibility: hidden; perspective: 1000px; will-change: transform, opacity; }
 
-        .modal-wrapper {
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-            transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none;
-            will-change: transform, opacity;
-        }
+        /* Modal Transitions */
+        .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 60; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-wrapper { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none; will-change: transform, opacity; }
         .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
-        .view-section { display: none; opacity: 0; transform: scale(0.99); transition: opacity 0.2s ease, transform 0.2s ease; will-change: opacity, transform; }
-        .view-section.active { display: block; opacity: 1; transform: scale(1); }
+        /* Smooth View Transitions (Fade Out & Fade In) */
+        .view-section { 
+            position: absolute; top: 0; left: 0; width: 100%; 
+            opacity: 0; visibility: hidden; 
+            transition: opacity 0.3s ease; 
+            pointer-events: none; 
+        }
+        .view-section.active { 
+            position: relative; opacity: 1; visibility: visible; 
+            pointer-events: auto; 
+        }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .list-anim { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .list-anim { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
 
-        .glass-nav { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .glass-nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
         .glass-bottom { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
         
         .tap-effect { transition: transform 0.1s; cursor: pointer; }
         .tap-effect:active { transform: scale(0.95); }
         
         .tab-active { background: #0f172a !important; color: #fff !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
-        .nav-item-active { color: #ef4444 !important; }
+        .nav-item-active { color: #0f172a !important; }
 
         .float-input-group { position: relative; width: 100%; transition: 0.3s; }
-        .float-input-group label { position: absolute; top: 6px; left: 14px; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; pointer-events: none; }
-        .float-input-group input, .float-input-group select { padding-top: 22px; padding-bottom: 10px; }
+        .float-input-group label { position: absolute; top: 8px; left: 16px; font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; pointer-events: none; }
+        .float-input-group input, .float-input-group select { padding-top: 24px; padding-bottom: 12px; }
+        
+        .input-label { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.25rem; display: block; }
 
-        #toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        #toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: #0f172a; color: white; padding: 12px 24px; border-radius: 99px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.15); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: translateY(-20px); pointer-events: auto; display: flex; align-items: center; gap: 8px; }
         @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
-
-        .timeline-item { position: relative; padding-left: 24px; padding-bottom: 24px; border-left: 2px solid #e2e8f0; }
-        .timeline-item:last-child { border-left: none; padding-bottom: 0; }
-        .timeline-item.active { border-left-color: #10b981; }
-        .timeline-dot { position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 2px solid #fff; box-shadow: 0 0 0 2px #e2e8f0; }
-        .timeline-item.active .timeline-dot { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
 
         @supports (padding: max(0px)) {
             .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)) !important; }
             .safe-bottom { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important; }
             .modal-safe-bottom { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important; }
         }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .dash-card-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     </style>
 </head>
-<body class="min-h-screen pb-32 bg-[#f8fafc]">
+<body class="bg-[#f8fafc] overflow-x-hidden">
 
-    <div id="gatekeeperSplash" class="fixed inset-0 z-[9999] bg-[#0f172a] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative w-24 h-24 bg-slate-800/80 rounded-[2.5rem] p-4 mb-6 shadow-2xl flex items-center justify-center animate-pulse">
-            <img src="logo.png" class="w-full h-full object-contain" alt="Logo">
-        </div>
-        <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">Memeriksa Akses...</p>
-    </div>
     <div id="toast-container"></div>
 
     <nav class="sticky top-0 z-40 glass-nav px-5 py-3 gpu safe-top">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg shadow-slate-900/10 tap-effect">
-                    <span class="text-white font-black text-[12px] italic">NX</span>
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg tap-effect">
+                    <span class="text-slate-900 font-black text-[12px] italic">NX</span>
                 </div>
                 <div>
-                    <h1 class="text-[12px] font-black italic uppercase tracking-[0.2em] text-slate-900 leading-none">NASZEX <span class="text-red-600">CLOUD</span></h1>
-                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1.5 leading-none pl-0.5">RMS Final v7.1</p>
+                    <h1 class="text-[14px] font-black italic uppercase tracking-[0.1em] text-white leading-none">NASZEX</h1>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1 leading-none">RMS v2.0 PRO</p>
                 </div>
             </div>
-            <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-slate-400 border border-slate-200 tap-effect shadow-sm">
-                <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
-            </button>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 rounded-xl text-white border border-slate-700 tap-effect shadow-sm transition-colors" aria-label="Segarkan Data">
+                    <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
+                </button>
+                <button onclick="window.location.href='setting.html'" class="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 rounded-xl text-white border border-slate-700 tap-effect shadow-sm transition-colors" aria-label="Tetapan Sistem">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <div class="max-w-md mx-auto p-4 space-y-6">
+    <div class="max-w-md mx-auto relative pb-32 pt-2">
         
-        <main id="dashboardView" class="view-section space-y-5">
-            <div class="grid grid-cols-3 gap-3">
-                <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-4 shadow-lg shadow-emerald-500/20 text-center relative overflow-hidden tap-effect">
-                    <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-paid">0</span></p>
-                    <p class="text-[7px] font-bold text-emerald-100 uppercase mt-1 tracking-widest">Paid</p>
-                </div>
-                <div class="bg-gradient-to-br from-rose-500 to-rose-700 rounded-2xl p-4 shadow-lg shadow-rose-500/20 text-center relative overflow-hidden tap-effect">
-                    <p class="text-[14px] font-black text-white font-num">RM <span id="stat-month-pending">0</span></p>
-                    <p class="text-[7px] font-bold text-rose-100 uppercase mt-1 tracking-widest">Unpaid</p>
-                </div>
-                <div class="bg-gradient-to-br from-slate-800 to-slate-950 rounded-2xl p-4 shadow-lg shadow-slate-900/20 text-center relative overflow-hidden tap-effect">
-                    <p class="text-[14px] font-black text-white font-num"><span id="stat-month-jobs">0</span></p>
-                    <p class="text-[7px] font-bold text-slate-400 uppercase mt-1 tracking-widest">Jobs</p>
-                </div>
-            </div>
-
-            <div class="relative group">
-                <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="SEARCH RECORD..." 
-                       class="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold shadow-sm outline-none focus:ring-2 focus:ring-slate-900/5 transition-all font-num tracking-wide">
-                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within:text-slate-900"></i>
-            </div>
-
-            <div class="flex p-1.5 bg-slate-200/50 rounded-2xl gap-1.5 backdrop-blur-md">
-                <button onclick="filterInvoices('all')" id="f-all" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tab-active tap-effect">All</button>
-                <button onclick="filterInvoices('paid')" id="f-paid" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-400 hover:text-slate-600 tap-effect">Paid</button>
-                <button onclick="filterInvoices('outstanding')" id="f-pending" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-400 hover:text-slate-600 tap-effect">Unpaid</button>
-            </div>
-
-            <div id="invoiceContainer" class="space-y-3 pb-8 min-h-[50vh]">
-            </div>
+        <main id="dashboardView" class="view-section active space-y-5 p-4 pt-4">
             
-            <div class="text-center pt-2">
-                 <p class="text-[8px] text-slate-300 font-bold uppercase tracking-widest">Showing Latest Records</p>
+            <div class="flex justify-between items-end px-1">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Hai 👋</h2>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Status Now</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xl font-black text-emerald-600 font-num" id="todayJobs">0</p>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Job</p>
+                </div>
             </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="dash-card-gradient rounded-[1.5rem] p-5 shadow-xl shadow-slate-900/10 text-white relative overflow-hidden tap-effect">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/5 rounded-full"></div>
+                    <div class="flex justify-between items-center mb-4 relative z-10">
+                        <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center"><i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i></div>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md">Paid</span>
+                    </div>
+                    <p class="text-2xl font-black font-num relative z-10 tracking-tight">RM <span id="stat-month-paid">0</span></p>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1 relative z-10">Hasil Bulan Ini</p>
+                </div>
+                
+                <div class="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-sm text-slate-900 relative overflow-hidden tap-effect">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="w-8 h-8 bg-rose-50 rounded-lg flex items-center justify-center"><i data-lucide="alert-circle" class="w-4 h-4 text-rose-500"></i></div>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-rose-500 bg-rose-50 px-2 py-1 rounded-md">Unpaid</span>
+                    </div>
+                    <p class="text-2xl font-black font-num tracking-tight">RM <span id="stat-month-pending">0</span></p>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1">Pending</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <div class="relative group">
+                    <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="Cari nama, phone atau item..." 
+                           class="w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-[11px] font-bold shadow-sm outline-none focus:border-slate-400 transition-all font-num tracking-wide">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within:text-slate-900"></i>
+                </div>
+
+                <div class="flex p-1.5 bg-slate-200/50 rounded-2xl gap-1.5 backdrop-blur-md">
+                    <button onclick="filterInvoices('all')" id="f-all" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all tab-active tap-effect">Semua Rekod</button>
+                    <button onclick="filterInvoices('outstanding')" id="f-pending" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-500 hover:text-slate-700 tap-effect">Unpaid / Aktif</button>
+                    <button onclick="filterInvoices('paid')" id="f-paid" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-all text-slate-500 hover:text-slate-700 tap-effect">Selesai (Paid)</button>
+                </div>
+            </div>
+
+            <div id="invoiceContainer" class="space-y-3 pb-8 min-h-[40vh]">
+                </div>
         </main>
 
-        <main id="reportsView" class="view-section">
-            <div id="dataMenu" class="space-y-4 pt-2">
-                <button onclick="openSubReport('performance')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between tap-effect">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><i data-lucide="bar-chart-2"></i></div>
-                        <div class="text-left">
-                            <h3 class="text-sm font-black uppercase text-slate-900">Performance</h3>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Job Volume & Trends</p>
-                        </div>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
-                </button>
-                <button onclick="openSubReport('profit')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between tap-effect">
+        <main id="reportsView" class="view-section p-4 pt-4 space-y-6">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Analitik Bisnes</h2>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Data & Prestasi Kedai</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="w-8 h-8 mx-auto bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center mb-2"><i data-lucide="activity" class="w-4 h-4"></i></div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kerosakan Utama</p>
+                    <p id="topDamage" class="text-sm font-black text-slate-900 mt-1 uppercase truncate">-</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="w-8 h-8 mx-auto bg-purple-50 text-purple-500 rounded-lg flex items-center justify-center mb-2"><i data-lucide="award" class="w-4 h-4"></i></div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Model Tertinggi</p>
+                    <p id="topModel" class="text-sm font-black text-slate-900 mt-1 uppercase truncate">-</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Laporan Terperinci</h3>
+                
+                <button onclick="toggleReportSection('profitReportBox')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-200 flex items-center justify-between tap-effect">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><i data-lucide="trending-up"></i></div>
                         <div class="text-left">
-                            <h3 class="text-sm font-black uppercase text-slate-900">Profit Analysis</h3>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Revenue vs Cost</p>
+                            <h3 class="text-sm font-black uppercase text-slate-900">Analisa Keuntungan</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Hasil Kasar vs Untung Bersih</p>
                         </div>
                     </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-300"></i>
                 </button>
-            </div>
+                <div id="profitReportBox" class="hidden bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden mt-2">
+                     <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr><th class="pl-5 py-3 text-[9px] font-black uppercase text-slate-400">Bulan</th><th class="text-center text-[9px] font-black uppercase text-rose-400">Modal</th><th class="pr-5 text-right text-[9px] font-black uppercase text-emerald-500">Untung</th></tr>
+                        </thead>
+                        <tbody id="profitTableBody" class="text-[11px] font-bold font-num"></tbody>
+                        <tfoot class="bg-slate-900 text-white font-num">
+                            <tr><td class="pl-5 py-4 text-[9px] uppercase font-bold text-white/50">Total Untung</td><td colspan="2" id="total-net-profit" class="text-right pr-5 py-4 text-lg font-black italic">RM 0</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
 
-            <div id="performanceContainer" class="hidden">
-                <button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                <button onclick="toggleReportSection('perfReportBox')" class="w-full bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-200 flex items-center justify-between tap-effect">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><i data-lucide="bar-chart-2"></i></div>
+                        <div class="text-left">
+                            <h3 class="text-sm font-black uppercase text-slate-900">Prestasi Bulanan</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Volume Job & Kutipan</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-300"></i>
+                </button>
+                <div id="perfReportBox" class="hidden bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden mt-2">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b border-slate-100">
-                            <tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-slate-400">Jobs</th><th class="pr-6 text-right text-[9px] font-black uppercase text-slate-400">Total</th></tr>
+                            <tr><th class="pl-5 py-3 text-[9px] font-black uppercase text-slate-400">Bulan</th><th class="text-center text-[9px] font-black uppercase text-slate-400">Jobs</th><th class="pr-5 text-right text-[9px] font-black uppercase text-slate-400">Kutipan</th></tr>
                         </thead>
                         <tbody id="reportTableBody" class="text-slate-800 text-[11px] font-bold font-num"></tbody>
                     </table>
                 </div>
             </div>
+        </main>
 
-            <div id="profitContainer" class="hidden">
-                <button onclick="closeSubReport()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                     <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-100">
-                            <tr><th class="pl-6 py-4 text-[9px] font-black uppercase text-slate-400">Month</th><th class="text-center text-[9px] font-black uppercase text-rose-400">Cost</th><th class="pr-6 text-right text-[9px] font-black uppercase text-emerald-500">Nett</th></tr>
-                        </thead>
-                        <tbody id="profitTableBody" class="text-[11px] font-bold font-num"></tbody>
-                        <tfoot class="bg-slate-900 text-white font-num">
-                            <tr><td class="pl-6 py-4 text-[9px] uppercase font-bold text-white/50">Total Profit</td><td colspan="2" id="total-net-profit" class="text-right pr-6 py-4 text-lg font-black italic">RM 0</td></tr>
-                        </tfoot>
-                    </table>
+        <main id="toolsView" class="view-section p-4 pt-4 space-y-6">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Smart Tools</h2>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Price list & Generate</p>
+            </div>
+
+            <div class="space-y-4">
+                
+                <div class="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="cpu" class="w-5 h-5 text-amber-500"></i>
+                            <div>
+                                <h3 class="text-[11px] font-black uppercase text-slate-900">Services</h3>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Price list</p>
+                            </div>
+                        </div>
+                        <button onclick="openServiceModal()" class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-md tap-effect">+ Tambah</button>
+                    </div>
+                    <div id="serviceCatalogList" class="divide-y divide-slate-50 max-h-60 overflow-y-auto">
+                        <div class="p-5 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">Memuatkan Data...</div>
+                    </div>
                 </div>
+
+                <div class="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden shadow-sm mt-4">
+                     <div class="bg-slate-50 px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="layers" class="w-5 h-5 text-emerald-500"></i>
+                            <div>
+                                <h3 class="text-[11px] font-black uppercase text-slate-900">Lcd / Battery / Backglass / Charging Port</h3>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Price & Part</p>
+                            </div>
+                        </div>
+                        <button onclick="openMatrixModal()" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2.5 py-1 rounded-md tap-effect">+ Tambah</button>
+                    </div>
+                    <div class="p-3 border-b border-slate-50">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                            <input type="text" id="searchBrand" onkeyup="filterMatrix()" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[10px] font-bold uppercase rounded-xl py-2.5 pl-9 pr-3 outline-none focus:border-emerald-500 focus:bg-white transition-all placeholder:normal-case placeholder:font-medium" placeholder="Cari jenama... (cth: Apple)">
+                        </div>
+                    </div>
+                    <div id="matrixCatalogList" class="grid grid-cols-2 gap-3 p-3 max-h-80 overflow-y-auto">
+                        <div class="col-span-2 p-5 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">Memuatkan Data...</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-[1.5rem] overflow-hidden shadow-xl shadow-slate-900/20">
+                    <div class="px-5 py-4 border-b border-white/10 flex items-center gap-3">
+                        <i data-lucide="printer" class="w-5 h-5 text-white"></i>
+                        <div>
+                            <h3 class="text-[11px] font-black uppercase text-white">Generate Receipt</h3>
+                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Print & Send</p>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-4">
+                         <input type="tel" id="toolReceiptPhone" placeholder="Masukkan No Phone Pelanggan..." class="w-full bg-white/10 border border-white/20 text-white rounded-xl p-4 font-bold outline-none font-num text-sm placeholder:text-white/40">
+                         <div class="grid grid-cols-2 gap-3">
+                            <button onclick="handleTools('whatsapp')" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button>
+                            <button onclick="handleTools('pdf')" class="w-full bg-white text-slate-900 py-3 rounded-xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect"><i data-lucide="download" class="w-4 h-4"></i> Download</button>
+                         </div>
+                    </div>
+                </div>
+
             </div>
         </main>
 
-        <main id="toolsView" class="view-section">
-            <div id="toolsMenu" class="space-y-4 pt-2">
-                <button onclick="openSubTool('receipt')" class="w-full bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-900/20 text-white flex items-center justify-between tap-effect">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center"><i data-lucide="printer"></i></div>
-                        <div class="text-left">
-                            <h3 class="text-sm font-black uppercase">Smart Receipt</h3>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">PDF & WhatsApp</p>
-                        </div>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-white/20"></i>
-                </button>
-                <button onclick="openSubTool('track')" class="w-full bg-white border border-slate-200 p-6 rounded-[2rem] shadow-sm text-slate-900 flex items-center justify-between tap-effect">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center"><i data-lucide="radar"></i></div>
-                        <div class="text-left">
-                            <h3 class="text-sm font-black uppercase">Live Tracker</h3>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Trace by Phone</p>
-                        </div>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
-                </button>
-            </div>
-
-            <div id="toolReceiptContainer" class="hidden">
-                <button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
-                <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 text-center space-y-6">
-                    <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg"><i data-lucide="printer"></i></div>
-                    <div class="space-y-4">
-                         <div class="float-input-group text-left">
-                            <input type="tel" id="toolReceiptPhone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none font-num rounded-2xl">
-                            <label>No. Telefon Pelanggan</label>
-                         </div>
-                         <div class="grid grid-cols-1 gap-3">
-                            <button onclick="handleTools('whatsapp')" class="w-full bg-[#25D366] text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg shadow-green-500/20"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</button>
-                            <button onclick="handleTools('pdf')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 tap-effect shadow-lg"><i data-lucide="download" class="w-4 h-4"></i> Download PDF</button>
-                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="toolTrackContainer" class="hidden">
-                <button onclick="closeSubTool()" class="mb-4 flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tap-effect"><i data-lucide="arrow-left" class="w-3 h-3"></i> Back</button>
-                <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-100 space-y-6">
-                     <div class="relative">
-                        <input type="tel" id="toolTrackPhone" placeholder="Masukkan No. Phone..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 pr-20 text-sm font-bold outline-none font-num">
-                        <button onclick="trackStatus()" class="absolute right-2 top-2 bottom-2 bg-orange-500 text-white px-5 rounded-xl font-bold text-[10px] uppercase tap-effect">Check</button>
-                     </div>
-                     <div id="trackResult" class="hidden">
-                         <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6">
-                             <div class="flex justify-between items-start">
-                                 <h4 id="trName" class="font-black text-xs uppercase text-slate-900"></h4>
-                                 <span id="trNo" class="text-[9px] font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-num"></span>
-                             </div>
-                             <p id="trDevice" class="text-[10px] text-slate-500 font-bold mt-1"></p>
-                         </div>
-                         <div class="space-y-0 px-2 pl-4" id="timelineContainer"></div>
-                     </div>
-                     <div id="trackEmpty" class="text-center py-12 opacity-40">
-                         <i data-lucide="radar" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
-                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sedia untuk dikesan</p>
-                     </div>
-                </div>
-            </div>
-        </main>
     </div>
 
     <div class="fixed bottom-0 left-0 right-0 z-40 glass-bottom px-4 py-2 safe-bottom gpu">
-        <div class="max-w-md mx-auto grid grid-cols-5 items-end h-14 pb-2">
-            <button onclick="showPage('dashboard')" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors text-slate-400">
+        <div class="max-w-md mx-auto grid grid-cols-4 items-end h-14 pb-2 relative">
+            <button onclick="window.location.href='index.html#dashboard'" id="nav-dash" class="group flex flex-col items-center justify-center gap-1.5 tap-effect transition-colors text-slate-900 nav-item-active">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Home</span>
             </button>
             
-            <button onclick="openAddModal()" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-900">
-                <div class="w-5 h-5 bg-slate-900 text-white rounded-md flex items-center justify-center shadow-md">
-                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <button onclick="window.location.href='index.html#newjob'" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-900">
+                <div class="w-10 h-10 bg-slate-900 text-white rounded-[1rem] flex items-center justify-center shadow-lg shadow-slate-900/30 transform -translate-y-2 border-4 border-white">
+                     <i data-lucide="plus" class="w-4 h-4"></i>
                 </div>
-                <span class="text-[9px] font-black uppercase tracking-tight">New</span>
             </button>
             
-            <button onclick="showPage('reports')" id="nav-report" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+            <button onclick="window.location.href='index.html#reports'" id="nav-report" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Data</span>
             </button>
             
-            <button onclick="showPage('tools')" id="nav-tools" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+            <button onclick="window.location.href='index.html#tools'" id="nav-tools" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
                 <i data-lucide="wrench" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Tools</span>
-            </button>
-
-            <button onclick="window.location.href='setting.html'" id="nav-settings" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                <span class="text-[9px] font-black uppercase tracking-tight">Setting</span>
             </button>
         </div>
     </div>
@@ -304,40 +325,41 @@
             <div class="px-6 py-5 bg-white/80 backdrop-blur-md border-b border-slate-100 flex justify-between items-center shrink-0 sticky top-0 z-10">
                 <div>
                     <h2 id="modalTitle" class="text-sm font-black uppercase text-slate-900">Initiate Job</h2>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Maklumat Customer</p>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">new job</p>
                 </div>
                 <button onclick="toggleModal(false)" class="w-9 h-9 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 border border-slate-100 tap-effect"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             
             <div class="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
                 <input type="hidden" id="editId">
+                
                 <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 space-y-4">
                     <div class="float-input-group">
-                        <input type="text" id="custName" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none focus:bg-white transition-colors">
-                        <label>Nama Pelanggan</label>
+                        <input type="text" id="custName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none focus:bg-white focus:border-blue-400 transition-colors text-xs" autocomplete="off">
+                        <label>Nama</label>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="float-input-group">
-                            <input type="tel" id="custPhone" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none font-num">
-                            <label>No. Phone</label>
+                            <input type="tel" id="custPhone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none focus:bg-white focus:border-blue-400 text-xs font-num" autocomplete="off">
+                            <label>No. WhatsApp</label>
                         </div>
                         <div class="float-input-group">
-                            <select id="warranty" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 font-bold outline-none">
-                                <option value="No Warranty">No Warranty</option>
-                                <option value="3 Hari">3 Hari</option>
-                                <option value="1 Minggu">1 Minggu</option>
-                                <option value="1 Bulan">1 Bulan</option>
+                            <select id="warranty" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 font-bold outline-none text-xs">
+                                <option value="Tiada Waranti">Tiada Waranti</option>
+                                <option value="7 Hari">7 Hari</option>
+                                <option value="30 Hari">30 Hari</option>
+                                <option value="90 Hari">90 Hari</option>
                             </select>
-                            <label></label>
+                            <label>Waranti</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-3">
                     <div class="flex justify-between items-end px-1">
-                        <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Item/Service</h4>
-                        <button onclick="addRow()" class="text-[9px] font-bold text-white bg-slate-900 px-4 py-2 rounded-xl uppercase tracking-wide tap-effect shadow-md">
-                            + Item
+                        <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Services / Item</h4>
+                        <button onclick="addRow()" class="text-[9px] font-bold text-white bg-slate-900 px-4 py-2 rounded-xl uppercase tracking-wide tap-effect shadow-md flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Tambah Item
                         </button>
                     </div>
                     <div id="itemRowsContainer" class="space-y-3 pb-20"></div>
@@ -346,17 +368,17 @@
 
             <div class="p-5 bg-white border-t border-slate-100 shrink-0 modal-safe-bottom">
                 <div class="flex justify-between items-center mb-4">
-                    <select id="initialStatus" class="bg-slate-100 text-slate-700 py-2 px-3 rounded-xl text-[10px] font-black uppercase outline-none">
+                    <select id="initialStatus" class="bg-slate-50 border border-slate-200 text-slate-700 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase outline-none">
                         <option value="outstanding">Unpaid</option>
                         <option value="paid">Paid</option>
                     </select>
                     <div class="text-right">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-0.5">Grand Total</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-0.5 tracking-widest">Jumlah Keseluruhan</p>
                         <p class="text-2xl font-black text-slate-900 italic font-num">RM <span id="grandTotal">0.00</span></p>
                     </div>
                 </div>
-                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-slate-900/20 tap-effect flex items-center justify-center gap-2">
-                    Simpan <i data-lucide="check" class="w-4 h-4"></i>
+                <button onclick="saveAndGenerate()" id="btnSave" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-emerald-600/20 tap-effect flex items-center justify-center gap-2">
+                    SAVE <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
@@ -364,38 +386,149 @@
 
     <div id="actionModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md hidden modal-wrapper flex flex-col justify-end gpu">
         <div class="bg-white rounded-t-[2.5rem] w-full p-6 pb-10 shadow-2xl space-y-5 modal-safe-bottom">
-            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto"></div>
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-2"></div>
+            
             <div class="text-center">
-                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tindakan Untuk</p>
+                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Pengurusan Invois</p>
                  <h2 id="actionTargetName" class="font-black text-lg uppercase text-slate-900 italic mt-1 truncate px-4"></h2>
+                 <p id="actionTargetNo" class="text-[10px] font-bold text-blue-500 font-num mt-0.5"></p>
             </div>
             
-            <div class="bg-slate-50 p-1 rounded-2xl border border-slate-200">
-                <select id="updateRepairStatus" onchange="updateLiveStatus(activeId, this.value)" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-black outline-none shadow-sm text-slate-700">
-                    <option value="Received">1. Received</option>
-                    <option value="Waiting">2. Waiting</option>
-                    <option value="Diagnosis">3. Diagnosis</option>
-                    <option value="Repairing">4. Repairing</option>
-                    <option value="Ready">5. Ready</option>
-                    <option value="Collected">6. Collected</option>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                <label class="text-[9px] font-black text-slate-500 uppercase tracking-widest block text-center">Update Status Repair</label>
+                <select id="updateRepairStatus" onchange="updateLiveStatusAndNotify(activeId, this.value)" class="w-full bg-white border border-slate-300 rounded-xl p-3.5 text-xs font-black outline-none shadow-sm text-slate-800 text-center uppercase tracking-wider">
+                    <option value="Received">📥 1. Received (Dalam Giliran)</option>
+                    <option value="Diagnosing">🔍 2. Diagnosing (Check)</option>
+                    <option value="Waiting Part">📦 3. Waiting Part (Tunggu Alat Ganti)</option>
+                    <option value="In Repair">⚙️ 4. In Repair (Sedang Dibaiki)</option>
+                    <option value="Testing">📱 5. Testing Mode (Pengujian)</option>
+                    <option value="Completed">✅ 6. Completed</option>
+                    <option value="Collected">🤝 7. Collected</option>
+                    <option value="Cancelled">❌ 8. Cancelled</option>
                 </select>
+                <p class="text-[8px] text-center text-slate-400 mt-2">*Perubahan status akan mencadangkan notifikasi WhatsApp.</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <button id="btnToggleStatus" class="col-span-2 p-4 rounded-2xl font-black text-[10px] uppercase shadow-lg tap-effect flex justify-between items-center px-6 transition-all duration-300">
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button id="btnToggleStatus" class="col-span-2 p-4 rounded-2xl font-black text-[11px] uppercase shadow-md tap-effect flex justify-between items-center px-6 transition-all duration-300">
                 </button>
 
-                <button onclick="handleAction('getlink')" class="p-4 bg-blue-50 text-blue-600 rounded-2xl font-black text-[9px] uppercase border border-blue-100 flex justify-center items-center gap-2 tap-effect">
-                    <i data-lucide="link" class="w-4 h-4"></i> Link
+                <button onclick="handleAction('receipt')" class="p-4 bg-slate-900 text-white rounded-2xl font-black text-[9px] uppercase shadow-lg shadow-slate-900/20 flex justify-center items-center gap-2 tap-effect">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Print / Send
                 </button>
-                <button onclick="handleAction('edit')" class="p-4 bg-amber-50 text-amber-600 rounded-2xl font-black text-[9px] uppercase border border-amber-100 flex justify-center items-center gap-2 tap-effect">
+                <button onclick="handleAction('edit')" class="p-4 bg-white text-slate-700 rounded-2xl font-black text-[9px] uppercase border border-slate-200 flex justify-center items-center gap-2 tap-effect">
                     <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
                 </button>
             </div>
-             <button onclick="handleAction('delete')" class="w-full p-4 text-rose-500 font-black text-[10px] uppercase border border-rose-100 rounded-2xl tap-effect">
-                Hapus Rekod
+            
+            <button onclick="handleAction('delete')" class="w-full py-4 text-rose-500 font-black text-[10px] uppercase tracking-widest tap-effect">
+                Delete
             </button>
-            <button onclick="closeActionMenu()" class="w-full py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Batal</button>
+            <button onclick="closeActionMenu()" class="w-full bg-slate-100 py-3 text-[10px] font-bold text-slate-500 uppercase rounded-xl tracking-widest tap-effect">Tutup</button>
+        </div>
+    </div>
+
+    <div id="serviceModal" class="fixed inset-0 flex items-end sm:items-center justify-center modal-overlay">
+        <div class="w-full max-w-md bg-white rounded-t-[2rem] sm:rounded-[2rem] p-6 shadow-2xl modal-content max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-sm font-black text-slate-900 uppercase">New Servis</h3>
+                <button onclick="closeServiceModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 tap-effect">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="input-label">Jenis Servis </label>
+                    <input type="text" id="svcName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs" placeholder="Cth: Screen Replacement">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="input-label">Kategori</label>
+                        <select id="svcCategory" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs">
+                            <option value="Hardware">Hardware</option>
+                            <option value="Software">Software</option>
+                            <option value="Diagnostic">Diagnostik</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="input-label">Caj / Upah (RM)</label>
+                        <input type="number" id="svcLabor" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs font-num" placeholder="Cth: 50.00">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="input-label">Anggaran Masa</label>
+                        <select id="svcTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs">
+                            <option value="15-30 Minit">15-40 Minit</option>
+                            <option value="1-2 Jam">1-2 Jam</option>
+                            <option value="1-3 Hari">1-3 Hari</option>
+                            <option value="Seminggu">3-7 Hari Bekerja</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="input-label">Warranty Period</label>
+                        <select id="svcWarranty" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs">
+                            <option value="Tiada">Tiada Waranti</option>
+                            <option value="7 Hari">7 Hari</option>
+                            <option value="30 Hari">30 Hari</option>
+                            <option value="90 Hari">90 Hari</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="saveNewService()" id="btnSaveSvc" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] py-3.5 rounded-xl flex items-center justify-center gap-2 tap-effect tracking-widest mt-4 shadow-lg shadow-blue-600/20">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> SAVE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="matrixModal" class="fixed inset-0 flex items-end sm:items-center justify-center modal-overlay z-50">
+        <div class="w-full max-w-md bg-white rounded-t-[2rem] sm:rounded-[2rem] p-6 shadow-2xl modal-content max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-sm font-black text-slate-900 uppercase">Add New</h3>
+                <button onclick="closeMatrixModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 tap-effect">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="input-label">Jenama (Brand)</label>
+                        <input type="text" id="matBrand" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs" placeholder="-">
+                    </div>
+                    <div>
+                        <label class="input-label">Model</label>
+                        <input type="text" id="matModel" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs font-num" placeholder="-">
+                    </div>
+                </div>
+                <div>
+                    <label class="input-label">Jenis Part & Gred</label>
+                    <input type="text" id="matGrade" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs" placeholder="Cth: LCD - OLED / Bateri - Ori">
+                </div>
+                <div>
+                    <label class="input-label">Harga (RM)</label>
+                    <input type="number" id="matPrice" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold outline-none text-xs font-num" placeholder="-">
+                </div>
+                <button onclick="saveNewMatrix()" id="btnSaveMat" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] py-3.5 rounded-xl flex items-center justify-center gap-2 tap-effect tracking-widest mt-4 shadow-lg shadow-emerald-600/20">
+                    <i data-lucide="layers" class="w-4 h-4"></i> SAVE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="brandDetailsModal" class="fixed inset-0 flex items-end sm:items-center justify-center modal-overlay z-50">
+        <div class="w-full max-w-md bg-white rounded-t-[2rem] sm:rounded-[2rem] p-6 shadow-2xl modal-content max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-5 shrink-0">
+                <div>
+                    <h3 id="brandDetailsTitle" class="text-sm font-black text-slate-900 uppercase">Brand</h3>
+                    <p class="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">Senarai Sprepart</p>
+                </div>
+                <button onclick="closeBrandDetails()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 tap-effect">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div id="brandDetailsList" class="overflow-y-auto space-y-2 flex-1 pb-4">
+                </div>
         </div>
     </div>
 
@@ -404,19 +537,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // PWA REGISTER
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered!', reg.scope))
-                    .catch(err => console.log('SW Fail:', err));
-            });
-        }
-
-        // Fix Icon Hilang sebab Bfcache Safari
         document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); });
-        window.addEventListener("pageshow", () => { lucide.createIcons(); });
-
+        
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBJdeEbuE9FlAeK4cJRaqiMkd7aa8EbwWE",
             authDomain: "rms-cloudnas.firebaseapp.com",
@@ -426,43 +549,32 @@
             messagingSenderId: "142738217487",
             appId: "1:142738217487:web:2c2a08c40b77447484a17a"
         };
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
         let allInvoices = [], currentFilter = 'all', activeId = null;
-        let searchTimeout = null;
-        let unsubscribe = null;
+        let searchTimeout = null, unsubscribe = null;
+        let businessProfile = {};
+        let globalMatrixData = [];
 
-        // --- GATEKEEPER LOGIC & DATA FETCHER ---
-        const splash = document.getElementById('gatekeeperSplash');
-        
-        if (sessionStorage.getItem('rms_session')) {
-            if(splash) splash.style.display = 'none';
-        }
-
-        const auth = firebase.auth();
+        // --- INIT & AUTH ---
         auth.onAuthStateChanged(user => {
             if (!user) {
                 window.location.replace('login.html');
             } else {
-                if (!sessionStorage.getItem('rms_session')) {
-                    if (splash) {
-                        splash.style.opacity = '0';
-                        setTimeout(() => {
-                            splash.style.display = 'none';
-                            sessionStorage.setItem('rms_session', 'true');
-                        }, 500); 
-                    }
-                }
-                
-                // --- BACA URL HASH UNTUK TERUS BUKA TAB YANG BETUL ---
+                loadGlobalSettings();
+
+                // Cross-page Hash logic
                 const hash = window.location.hash.replace('#', '');
                 if (['dashboard', 'reports', 'tools'].includes(hash)) {
                     showPage(hash);
-                } else {
+                } else if (hash === 'newjob') {
                     showPage('dashboard');
+                    setTimeout(openAddModal, 300);
                 }
 
+                // Load Data
                 if(unsubscribe) unsubscribe();
                 unsubscribe = db.collection("invoices")
                     .where("uid", "==", user.uid)
@@ -470,19 +582,34 @@
                         allInvoices = s.docs.map(d=>({id:d.id, ...d.data()}))
                                             .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
                         updateDashboard();
+                        generateReport();
+                        generateProfitReport();
                     });
+                
+                loadServiceCatalog();
+                loadPricingMatrix();
             }
         });
 
-        const statusDescriptions = {
-            'Received': 'Peranti diterima, menunggu giliran.',
-            'Waiting': 'Dalam senarai menunggu (Queue).',
-            'Diagnosis': 'Juruteknik sedang mencari punca kerosakan.',
-            'Repairing': 'Sedang dibaiki (Hardware/Software).',
-            'Ready': 'Siap dibaiki & sedia untuk diambil.',
-            'Collected': 'Telah diambil oleh pelanggan.'
-        };
+        // Hash change event untuk tangkap perubahan URL dari fail lain (cross-page routing)
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (['dashboard', 'reports', 'tools'].includes(hash)) {
+                showPage(hash);
+            } else if (hash === 'newjob') {
+                openAddModal();
+                window.history.replaceState(null, null, '#dashboard'); // Reset URL
+            }
+        });
 
+        async function loadGlobalSettings() {
+            try {
+                const bp = await db.collection('settings').doc('business_profile').get();
+                if(bp.exists) businessProfile = bp.data();
+            } catch(e) { console.error("Error loading settings", e); }
+        }
+
+        // --- UI UTILS ---
         function showToast(msg, type='success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -497,57 +624,53 @@
         }
 
         function showPage(p) {
-            // Update URL hash secara senyap supaya browser ingat
-            if(window.location.hash !== '#' + p) {
-                window.history.replaceState(null, null, '#' + p);
-            }
-
             const views = ['dashboardView', 'reportsView', 'toolsView'];
+            const target = document.getElementById(p + 'View');
+            if (target.classList.contains('active')) return;
+
+            // Fade out semua section
             views.forEach(v => {
                 const el = document.getElementById(v);
-                el.classList.remove('active');
-                setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 200);
+                el.style.opacity = 0;
+                el.style.pointerEvents = 'none';
             });
-            const target = document.getElementById(p + 'View');
-            target.style.display = 'block';
-            void target.offsetWidth;
-            target.classList.add('active');
+
+            // Tunggu fade out selesai, kemudian fade in
+            setTimeout(() => {
+                views.forEach(v => {
+                    document.getElementById(v).classList.remove('active');
+                });
+                
+                target.classList.add('active');
+                
+                requestAnimationFrame(() => {
+                    target.style.opacity = 1;
+                    target.style.pointerEvents = 'auto';
+                });
+                window.scrollTo({top: 0, behavior: 'instant'});
+            }, 300); // 300ms bersamaan masa CSS transition
             
             document.querySelectorAll('button[id^="nav-"]').forEach(b => {
                 b.classList.remove('nav-item-active');
                 b.classList.add('text-slate-400');
             });
-            
-            const navId = p === 'dashboard' ? 'nav-dash' : p === 'reports' ? 'nav-report' : 'nav-tools';
-            const activeBtn = document.getElementById(navId);
+            const activeBtn = document.getElementById('nav-' + (p==='dashboard'?'dash':p));
             if(activeBtn) {
                 activeBtn.classList.add('nav-item-active');
                 activeBtn.classList.remove('text-slate-400');
             }
-            
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            lucide.createIcons();
         }
 
-        async function refreshData() {
-            const btnIcon = document.getElementById('refresh-icon');
-            btnIcon.classList.add('animate-spin');
-            try {
-                const user = firebase.auth().currentUser;
-                if(!user) return;
-
-                const s = await db.collection("invoices").where("uid", "==", user.uid).get();
-                allInvoices = s.docs.map(d => ({id: d.id, ...d.data()}))
-                                    .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-                updateDashboard();
-                showToast("Data Synced");
-            } catch (error) { 
-                console.error(error);
-                showToast("Sync Failed", "error"); 
-            } 
-            finally { btnIcon.classList.remove('animate-spin'); }
+        function toggleReportSection(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden'); el.classList.add('list-anim');
+            } else {
+                el.classList.add('hidden'); el.classList.remove('list-anim');
+            }
         }
 
+        // --- DASHBOARD CORE ---
         function filterInvoices(type) {
             currentFilter = type;
             const ids = {all: 'f-all', paid: 'f-paid', outstanding: 'f-pending'};
@@ -558,19 +681,131 @@
             updateDashboard();
         }
 
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => { updateDashboard(document.getElementById('searchInput').value); }, 300);
+        }
+
+        function updateDashboard(search = "") {
+            const container = document.getElementById('invoiceContainer');
+            const now = new Date();
+            let mPaid=0, mPending=0, todayJ=0;
+
+            allInvoices.forEach(i => {
+                const d = i.createdAt?.toDate ? i.createdAt.toDate() : new Date();
+                if(d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+                    if(i.status === 'paid') mPaid += parseFloat(i.total); else mPending += parseFloat(i.total);
+                }
+                if(d.getDate() === now.getDate() && d.getMonth() === now.getMonth()) todayJ++;
+            });
+
+            document.getElementById('stat-month-paid').innerText = Math.round(mPaid);
+            document.getElementById('stat-month-pending').innerText = Math.round(mPending);
+            document.getElementById('todayJobs').innerText = todayJ;
+
+            let filtered = allInvoices.filter(i => {
+                if(currentFilter !== 'all' && i.status !== currentFilter) return false;
+                if(search) {
+                    const q = search.toLowerCase();
+                    const itemName = i.items && i.items[0] ? i.items[0].name.toLowerCase() : "";
+                    return (i.customerName||"").toLowerCase().includes(q) || (i.customerPhone||"").includes(q) || itemName.includes(q);
+                }
+                return true;
+            });
+
+            container.innerHTML = filtered.length ? '' : `<div class="py-12 text-center opacity-40 text-[10px] font-bold uppercase">Tiada Rekod Dijumpai</div>`;
+
+            filtered.forEach((i, index) => {
+                const isPaid = i.status === 'paid';
+                const statusColor = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
+                
+                const pColor = {
+                    'Received': 'bg-slate-200 text-slate-700', 'Diagnosing': 'bg-purple-100 text-purple-700',
+                    'Waiting Part': 'bg-amber-100 text-amber-700', 'In Repair': 'bg-blue-100 text-blue-700',
+                    'Testing': 'bg-indigo-100 text-indigo-700', 'Completed': 'bg-emerald-400 text-white animate-pulse',
+                    'Collected': 'bg-slate-800 text-white', 'Cancelled': 'bg-rose-200 text-rose-800'
+                };
+                const badgeColor = pColor[i.repairStatus] || 'bg-slate-100 text-slate-600';
+                const delay = index < 10 ? index * 0.05 : 0; 
+                
+                // Ambil model item
+                let deviceDesc = "Servis Umum";
+                if(i.items && i.items.length > 0) deviceDesc = i.items[0].name.substring(0,30);
+                
+                // Tarikh format
+                const d = i.createdAt?.toDate ? i.createdAt.toDate() : new Date();
+                const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+                
+                container.insertAdjacentHTML('beforeend', `
+                <div onclick="openActionMenu('${i.id}')" style="animation-delay: ${delay}s" class="list-anim bg-white p-4 rounded-2xl shadow-sm border border-slate-100 tap-effect flex justify-between items-center group relative overflow-hidden">
+                    ${i.repairStatus === 'Completed' ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>' : ''}
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-[1rem] ${badgeColor} flex flex-col items-center justify-center shadow-sm">
+                            <i data-lucide="wrench" class="w-5 h-5 mb-0.5 opacity-80"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[12px] font-black uppercase text-slate-900 leading-tight">${i.customerName}</h4>
+                            <p class="text-[10px] font-bold text-slate-600 mt-0.5">${deviceDesc}</p>
+                            <p class="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-wider">${dateStr} • ${(i.repairStatus||'NEW').substring(0,10)}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[14px] font-black italic text-slate-900 font-num">RM ${Math.round(i.total)}</p>
+                        <span class="text-[8px] font-bold uppercase px-2 py-0.5 rounded ${statusColor} mt-1 inline-block">${i.status}</span>
+                    </div>
+                </div>`);
+            });
+            lucide.createIcons();
+            updateTopAnalytics();
+        }
+
+        // --- PIPELINE & WHATSAPP LOGIC ---
+        async function updateLiveStatusAndNotify(id, newStatus) {
+            const i = allInvoices.find(x=>x.id===id);
+            if(!i) return;
+            
+            await db.collection("invoices").doc(id).update({repairStatus: newStatus}); 
+            i.repairStatus = newStatus;
+            updateDashboard();
+            
+            if(confirm(`Status dikemaskini ke: ${newStatus}.\nBuka WhatsApp untuk maklumkan pelanggan?`)) {
+                let msg = "";
+                const name = i.customerName;
+                const total = i.total;
+                const bizName = businessProfile.name || "NASZEX CLOUD";
+                
+                switch(newStatus) {
+                    case 'Received': msg = `Salam ${name}, device anda telah diterima dan berada dalam giliran. No Rujukan: ${i.invoiceNo}.`; break;
+                    case 'Diagnosing': msg = `Salam ${name}, device anda sedang diperiksa oleh technician kami di ${bizName}. Kami akan maklumkan punca kerosakan sebentar lagi.`; break;
+                    case 'Waiting Part': msg = `Salam ${name}, pihak ${bizName} kini sedang menunggu alat ganti (sparepart) tiba untuk device anda. Harap maklum.`; break;
+                    case 'In Repair': msg = `Salam ${name}, device anda sekarang dalam proses repair.`; break;
+                    case 'Testing': msg = `Salam ${name}, device anda sudah siap dibaiki, sekarang dalam test mode bagi memastikan semuanya berfungsi dengan baik.`; break;
+                    case 'Completed': msg = `*SIAP DIBAIKI!*\n\nSalam ${name}, peranti anda telah siap sepenuhnya dan boleh di ambil. \n\nJumlah Bil: *RM ${total}*\n\nTerima kasih atas kesabaran anda!`; break;
+                    case 'Collected': msg = `Terima kasih ${name} kerana menggunakan perkhidmatan repair di ${bizName}. Sila simpan resit ini untuk rujukan waranti anda.`; break;
+                    case 'Cancelled': msg = `Salam ${name}, device anda (No: ${i.invoiceNo}), proses repair terpaksa dibatalkan. Sila hubungi kami untuk maklumat lanjut.`; break;
+                    default: msg = `Salam ${name}, status terkini peranti anda: ${newStatus}.`;
+                }
+                
+                const url = `https://wa.me/60${i.customerPhone.replace(/^0+/,'')}?text=${encodeURIComponent(msg)}`;
+                window.open(url, '_blank');
+            }
+            closeActionMenu();
+        }
+
+        // --- FORM & CALCULATION ---
         function createItemRow(d = {}) {
             return `
-            <div class="item-entry bg-white p-3 rounded-2xl border border-slate-200 relative mb-3 shadow-sm list-anim">
+            <div class="item-entry bg-white p-3.5 rounded-[1.2rem] border border-slate-200 relative mb-3 shadow-sm list-anim">
                 <button onclick="this.closest('.item-entry').remove(); calculateTotal();" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 shadow-md border-2 border-white flex items-center justify-center tap-effect z-10"><i data-lucide="x" class="w-3 h-3"></i></button>
                 <div class="space-y-2 mb-2">
-                    <input type="text" class="item-name w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:bg-white transition-colors" placeholder="Nama Item" value="${d.name || ''}">
-                    <textarea class="item-desc w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[10px] font-medium outline-none focus:bg-white transition-colors resize-none h-16" placeholder="Keterangan">${d.description || ''}</textarea>
+                    <input type="text" class="item-name w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-bold outline-none focus:bg-white focus:border-blue-400 transition-colors placeholder:text-slate-400" placeholder="Item / Part" value="${d.name || ''}">
+                    <textarea class="item-desc w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[10px] font-medium outline-none focus:bg-white transition-colors resize-none h-12 placeholder:text-slate-400" placeholder="Desc...">${d.description || ''}</textarea>
                 </div>
                 <div class="grid grid-cols-4 gap-2">
-                    <div class="float-input-group"><input type="number" oninput="calculateTotal()" class="qty w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] font-num" value="${d.qty || 1}"><label class="w-full text-center">Qty</label></div>
-                    <div class="float-input-group"><input type="number" step="0.01" oninput="calculateTotal()" class="kos w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] font-num" value="${d.kos || ''}"><label class="w-full text-center">Harga</label></div>
-                    <div class="float-input-group"><input type="number" step="0.01" class="modal-price w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] text-rose-500 font-num" value="${d.modal || ''}"><label class="w-full text-center text-rose-300">Modal</label></div>
-                    <div class="float-input-group"><input type="number" step="0.01" oninput="calculateTotal()" class="discount w-full bg-slate-50 border border-slate-200 rounded-xl px-1 text-center font-bold text-[10px] text-blue-500 font-num" value="${d.discount || ''}"><label class="w-full text-center text-blue-300">Diskaun</label></div>
+                    <div class="float-input-group"><input type="number" oninput="calculateTotal()" class="qty w-full bg-slate-50 border border-slate-200 rounded-lg px-1 text-center font-bold text-[11px] font-num" value="${d.qty || 1}"><label class="w-full text-center">Qty</label></div>
+                    <div class="float-input-group"><input type="number" step="0.01" oninput="calculateTotal()" class="kos w-full bg-slate-50 border border-slate-200 rounded-lg px-1 text-center font-bold text-[11px] font-num" value="${d.kos || ''}"><label class="w-full text-center text-slate-500">Harga</label></div>
+                    <div class="float-input-group"><input type="number" step="0.01" class="modal-price w-full bg-slate-50 border border-slate-200 rounded-lg px-1 text-center font-bold text-[11px] text-rose-500 font-num" value="${d.modal || ''}"><label class="w-full text-center text-rose-400">Modal</label></div>
+                    <div class="float-input-group"><input type="number" step="0.01" oninput="calculateTotal()" class="discount w-full bg-slate-50 border border-slate-200 rounded-lg px-1 text-center font-bold text-[11px] text-blue-500 font-num" value="${d.discount || ''}"><label class="w-full text-center text-blue-400">Diskaun</label></div>
                 </div>
             </div>`;
         }
@@ -591,288 +826,168 @@
             document.getElementById('grandTotal').innerText = t.toFixed(2);
         }
 
+        async function saveAndGenerate() {
+            const btn = document.getElementById('btnSave');
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...`; lucide.createIcons();
+            const n = document.getElementById('custName').value.trim(), p = document.getElementById('custPhone').value.trim();
+            if(!n || !p) { showToast("Sila isi Nama & No. WA!", "error"); btn.innerHTML = `Simpan & Jana <i data-lucide="arrow-right" class="w-4 h-4"></i>`; return; }
+            
+            const items = [];
+            document.querySelectorAll('.item-entry').forEach(r => {
+                const name = r.querySelector('.item-name').value;
+                if(name) items.push({
+                    name: name,
+                    description: r.querySelector('.item-desc').value.trim(),
+                    qty: parseFloat(r.querySelector('.qty').value)||1, kos: parseFloat(r.querySelector('.kos').value)||0,
+                    modal: parseFloat(r.querySelector('.modal-price').value)||0, discount: parseFloat(r.querySelector('.discount').value)||0
+                });
+            });
+
+            if(items.length === 0) { showToast("Sila masukkan sekurang-kurangnya 1 item!", "error"); btn.innerHTML = `Simpan & Jana <i data-lucide="arrow-right" class="w-4 h-4"></i>`; return; }
+
+            const user = firebase.auth().currentUser;
+            const data = {
+                uid: user.uid, customerName: n, customerPhone: p, warranty: document.getElementById('warranty').value,
+                status: document.getElementById('initialStatus').value, total: document.getElementById('grandTotal').innerText, items: items
+            };
+            const editId = document.getElementById('editId').value;
+            
+            try {
+                if(editId) { 
+                    await db.collection("invoices").doc(editId).update(data); 
+                    showToast("Rekod Dikemaskini");
+                }
+                else {
+                    const prefix = 'INV-';
+                    const lastNo = allInvoices.reduce((max, i) => {
+                        let num = 0;
+                        if(i.invoiceNo && i.invoiceNo.includes('-')) num = parseInt(i.invoiceNo.split('-')[1]);
+                        return Math.max(max, isNaN(num) ? 0 : num);
+                    }, 0);
+                    data.invoiceNo = prefix + (lastNo + 1).toString().padStart(4, '0');
+                    data.repairStatus = 'Received'; 
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("invoices").add(data);
+                    showToast("Job Sheet Berjaya Dicipta!");
+                    
+                    if(confirm("Buka WhatsApp untuk hantar resit awal kepada pelanggan?")) {
+                        const msg = `Salam ${n}, terima kasih berurusan dengan kami. Peranti anda telah didaftarkan dengan No. Rujukan: ${data.invoiceNo}. Kami akan maklumkan status terkini dari masa ke semasa.`;
+                        window.open(`https://wa.me/60${p.replace(/^0+/,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+                    }
+                }
+                toggleModal(false);
+            } catch(e) { console.error(e); showToast("Ralat Sistem", "error"); }
+            btn.innerHTML = `Simpan & Jana <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        }
+
+        // --- SMART RECEIPT (PDF) ---
         function generateInvoicePDF(inv) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.width;
 
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageWidth, 40, 'F');
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageWidth, 45, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("NASZEX CLOUD", 15, 20);
-            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("GSM Professional Repair Center", 15, 26);
+            doc.setFontSize(22); doc.setFont("helvetica", "bold"); 
+            doc.text(businessProfile.name || "NASZEX CLOUD", 15, 20);
+            doc.setFontSize(10); doc.setFont("helvetica", "normal"); 
+            doc.text("Professional Device Repair Center", 15, 26);
             
             doc.setFontSize(9);
-            doc.text("Ara Kuda / Tasek Gelugor, Penang", pageWidth - 15, 18, { align: "right" });
-            doc.text("SSM: PG052XXXX-T", pageWidth - 15, 23, { align: "right" });
-            doc.text("Contact: 01X-XXXXXXX", pageWidth - 15, 28, { align: "right" });
+            const addr = businessProfile.address || "Ara Kuda, Penang";
+            const splittedAddr = doc.splitTextToSize(addr, 70);
+            doc.text(splittedAddr, pageWidth - 15, 18, { align: "right" });
+            doc.text(`SSM: ${businessProfile.ssm || '-'}`, pageWidth - 15, 30, { align: "right" });
+            doc.text(`Tel/WA: ${businessProfile.phone || '-'}`, pageWidth - 15, 35, { align: "right" });
 
-            doc.setTextColor(30, 41, 59); doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("OFFICIAL RECEIPT", 15, 55);
+            doc.setTextColor(30, 41, 59); doc.setFontSize(18); doc.setFont("helvetica", "bold"); 
+            const docType = inv.status === 'paid' ? "OFFICIAL RECEIPT" : "INVOICE";
+            doc.text(docType, 15, 60);
+            
             doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text(`No. Resit: ${inv.invoiceNo}`, 15, 62);
-            doc.text(`Tarikh: ${formatDate(inv.createdAt, true)}`, 15, 67);
-            doc.text(`Status: ${inv.status.toUpperCase()}`, 15, 72);
+            doc.text(`No. Rujukan: ${inv.invoiceNo}`, 15, 68);
+            const d = inv.createdAt?.toDate ? inv.createdAt.toDate() : new Date();
+            doc.text(`Tarikh: ${d.toLocaleDateString('ms-MY')}`, 15, 74);
+            doc.text(`Status: ${inv.status.toUpperCase()}`, 15, 80);
 
-            doc.setFont("helvetica", "bold"); doc.text("KEPADA:", 120, 62);
-            doc.setFont("helvetica", "normal"); doc.text(inv.customerName, 120, 67); doc.text(inv.customerPhone, 120, 72);
+            doc.setFont("helvetica", "bold"); doc.text("KEPADA:", 120, 68);
+            doc.setFont("helvetica", "normal"); 
+            doc.text(inv.customerName, 120, 74); 
+            doc.text(`Telefon: ${inv.customerPhone}`, 120, 80);
 
-            const rows = (inv.items||[]).map(x => [x.name, x.description||'-', x.qty, `RM ${parseFloat(x.kos).toFixed(2)}`, `RM ${((x.qty*x.kos)-x.discount).toFixed(2)}`]);
+            // Sertakan description jika ada
+            const rows = (inv.items||[]).map(x => [
+                x.name + (x.description ? `\n( ${x.description} )` : ''), 
+                x.qty, 
+                `RM ${parseFloat(x.kos).toFixed(2)}`, 
+                `RM ${parseFloat(x.discount).toFixed(2)}`, 
+                `RM ${((x.qty*x.kos)-x.discount).toFixed(2)}`
+            ]);
+
             doc.autoTable({
-                startY: 85,
-                head: [['Perkara', 'Keterangan', 'Unit', 'Harga', 'Jumlah']],
+                startY: 95,
+                head: [['Perkara / Kerosakan', 'Unit', 'Harga (RM)', 'Diskaun', 'Jumlah (RM)']],
                 body: rows,
                 theme: 'grid',
-                headStyles: { fillColor: [15, 23, 42] }
+                headStyles: { fillColor: [15, 23, 42], textColor: 255, fontStyle: 'bold' },
+                styles: { fontSize: 9 }
             });
 
-            const finalY = doc.lastAutoTable.finalY + 10;
+            let finalY = doc.lastAutoTable.finalY + 10;
             doc.setFontSize(14); doc.setFont("helvetica", "bold");
-            doc.text(`JUMLAH KESELURUHAN: RM ${parseFloat(inv.total).toFixed(2)}`, 110, finalY);
+            doc.text(`JUMLAH: RM ${parseFloat(inv.total).toFixed(2)}`, 130, finalY);
             
+            doc.setFontSize(9); doc.setTextColor(100); doc.setFont("helvetica", "normal");
+            doc.text(`Waranti: ${inv.warranty || 'Tiada'}`, 15, finalY);
+
+            // Footer Notes
             doc.setFontSize(8); doc.setTextColor(150);
-            const terms = [
-                "TERMA & SYARAT:",
-                "1. Waranti hanya meliputi bahagian yang ditukar sahaja.",
-                "2. NASZEX Cloud tidak bertanggungjawab atas kehilangan data semasa proses pembaikan.",
-                "3. Barang yang tidak dituntut selepas 3 bulan akan dilupuskan."
+            let termY = 260;
+            doc.text("TERMA & SYARAT:", 15, termY);
+            termY += 5;
+            const customNotes = [
+                "1. Waranti hanya meliputi kerosakan pada komponen yang ditukar sahaja.",
+                "2. Pihak kami tidak bertanggungjawab atas kehilangan data pengguna.",
+                "3. Peranti yang tidak dituntut selepas 90 hari akan dilupuskan."
             ];
-            let termY = 270;
-            terms.forEach(t => { doc.text(t, 15, termY); termY += 4; });
+            doc.text(customNotes, 15, termY);
 
-            doc.save(`NASZEX-${inv.invoiceNo}.pdf`);
-            showToast("PDF Generated");
-        }
-
-        function handleSearch() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                updateDashboard(document.getElementById('searchInput').value);
-            }, 300);
-        }
-
-        function updateDashboard(search = "") {
-            const container = document.getElementById('invoiceContainer');
-            const now = new Date();
-            let mPaid=0, mPending=0, mJobs=0;
-
-            allInvoices.forEach(i => {
-                const d = i.createdAt?.toDate ? i.createdAt.toDate() : new Date();
-                if(d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-                    mJobs++;
-                    if(i.status === 'paid') mPaid += parseFloat(i.total); else mPending += parseFloat(i.total);
-                }
-            });
-
-            document.getElementById('stat-month-paid').innerText = Math.round(mPaid);
-            document.getElementById('stat-month-pending').innerText = Math.round(mPending);
-            document.getElementById('stat-month-jobs').innerText = mJobs;
-
-            let filtered = allInvoices.filter(i => {
-                if(currentFilter !== 'all' && i.status !== currentFilter) return false;
-                if(search) {
-                    const q = search.toLowerCase();
-                    return (i.customerName||"").toLowerCase().includes(q) || (i.customerPhone||"").includes(q) || (i.invoiceNo||"").toLowerCase().includes(q);
-                }
-                return true;
-            });
-
-            container.innerHTML = filtered.length ? '' : `<div class="py-12 text-center opacity-40 text-[10px] font-bold uppercase">Tiada Rekod</div>`;
-
-            filtered.forEach((i, index) => {
-                const isPaid = i.status === 'paid';
-                const statusColor = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
-                const repairMap = {'Received':'bg-slate-200','Waiting':'bg-amber-200','Diagnosis':'bg-purple-200','Repairing':'bg-blue-200','Ready':'bg-emerald-400 animate-pulse','Collected':'bg-slate-800 text-white'};
-                
-                const delay = index < 10 ? index * 0.05 : 0; 
-                
-                container.insertAdjacentHTML('beforeend', `
-                <div onclick="openActionMenu('${i.id}')" style="animation-delay: ${delay}s" class="list-anim bg-white p-4 rounded-2xl shadow-sm border border-slate-100 tap-effect flex justify-between items-center group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl ${repairMap[i.repairStatus]||'bg-slate-100'} flex items-center justify-center text-[10px] font-black uppercase">
-                            ${(i.repairStatus||'NEW').substring(0,3)}
-                        </div>
-                        <div>
-                            <h4 class="text-[11px] font-black uppercase text-slate-800 leading-none">${i.customerName}</h4>
-                            <p class="text-[9px] font-bold text-slate-400 mt-1 font-num">${i.invoiceNo} • ${formatDate(i.createdAt)}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[13px] font-black italic text-slate-800 font-num">RM ${Math.round(i.total)}</p>
-                        <span class="text-[8px] font-bold uppercase px-2 py-0.5 rounded ${statusColor}">${i.status}</span>
-                    </div>
-                </div>`);
-            });
-            lucide.createIcons();
-        }
-
-        function trackStatus() {
-            const p = document.getElementById('toolTrackPhone').value.trim();
-            if(!p) return showToast("Masukkan No. Phone", "error");
-            
-            const match = allInvoices.filter(i => i.customerPhone.includes(p)).sort((a,b) => {
-                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
-                return dateB - dateA;
-            })[0];
-            
-            if(!match) return showToast("Tiada rekod dijumpai", "error");
-            
-            document.getElementById('trackEmpty').classList.add('hidden');
-            document.getElementById('trackResult').classList.remove('hidden');
-            document.getElementById('trName').innerText = match.customerName;
-            document.getElementById('trNo').innerText = match.invoiceNo;
-            document.getElementById('trDevice').innerText = (match.items||[]).map(x=>x.name).join(", ") || "Servis Umum";
-            
-            const stages = ['Received', 'Waiting', 'Diagnosis', 'Repairing', 'Ready', 'Collected'];
-            let h = '', passed = true;
-            
-            stages.forEach(s => {
-                if(s === match.repairStatus) passed = false;
-                const active = passed || s === match.repairStatus;
-                
-                const desc = statusDescriptions[s] || 'Status update';
-                
-                h += `
-                <div class="timeline-item ${active?'active':''}">
-                    <div class="timeline-dot"></div>
-                    <div class="flex flex-col">
-                        <span class="text-[10px] font-black ${active?'text-slate-900':'text-slate-300'} uppercase">${s}</span>
-                        <span class="text-[8px] font-medium ${active?'text-slate-500':'text-slate-200'} leading-tight">${desc}</span>
-                    </div>
-                    ${s===match.repairStatus ? '<span class="text-[8px] text-emerald-600 font-bold italic block mt-1">Status Semasa</span>' : ''}
-                </div>`;
-            });
-            document.getElementById('timelineContainer').innerHTML = h;
-            showToast("Rekod Dijumpai");
-        }
-
-        async function saveAndGenerate() {
-            const btn = document.getElementById('btnSave');
-            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...`; lucide.createIcons();
-            const n = document.getElementById('custName').value, p = document.getElementById('custPhone').value;
-            if(!n || !p) { showToast("Sila isi Nama & Phone!", "error"); btn.innerText = "Simpan Rekod"; return; }
-            
-            const user = firebase.auth().currentUser;
-            if(!user) return;
-
-            const items = [];
-            document.querySelectorAll('.item-entry').forEach(r => {
-                const name = r.querySelector('.item-name').value;
-                if(name) items.push({
-                    name: name, description: r.querySelector('.item-desc').value,
-                    qty: parseFloat(r.querySelector('.qty').value)||1, kos: parseFloat(r.querySelector('.kos').value)||0,
-                    modal: parseFloat(r.querySelector('.modal-price').value)||0, discount: parseFloat(r.querySelector('.discount').value)||0
-                });
-            });
-            const data = {
-                uid: user.uid,
-                customerName: n, customerPhone: p, warranty: document.getElementById('warranty').value,
-                status: document.getElementById('initialStatus').value, total: document.getElementById('grandTotal').innerText, items: items
-            };
-            const editId = document.getElementById('editId').value;
-            try {
-                if(editId) { 
-                    await db.collection("invoices").doc(editId).update(data); 
-                    showToast("Rekod Dikemaskini");
-                    const idx = allInvoices.findIndex(x => x.id === editId);
-                    if(idx !== -1) allInvoices[idx] = { ...allInvoices[idx], ...data };
-                }
-                else {
-                    const lastNo = allInvoices.reduce((max, i) => Math.max(max, parseInt(i.invoiceNo?.split('-')[1]||0)), 0);
-                    data.invoiceNo = "NX-" + (lastNo + 1).toString().padStart(4, '0');
-                    data.repairStatus = 'Received'; data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    const docRef = await db.collection("invoices").add(data);
-                    allInvoices.unshift({ id: docRef.id, ...data });
-                    showToast("Job Sheet Dicipta");
-                }
-                updateDashboard();
-                toggleModal(false);
-            } catch(e) { console.error(e); showToast("Ralat Sistem", "error"); }
-            btn.innerHTML = `Simpan <i data-lucide="check" class="w-4 h-4"></i>`;
-        }
-
-        function toggleModal(show) {
-            const m = document.getElementById('invoiceModal');
-            if(show) { m.classList.remove('hidden'); requestAnimationFrame(()=>m.classList.add('active')); }
-            else { m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 250); }
-        }
-        function openAddModal() {
-            const user = firebase.auth().currentUser;
-            if (user && user.isAnonymous && allInvoices.length >= 3) {
-                showToast("Demo terhad kepada 3 rekod sahaja.", "error");
-                return;
-            }
-
-            document.getElementById('modalTitle').innerText = "Initiate Job";
-            document.getElementById('editId').value = "";
-            document.getElementById('custName').value = ""; document.getElementById('custPhone').value = "";
-            document.getElementById('itemRowsContainer').innerHTML = ""; addRow();
-            document.getElementById('grandTotal').innerText = "0.00"; toggleModal(true);
-        }
-
-        function openActionMenu(id) {
-            activeId = id; 
-            const i = allInvoices.find(x=>x.id===id);
-            if (!i) return;
-
-            document.getElementById('actionTargetName').innerText = i.customerName;
-            document.getElementById('updateRepairStatus').value = i.repairStatus || 'Received';
-            
-            const btn = document.getElementById('btnToggleStatus');
-            btn.onclick = null;
-
-            if (i.status === 'paid') {
-                btn.className = "col-span-2 p-4 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl font-black text-[10px] uppercase shadow-sm tap-effect flex justify-between items-center px-6 transition-all";
-                btn.innerHTML = `<span>OUTSTANDING</span><i data-lucide="x-circle" class="w-4 h-4 text-rose-500"></i>`;
-                btn.onclick = async () => {
-                    await db.collection("invoices").doc(id).update({status: 'outstanding'});
-                    i.status = 'outstanding'; updateDashboard();
-                    showToast("Status: OUTSTANDING"); closeActionMenu();
-                };
-            } else {
-                btn.className = "col-span-2 p-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-emerald-500/30 tap-effect flex justify-between items-center px-6 transition-all";
-                btn.innerHTML = `<span>PAID</span><i data-lucide="check-circle" class="w-4 h-4 text-white"></i>`;
-                btn.onclick = async () => {
-                    await db.collection("invoices").doc(id).update({status: 'paid'});
-                    i.status = 'paid'; updateDashboard();
-                    showToast("Status: PAID"); closeActionMenu();
-                };
-            }
-
-            document.getElementById('actionModal').classList.remove('hidden');
-            requestAnimationFrame(()=>document.getElementById('actionModal').classList.add('active'));
-            lucide.createIcons();
-        }
-        
-        function closeActionMenu() { const m = document.getElementById('actionModal'); m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 250); }
-        
-        async function updateLiveStatus(id, val) { 
-            await db.collection("invoices").doc(id).update({repairStatus: val}); 
-            const i = allInvoices.find(x=>x.id===id); if(i) i.repairStatus = val;
-            updateDashboard();
-            showToast(`Status: ${val}`); 
+            doc.save(`${inv.invoiceNo}-${inv.customerName}.pdf`);
+            showToast("Dokumen PDF Berjaya Dijana");
         }
 
         function handleTools(act) {
-            const p = document.getElementById('toolReceiptPhone').value;
+            const p = document.getElementById('toolReceiptPhone').value.trim();
+            if(!p) return showToast("Sila masukkan no phone", "error");
             const match = allInvoices.filter(i => i.customerPhone.includes(p)).sort((a,b)=>{
                 const dA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
                 const dB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
                 return dB - dA;
             })[0];
             
-            if(!match) return showToast("Rekod tidak dijumpai", "error");
-            if(act === 'whatsapp') window.open(`https://wa.me/60${p.replace(/^0+/,'')}`); else generateInvoicePDF(match);
+            if(!match) return showToast("Tiada rekod jumpa", "error");
+            if(act === 'whatsapp') {
+                const msg = `Salam ${match.customerName}, berikut adalah status peranti anda:\nNo: ${match.invoiceNo}\nStatus: ${match.repairStatus}\nTotal: RM${match.total}`;
+                window.open(`https://wa.me/60${p.replace(/^0+/,'')}?text=${encodeURIComponent(msg)}`); 
+            } else {
+                generateInvoicePDF(match);
+            }
         }
-        function formatDate(ts, full=false) { if(!ts) return '--/--'; const d = ts.toDate ? ts.toDate() : new Date(ts); return full ? `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` : `${d.getDate()}/${d.getMonth()+1}`; }
 
-        function openSubReport(t) {
-            document.getElementById('dataMenu').classList.add('hidden');
-            if(t==='performance'){ document.getElementById('performanceContainer').classList.remove('hidden'); generateReport(); }
-            else { document.getElementById('profitContainer').classList.remove('hidden'); generateProfitReport(); }
+        // --- DATA ANALYTICS ---
+        function updateTopAnalytics() {
+            let partsCount = {};
+            allInvoices.forEach(inv => {
+                (inv.items||[]).forEach(it => {
+                    const name = it.name.trim().toUpperCase();
+                    if(name) partsCount[name] = (partsCount[name]||0) + 1;
+                });
+            });
+            let topDmg = "-", max = 0;
+            for(let key in partsCount) { if(partsCount[key] > max) { max = partsCount[key]; topDmg = key; } }
+            document.getElementById('topDamage').innerText = topDmg;
+            document.getElementById('topModel').innerText = topDmg !== "-" ? `${max} Kes` : "-"; 
         }
-        function closeSubTool() { document.getElementById('toolReceiptContainer').classList.add('hidden'); document.getElementById('toolTrackContainer').classList.add('hidden'); document.getElementById('toolsMenu').classList.remove('hidden'); }
-        function openSubTool(t) { document.getElementById('toolsMenu').classList.add('hidden'); if(t==='receipt') document.getElementById('toolReceiptContainer').classList.remove('hidden'); else document.getElementById('toolTrackContainer').classList.remove('hidden'); }
-        function closeSubReport() { document.getElementById('performanceContainer').classList.add('hidden'); document.getElementById('profitContainer').classList.add('hidden'); document.getElementById('dataMenu').classList.remove('hidden'); }
 
         function generateReport() {
             const tb = document.getElementById('reportTableBody'), mo = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
@@ -881,9 +996,9 @@
             mo.forEach((m, i) => {
                 const monthly = allInvoices.filter(inv => { const d = inv.createdAt?.toDate ? inv.createdAt.toDate() : new Date(); return d.getMonth() === i && d.getFullYear() === currentYear; });
                 const pS = monthly.reduce((s, inv) => inv.status === 'paid' ? s + parseFloat(inv.total) : s, 0);
-                if (monthly.length > 0) h += `<tr class="border-b border-slate-50 last:border-0"><td class="pl-6 py-4 text-slate-500 uppercase font-bold text-[9px]">${m}</td><td class="text-center text-slate-400">${monthly.length}</td><td class="text-right pr-6 text-emerald-600 italic font-black">RM ${Math.round(pS)}</td></tr>`;
+                if (monthly.length > 0) h += `<tr class="border-b border-slate-50 last:border-0"><td class="pl-5 py-4 text-slate-600 uppercase font-black text-[10px]">${m}</td><td class="text-center text-slate-500 font-bold">${monthly.length}</td><td class="text-right pr-5 text-slate-800 font-black">RM ${Math.round(pS)}</td></tr>`;
             });
-            tb.innerHTML = h || '<tr><td colspan="3" class="text-center py-8">Tiada Data</td></tr>';
+            tb.innerHTML = h || '<tr><td colspan="3" class="text-center py-8 text-xs font-bold text-slate-400">Tiada Data</td></tr>';
         }
 
         function generateProfitReport() {
@@ -895,38 +1010,163 @@
                 let mModal = 0, mRev = 0;
                 monthly.forEach(inv => { mRev += parseFloat(inv.total); (inv.items || []).forEach(it => { mModal += (parseFloat(it.modal)||0) * (parseFloat(it.qty)||1); }); });
                 const mProfit = mRev - mModal; totalNett += mProfit;
-                if(mRev > 0) h += `<tr class="border-b border-slate-50 last:border-0"><td class="pl-6 py-4 text-slate-500 uppercase font-bold text-[9px]">${m}</td><td class="text-center text-rose-500">RM ${Math.round(mModal)}</td><td class="text-right pr-6 text-emerald-600 italic font-black">RM ${Math.round(mProfit)}</td></tr>`;
+                if(mRev > 0) h += `<tr class="border-b border-slate-50 last:border-0"><td class="pl-5 py-4 text-slate-600 uppercase font-black text-[10px]">${m}</td><td class="text-center text-rose-500 font-bold">RM ${Math.round(mModal)}</td><td class="text-right pr-5 text-emerald-600 font-black">RM ${Math.round(mProfit)}</td></tr>`;
             });
-            tb.innerHTML = h || '<tr><td colspan="3" class="text-center py-8">Tiada Data</td></tr>';
+            tb.innerHTML = h || '<tr><td colspan="3" class="text-center py-8 text-xs font-bold text-slate-400">Tiada Data</td></tr>';
             document.getElementById('total-net-profit').innerText = `RM ${Math.round(totalNett)}`;
         }
 
+        // --- MODAL UTILS & ACTIONS ---
+        function toggleModal(show) {
+            const m = document.getElementById('invoiceModal');
+            if(show) { m.classList.remove('hidden'); requestAnimationFrame(()=>m.classList.add('active')); }
+            else { m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 300); }
+        }
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = "Initiate Job";
+            document.getElementById('editId').value = "";
+            document.getElementById('custName').value = ""; document.getElementById('custPhone').value = "";
+            document.getElementById('itemRowsContainer').innerHTML = ""; addRow();
+            document.getElementById('grandTotal').innerText = "0.00"; toggleModal(true);
+        }
+        function openActionMenu(id) {
+            activeId = id; const i = allInvoices.find(x=>x.id===id); if (!i) return;
+            document.getElementById('actionTargetName').innerText = i.customerName;
+            document.getElementById('actionTargetNo').innerText = "Rujukan: " + i.invoiceNo;
+            document.getElementById('updateRepairStatus').value = i.repairStatus || 'Received';
+            const btn = document.getElementById('btnToggleStatus'); btn.onclick = null;
+            if (i.status === 'paid') {
+                btn.className = "col-span-2 p-4 bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl font-black text-[10px] uppercase shadow-sm tap-effect flex justify-between items-center px-6 transition-all";
+                btn.innerHTML = `<span>Tukar ke UNPAID</span><i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-400"></i>`;
+                btn.onclick = async () => { await db.collection("invoices").doc(id).update({status: 'outstanding'}); i.status = 'outstanding'; updateDashboard(); showToast("Status Ditukar: UNPAID"); closeActionMenu(); };
+            } else {
+                btn.className = "col-span-2 p-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-emerald-500/30 tap-effect flex justify-between items-center px-6 transition-all";
+                btn.innerHTML = `<span>Sahkan BAYARAN (PAID)</span><i data-lucide="check-circle" class="w-4 h-4 text-white"></i>`;
+                btn.onclick = async () => { await db.collection("invoices").doc(id).update({status: 'paid'}); i.status = 'paid'; updateDashboard(); showToast("Bayaran Disahkan!"); closeActionMenu(); };
+            }
+            const m = document.getElementById('actionModal'); m.classList.remove('hidden'); requestAnimationFrame(()=>m.classList.add('active')); lucide.createIcons();
+        }
+        function closeActionMenu() { const m = document.getElementById('actionModal'); m.classList.remove('active'); setTimeout(()=>m.classList.add('hidden'), 300); }
         function handleAction(type) {
             if(type === 'edit') {
-                const i = allInvoices.find(x=>x.id===activeId);
-                if(!i) return;
+                const i = allInvoices.find(x=>x.id===activeId); if(!i) return;
                 document.getElementById('editId').value = activeId;
-                document.getElementById('modalTitle').innerText = "Modify Job";
+                document.getElementById('modalTitle').innerText = "Kemaskini Maklumat";
                 document.getElementById('custName').value = i.customerName;
                 document.getElementById('custPhone').value = i.customerPhone;
-                document.getElementById('warranty').value = i.warranty || 'No Warranty';
+                document.getElementById('warranty').value = i.warranty || 'Tiada Waranti';
                 document.getElementById('initialStatus').value = i.status;
-                const cont = document.getElementById('itemRowsContainer');
-                cont.innerHTML = "";
+                const cont = document.getElementById('itemRowsContainer'); cont.innerHTML = "";
                 (i.items||[]).forEach(it => { cont.insertAdjacentHTML('beforeend', createItemRow(it)); });
-                calculateTotal();
-                toggleModal(true);
+                calculateTotal(); closeActionMenu(); setTimeout(() => toggleModal(true), 300);
             }
-            if(type === 'delete' && confirm("Hapus rekod ini?")) { 
-                db.collection("invoices").doc(activeId).delete(); 
-                allInvoices = allInvoices.filter(x=>x.id !== activeId);
-                updateDashboard();
-                showToast("Rekod Dihapus"); 
+            if(type === 'delete' && confirm("Anda pasti mahu hapus rekod ini secara kekal?")) { 
+                db.collection("invoices").doc(activeId).delete(); showToast("Rekod Dihapus"); closeActionMenu();
             }
-            if(type === 'getlink') { navigator.clipboard.writeText(window.location.origin + "/view?id=" + activeId); showToast("Link Disalin"); }
-            closeActionMenu();
+            if(type === 'receipt') { generateInvoicePDF(allInvoices.find(x=>x.id===activeId)); closeActionMenu(); }
         }
 
+        // --- TOOLS: KATALOG SERVIS & MATRIKS HARGA LOGIC ---
+        function openServiceModal() { document.getElementById('serviceModal').classList.add('active'); }
+        function closeServiceModal() { document.getElementById('serviceModal').classList.remove('active'); document.getElementById('svcName').value = ''; document.getElementById('svcLabor').value = ''; }
+        
+        async function loadServiceCatalog() {
+            const listContainer = document.getElementById('serviceCatalogList');
+            try {
+                db.collection('settings').doc('service_catalog').collection('items').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                    listContainer.innerHTML = '';
+                    if (snapshot.empty) { listContainer.innerHTML = `<div class="p-5 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">Tiada Servis Didaftarkan</div>`; return; }
+                    snapshot.forEach(doc => {
+                        const s = doc.data(); const color = s.category === 'Hardware' ? 'text-amber-500 bg-amber-50' : (s.category === 'Software' ? 'text-blue-500 bg-blue-50' : 'text-purple-500 bg-purple-50');
+                        listContainer.innerHTML += `
+                            <div class="p-4 flex items-center justify-between group border-b border-slate-50 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center ${color}"><i data-lucide="${s.category === 'Hardware' ? 'cpu' : (s.category === 'Software' ? 'smartphone' : 'activity')}" class="w-4 h-4"></i></div>
+                                    <div><h4 class="text-[11px] font-black text-slate-900">${s.name}</h4><div class="flex gap-2 mt-1"><span class="text-[8px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded uppercase font-num">RM${parseFloat(s.laborBase).toFixed(2)}</span><span class="text-[8px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded uppercase">${s.estTime}</span></div></div>
+                                </div>
+                                <button onclick="deleteService('${doc.id}')" class="w-7 h-7 bg-rose-50 text-rose-500 rounded-md flex items-center justify-center tap-effect"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>`;
+                    }); lucide.createIcons();
+                });
+            } catch (error) { listContainer.innerHTML = `<div class="p-5 text-center text-rose-500 text-[10px] font-bold tracking-widest uppercase">Gagal memuat katalog</div>`; }
+        }
+
+        async function saveNewService() {
+            const name = document.getElementById('svcName').value.trim(), category = document.getElementById('svcCategory').value;
+            const laborBase = document.getElementById('svcLabor').value.trim(), estTime = document.getElementById('svcTime').value, warranty = document.getElementById('svcWarranty').value;
+            if (!name || !laborBase) return showToast("Sila isi Nama Servis dan Caj Asas!", "error");
+            const btn = document.getElementById('btnSaveSvc'); btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Memproses...`;
+            try {
+                await db.collection('settings').doc('service_catalog').collection('items').add({ name, category, laborBase: parseFloat(laborBase), estTime, warranty, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                showToast("Servis ditambah!"); closeServiceModal();
+            } catch (error) { showToast("Ralat menyimpan data", "error"); } 
+            finally { btn.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i> Simpan Ke Katalog`; lucide.createIcons(); }
+        }
+
+        async function deleteService(id) { if(confirm("Padam servis ini dari katalog?")) { try { await db.collection('settings').doc('service_catalog').collection('items').doc(id).delete(); showToast("Servis dipadam."); } catch (error) { showToast("Gagal memadam servis.", "error"); } } }
+
+        function openMatrixModal() { document.getElementById('matrixModal').classList.add('active'); }
+        function closeMatrixModal() { document.getElementById('matrixModal').classList.remove('active'); document.getElementById('matBrand').value = ''; document.getElementById('matModel').value = ''; document.getElementById('matGrade').value = ''; document.getElementById('matPrice').value = ''; }
+
+        async function loadPricingMatrix() {
+            const listContainer = document.getElementById('matrixCatalogList');
+            db.collection('settings').doc('pricing_matrix').collection('items').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                globalMatrixData = []; const brandsMap = {}; 
+                if (snapshot.empty) { listContainer.innerHTML = `<div class="col-span-2 p-5 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">Tiada Matriks Didaftarkan</div>`; return; }
+                snapshot.forEach(doc => {
+                    const m = doc.data(); m.id = doc.id; globalMatrixData.push(m);
+                    const brandName = m.brand.toUpperCase(); if(!brandsMap[brandName]) brandsMap[brandName] = []; brandsMap[brandName].push(m);
+                });
+                listContainer.innerHTML = '';
+                for (let brand in brandsMap) {
+                    const count = brandsMap[brand].length;
+                    listContainer.innerHTML += `
+                        <div data-brand="${brand}" onclick="openBrandDetails('${brand}')" class="brand-card bg-white border border-slate-200 rounded-[1.2rem] p-4 flex flex-col items-center justify-center gap-2 tap-effect shadow-sm">
+                            <div class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center"><i data-lucide="smartphone" class="w-5 h-5"></i></div>
+                            <h4 class="text-[12px] font-black text-slate-900 text-center uppercase leading-tight mt-1">${brand}</h4>
+                            <span class="text-[9px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-2.5 py-0.5 rounded-full">${count} Model Disimpan</span>
+                        </div>`;
+                }
+                lucide.createIcons(); filterMatrix(); 
+            }, error => { listContainer.innerHTML = `<div class="col-span-2 p-5 text-center text-rose-500 text-[10px] font-bold tracking-widest uppercase">Gagal memuat matriks</div>`; });
+        }
+
+        function filterMatrix() {
+            const input = document.getElementById('searchBrand').value.toUpperCase();
+            document.querySelectorAll('.brand-card').forEach(card => {
+                const brand = card.getAttribute('data-brand').toUpperCase();
+                card.style.display = brand.includes(input) ? 'flex' : 'none';
+            });
+        }
+
+        function openBrandDetails(brand) {
+            document.getElementById('brandDetailsTitle').innerText = brand;
+            const container = document.getElementById('brandDetailsList'); container.innerHTML = '';
+            globalMatrixData.filter(m => m.brand.toUpperCase() === brand).forEach(m => {
+                container.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-100 rounded-[1rem] p-3 flex justify-between items-center group">
+                        <div><h4 class="text-[11px] font-black text-slate-900">${m.model}</h4>
+                            <div class="flex gap-2 mt-1"><span class="text-[8px] font-bold text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded uppercase">${m.grade}</span><span class="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-num">RM${parseFloat(m.price).toFixed(2)}</span></div>
+                        </div>
+                        <button onclick="deleteMatrix('${m.id}')" class="w-8 h-8 bg-white border border-rose-100 text-rose-500 rounded-lg flex items-center justify-center tap-effect"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
+            });
+            lucide.createIcons(); document.getElementById('brandDetailsModal').classList.add('active');
+        }
+        function closeBrandDetails() { document.getElementById('brandDetailsModal').classList.remove('active'); }
+
+        async function saveNewMatrix() {
+            const brand = document.getElementById('matBrand').value.trim(), model = document.getElementById('matModel').value.trim(), grade = document.getElementById('matGrade').value.trim(), price = document.getElementById('matPrice').value.trim();
+            if (!brand || !model || !grade || !price) return showToast("Sila isi semua maklumat!", "error");
+            const btn = document.getElementById('btnSaveMat'); btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
+            try {
+                await db.collection('settings').doc('pricing_matrix').collection('items').add({ brand, model, grade, price: parseFloat(price), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                showToast("Matriks harga ditambah!"); closeMatrixModal();
+            } catch (error) { showToast("Ralat menyimpan data matriks", "error"); } 
+            finally { btn.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> Simpan Matriks`; lucide.createIcons(); }
+        }
+
+        async function deleteMatrix(id) { if(confirm("Padam matriks harga ini?")) { try { await db.collection('settings').doc('pricing_matrix').collection('items').doc(id).delete(); showToast("Matriks dipadam."); closeBrandDetails(); } catch (error) { showToast("Gagal memadam matriks.", "error"); } } }
     </script>
 </body>
 </html>
