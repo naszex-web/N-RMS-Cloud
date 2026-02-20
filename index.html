@@ -37,17 +37,20 @@
         .modal-wrapper { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; transform: translateY(110%) scale(0.95); opacity: 0; pointer-events: none; will-change: transform, opacity; }
         .modal-wrapper.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
-        /* Smooth View Transitions (Fade Out & Fade In) */
+                /* Smooth View Transitions */
         .view-section { 
-            position: absolute; top: 0; left: 0; width: 100%; 
-            opacity: 0; visibility: hidden; 
-            transition: opacity 0.3s ease; 
-            pointer-events: none; 
+            display: none; 
+            opacity: 0;
         }
         .view-section.active { 
-            position: relative; opacity: 1; visibility: visible; 
-            pointer-events: auto; 
+            display: block; 
+            animation: fadeInView 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        @keyframes fadeInView {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .list-anim { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
@@ -308,7 +311,7 @@
                 </div>
             </button>
             
-            <button onclick="window.location.href='index.html#reports'" id="nav-report" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
+            <button onclick="window.location.href='index.html#reports'" id="nav-reports" class="group flex flex-col items-center justify-center gap-1.5 tap-effect text-slate-400 transition-colors">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
                 <span class="text-[9px] font-black uppercase tracking-tight">Data</span>
             </button>
@@ -623,43 +626,33 @@
             setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        function showPage(p) {
+                function showPage(p) {
             const views = ['dashboardView', 'reportsView', 'toolsView'];
             const target = document.getElementById(p + 'View');
-            if (target.classList.contains('active')) return;
-
-            // Fade out semua section
-            views.forEach(v => {
-                const el = document.getElementById(v);
-                el.style.opacity = 0;
-                el.style.pointerEvents = 'none';
-            });
-
-            // Tunggu fade out selesai, kemudian fade in
-            setTimeout(() => {
-                views.forEach(v => {
-                    document.getElementById(v).classList.remove('active');
-                });
-                
-                target.classList.add('active');
-                
-                requestAnimationFrame(() => {
-                    target.style.opacity = 1;
-                    target.style.pointerEvents = 'auto';
-                });
-                window.scrollTo({top: 0, behavior: 'instant'});
-            }, 300); // 300ms bersamaan masa CSS transition
             
+            // Kalau view tu dah memang aktif, abaikan
+            if (!target || target.classList.contains('active')) return;
+
+            // Sembunyikan semua view, kemudian aktifkan target
+            views.forEach(v => document.getElementById(v).classList.remove('active'));
+            target.classList.add('active');
+            
+            // Scroll ke atas dengan pantas tapi tak mengejut
+            window.scrollTo({top: 0, behavior: 'instant'});
+
+            // Kemas kini warna Bottom Nav
             document.querySelectorAll('button[id^="nav-"]').forEach(b => {
                 b.classList.remove('nav-item-active');
                 b.classList.add('text-slate-400');
             });
-            const activeBtn = document.getElementById('nav-' + (p==='dashboard'?'dash':p));
+            
+            const activeBtn = document.getElementById('nav-' + (p === 'dashboard' ? 'dash' : p));
             if(activeBtn) {
                 activeBtn.classList.add('nav-item-active');
                 activeBtn.classList.remove('text-slate-400');
             }
         }
+
 
         function toggleReportSection(id) {
             const el = document.getElementById(id);
