@@ -1265,17 +1265,51 @@
         }
 
         async function saveNewMatrix() {
-            const brand = document.getElementById('matBrand').value.trim(), model = document.getElementById('matModel').value.trim(), grade = document.getElementById('matGrade').value.trim(), price = document.getElementById('matPrice').value.trim();
-            if (!brand || !model || !grade || !price) return showToast("Sila isi semua maklumat!", "error");
-            
-            const btn = document.getElementById('btnSaveMat'); btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...`; lucide.createIcons();
-            try {
-                await db.collection('settings').doc('pricing_matrix').collection('items').add({ brand, model, grade, price: parseFloat(price), createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                showToast("Matriks harga ditambah!"); closeMatrixModal();
-            } catch (error) { showToast("Ralat menyimpan data matriks", "error"); } 
-            finally { btn.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> SAVE`; lucide.createIcons(); }
-        }
+    const brand = document.getElementById('matBrand').value.trim();
+    const model = document.getElementById('matModel').value.trim();
+    const grade = document.getElementById('matGrade').value.trim();
+    const price = document.getElementById('matPrice').value.trim();
 
+    // Guard clause: Pastikan semua field diisi
+    if (!brand || !model || !grade || !price) {
+        return showToast("Sila isi semua maklumat!", "error");
+    }
+
+    const btn = document.getElementById('btnSaveMat');
+    const originalHTML = btn.innerHTML;
+    
+    // UI Loading state
+    btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Menyimpan...`;
+    lucide.createIcons();
+
+    try {
+        const user = firebase.auth().currentUser;
+        if (!user) throw new Error("User not authenticated");
+
+        // Simpan data
+        await db.collection('pricing_matrix').add({
+            uid: user.uid, // Tambah UID untuk keselamatan rules
+            brand: brand,
+            model: model,
+            grade: grade,
+            price: parseFloat(price),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showToast("Matriks harga ditambah!");
+        closeMatrixModal();
+        
+        // Refresh list secara automatik
+        if(typeof loadPricingMatrix === 'function') loadPricingMatrix();
+
+    } catch (error) {
+        console.error("Firebase Error:", error); // Lihat punca ralat di console log
+        showToast("Ralat: " + error.message, "error");
+    } finally {
+        btn.innerHTML = originalHTML;
+        lucide.createIcons();
+    }
+}
         async function deleteMatrix(id) { if(confirm("Padam matriks harga ini?")) { try { await db.collection('settings').doc('pricing_matrix').collection('items').doc(id).delete(); showToast("Matriks dipadam."); closeBrandDetails(); } catch (error) { showToast("Gagal memadam matriks.", "error"); } } }
     </script>
 </body>
